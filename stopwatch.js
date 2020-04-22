@@ -150,20 +150,22 @@ function show() {
 	update();
 }
 
-function onStart() {
-  start();
-	document.getElementById("start").style.visibility = 'hidden'; // hide start button
-  document.getElementById("stop").style.visibility = 'visible'; // show stop button
-  document.getElementById("capture").style.visibility = 'visible'; // show capture button
-}
-
-function onStop() {
+function onStart() {  
+start();
+document.getElementById("capture").style.visibility = 'visible'; // show capture button
+ var button = document.getElementById("start");
+  label = "Stop & Capture";
+  document.getElementById("start").innerHTML = label;
+  
+  button.addEventListener('click', function() {
   stop();
-	document.getElementById("stop").style.visibility = 'hidden'; // hide stop button
-	document.getElementById("capture").style.visibility = 'hidden'; // hide capture button
-  document.getElementById("start").style.visibility = 'visible'; // show start button
-}
+  label = "Start";
+  document.getElementById("start").innerHTML = label; 
+  document.getElementById("capture").style.visibility = 'hidden'; // hide capture button
 
+  },false);};
+  
+  
 function onCapture() {
   capture();
   if ($lap4.innerHTML === '') {
@@ -197,6 +199,7 @@ function capture() {
 }
 
 function reset() {
+	//stop();
 	x.reset();
 	$time.innerHTML = '';
 	$lap.innerHTML = '';
