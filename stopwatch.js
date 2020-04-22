@@ -154,11 +154,13 @@ function onStart() {
   start();
 	document.getElementById("start").style.visibility = 'hidden'; // hide start button
   document.getElementById("stop").style.visibility = 'visible'; // show stop button
+  document.getElementById("capture").style.visibility = 'visible'; // show capture button
 }
 
 function onStop() {
   stop();
 	document.getElementById("stop").style.visibility = 'hidden'; // hide stop button
+	document.getElementById("capture").style.visibility = 'hidden'; // hide capture button
   document.getElementById("start").style.visibility = 'visible'; // show start button
 }
 
