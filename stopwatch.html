@@ -6,10 +6,17 @@
 </head>
 <body onload="show();">
 	<div>Time: <span id="time"></span></div>
-	<input type="button" value="start" onclick="start();">
-	<input type="button" value="pause" onclick="pause();">
-	<input type="button" value="stop" onclick="stop();">
+
+	<button onclick="onStart()" id="start">start</button>
+  <button onclick="onStop()" id="stop" style="visibility:hidden">stop & capture</button>
+	<input type="button" value="capture" onclick="capture()">
 	<input type="button" value="reset" onclick="reset()">
+	<div> <span id="lap"></span></div>
+	<div> <span id="lap2"></span></div>
+	<div> <span id="lap3"></span></div>
+	<div> <span id="lap4"></span></div>
+	<div> <span id="lap5"></span></div>
+  
 <script src=".\stopwatch.js"> </script>
 </body>
 </html>
