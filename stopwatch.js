@@ -164,6 +164,13 @@ function onStop() {
   document.getElementById("start").style.visibility = 'visible'; // show start button
 }
 
+function onCapture() {
+  capture();
+  if ($lap4.innerHTML === '') {
+  document.getElementById("capture").style.visibility = 'visible'; // show capture button until last lap
+  }
+}
+
 function update() {
 	$time.innerHTML = formatTime(x.time());
 	$lap.innerHTML = "Lap: " + formatTime(x.lap());
@@ -190,7 +197,6 @@ function capture() {
 }
 
 function reset() {
-	//stop();
 	x.reset();
 	$time.innerHTML = '';
 	$lap.innerHTML = '';
