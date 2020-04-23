@@ -151,21 +151,32 @@ function show() {
 }
 
 function onStart() {  
-start();
-document.getElementById("capture").style.visibility = 'visible'; // show capture button
- var button = document.getElementById("start");
+  start();
+  document.getElementById("capture").style.visibility = 'visible'; // show capture button
+  
+  var button = document.getElementById("start");
   label = "Stop & Capture";
   document.getElementById("start").innerHTML = label;
   
   button.addEventListener('click', function() {
-  stop();
+  onStop();
   label = "Start";
   document.getElementById("start").innerHTML = label; 
-  document.getElementById("capture").style.visibility = 'hidden'; // hide capture button
+  },false);
+}
 
-  },false);};
+function onStop() {  
+  stop();
+  document.getElementById("capture").style.visibility = 'hidden'; // hide capture button
+    
+  var button = document.getElementById("start");
   
-  
+  button.addEventListener('click', function() {
+  document.getElementById("capture").style.visibility = 'visible'; // hide capture button
+  onStart();
+  },false);
+}
+
 function onCapture() {
   capture();
   if ($lap4.innerHTML === '') {
@@ -190,7 +201,7 @@ function start() {
 function stop() {
 	x.stop();
 	clearInterval(clocktimer);
-	update();
+	//update();
 }
 
 function capture() {
@@ -199,7 +210,6 @@ function capture() {
 }
 
 function reset() {
-	//stop();
 	x.reset();
 	$time.innerHTML = '';
 	$lap.innerHTML = '';
