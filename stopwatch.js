@@ -1,8 +1,7 @@
 
-class stopwatch {
-	constructor() {
+var	stopwatch = function() {
 		// Private vars
-		var startAt = 0; // Time of last start / resume (0 if timer is not already running)
+		var startAt = 0; // Time of last start / resume (0 if timer has not already run)
 		var elapsedTime = 0;
 		var lapTime = 0; // Time saved 
 		var lapTime2 = 0; // Time saved
@@ -99,15 +98,16 @@ class stopwatch {
 		};
 
 		// Create array to store lap variables
-		this.createLapVariables = function () {
+		/*this.createLapVariables = function () {
 			var lap = [];
 			for (var i = 0; i <= 100; ++i) {
 				lap[i] = startAt ? elapsedTime + now() - startAt : elapsedTime;
 			}
 			return lap;
 		};
-	}
-}
+		*/
+
+};
 
 var x = new stopwatch();
 var $time;
@@ -150,9 +150,9 @@ function onStart() {
   document.getElementById("capture").style.visibility = 'visible'; // show capture button
   document.getElementById("start").innerHTML = "Stop & Capture";
   
-  button.addEventListener("click", function _listener1() {
+  button.addEventListener("click", function() {
 	  onStop();
-	  button.removeEventListener("click", _listener1, false); // remove the EventListener
+	  button.removeEventListener("click", arguments.callee, false); // remove EventListener
   	},false);
 }
 
@@ -161,9 +161,9 @@ function onStop() {
   document.getElementById("capture").style.visibility = 'hidden'; // hide capture button 
   document.getElementById("start").innerHTML = "Start";
 
-  button.addEventListener("click", function _listener2() {
+  button.addEventListener("click", function() {
 	  onStart();
-	  button.removeEventListener("click", _listener2, false); // remove the EventListener
+	  button.removeEventListener("click", arguments.callee, false); // remove EventListener
   },false);
 }
 
@@ -191,7 +191,7 @@ function start() {
 function stop() {
 	x.stop();
 	clearInterval(clocktimer);
-	//update();
+	update();
 }
 
 function capture() {
