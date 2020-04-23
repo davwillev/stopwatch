@@ -111,7 +111,11 @@ var	stopwatch = function() {
 
 var x = new stopwatch();
 var $time;
-var $lap;
+var $lap = '';
+var $lap2 = '';
+var $lap3 = '';
+var $lap4 = '';
+var $lap5 = '';
 var clocktimer;
 var button = document.getElementById("start");
 
@@ -152,7 +156,7 @@ function onStart() {
   
   button.addEventListener("click", function() {
 	  onStop();
-	  button.removeEventListener("click", arguments.callee, false); // remove EventListener
+	  button.removeEventListener("click", arguments.callee, false); // remove this EventListener
   	},false);
 }
 
@@ -163,15 +167,16 @@ function onStop() {
 
   button.addEventListener("click", function() {
 	  onStart();
-	  button.removeEventListener("click", arguments.callee, false); // remove EventListener
+	  button.removeEventListener("click", arguments.callee, false); // remove this EventListener
   },false);
 }
 
 function onCapture() {
-  capture();
-  if ($lap4.innerHTML === '') {
-  document.getElementById("capture").style.visibility = 'visible'; // show capture button until last lap
-  }
+	capture();
+  	//if ($lap4 == '') {
+	//  document.getElementById("capture").style.visibility = 'visible'; // show capture button until last lap
+	//  }
+	//else document.getElementById("capture").style.visibility = 'hidden';
 }
 
 function update() {
