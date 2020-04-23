@@ -1,124 +1,119 @@
-//	To start the stopwatch:
-//		obj.start();
-//
-//	To get the duration in milliseconds without pausing / resuming:
-//		var	x = obj.time();
-//
-//	To pause the stopwatch:
-//		var	x = obj.stop();	// Result is duration in milliseconds
-//
-//	To resume a paused stopwatch
-//		var	x = obj.start();	// Result is duration in milliseconds
-//
-//	To reset a paused stopwatch
-//		obj.stop();
-//
-var	stopwatch = function() {
+
+class stopwatch {
+	constructor() {
 		// Private vars
-		var	startAt	= 0;	// Time of last start / resume (0 if not already running)
-		var	elapsedTime	= 0;
+		var startAt = 0; // Time of last start / resume (0 if timer is not already running)
+		var elapsedTime = 0;
 		var lapTime = 0; // Time saved 
 		var lapTime2 = 0; // Time saved
 		var lapTime3 = 0; // Time saved
 		var lapTime4 = 0; // Time saved
 		var lapTime5 = 0; // Time saved
 
-		var	now	= function() {
-				return (new Date()).getTime(); // captures current time
-			}; 
- 
+		var now = function () {
+			return (new Date()).getTime(); // captures current time
+		};
+
 		/* Public methods */
-		
 		// Start or resume
-		this.start = function() {
-				  startAt	= startAt ? startAt : now();
-			};
-		
+		this.start = function () {
+			startAt = startAt ? startAt : now();
+		};
+
 		// Duration
-		this.time = function() {
-				return elapsedTime + (startAt ? now() - startAt : 0);
-			};
+		this.time = function () {
+			return elapsedTime + (startAt ? now() - startAt : 0);
+		};
 
 		// Stop timer and capture time
-		this.stop = function() {
-				elapsedTime	= startAt ? elapsedTime + now() - startAt : elapsedTime;
-				// Capture time for laps
-				if (!lapTime5 && lapTime4 !== 0 && lapTime3 !== 0 && lapTime2 !== 0 && lapTime !== 0) {
-				  lapTime5 = elapsedTime; // fifth lap
-				}
-				if (!lapTime4 && lapTime3 !== 0 && lapTime2 !== 0 && lapTime !== 0) {
-				  lapTime4 = elapsedTime; // fourth lap
-				}
-				if (!lapTime3 && lapTime2 !== 0 && lapTime !== 0) {
-				  lapTime3 = elapsedTime; // third lap
-				}
-				if (!lapTime2 && lapTime !== 0) {
-				  lapTime2 = elapsedTime; // second lap
-				}
-				if (!lapTime) {
-				  lapTime = elapsedTime; // first lap
-				}
-				startAt	= 0; // Resets startAt so that timer does not continue
-			};
-			
-			// Capture time
-		this.capture = function() {
-		  capturedTime	= startAt ? elapsedTime + now() - startAt : elapsedTime;
-				// Capture time for laps without stopping timer
-				if (!lapTime5 && lapTime4 !== 0 && lapTime3 !== 0 && lapTime2 !== 0 && lapTime !== 0) {
-				  lapTime5 = capturedTime; // fifth lap
-				}
-				if (!lapTime4 && lapTime3 !== 0 && lapTime2 !== 0 && lapTime !== 0) {
-				  lapTime4 = capturedTime; // fourth lap
-				}
-				if (!lapTime3 && lapTime2 !== 0 && lapTime !== 0) {
-				  lapTime3 = capturedTime; // third lap
-				}
-				if (!lapTime2 && lapTime !== 0) {
-				  lapTime2 = capturedTime; // second lap
-				}
-				if (!lapTime) {
-				  lapTime = capturedTime; // first lap
-				}
-			};
-			
+		this.stop = function () {
+			elapsedTime = startAt ? elapsedTime + now() - startAt : elapsedTime;
+			// Capture time for laps
+			if (!lapTime5 && lapTime4 !== 0 && lapTime3 !== 0 && lapTime2 !== 0 && lapTime !== 0) {
+				lapTime5 = elapsedTime; // fifth lap
+			}
+			if (!lapTime4 && lapTime3 !== 0 && lapTime2 !== 0 && lapTime !== 0) {
+				lapTime4 = elapsedTime; // fourth lap
+			}
+			if (!lapTime3 && lapTime2 !== 0 && lapTime !== 0) {
+				lapTime3 = elapsedTime; // third lap
+			}
+			if (!lapTime2 && lapTime !== 0) {
+				lapTime2 = elapsedTime; // second lap
+			}
+			if (!lapTime) {
+				lapTime = elapsedTime; // first lap
+			}
+			startAt = 0; // Resets startAt so that timer does not continue
+		};
+
+		// Capture time without stopping timer
+		this.capture = function () {
+			capturedTime = startAt ? elapsedTime + now() - startAt : elapsedTime;
+			// Capture time for laps without stopping timer
+			if (!lapTime5 && lapTime4 !== 0 && lapTime3 !== 0 && lapTime2 !== 0 && lapTime !== 0) {
+				lapTime5 = capturedTime; // fifth lap
+			}
+			if (!lapTime4 && lapTime3 !== 0 && lapTime2 !== 0 && lapTime !== 0) {
+				lapTime4 = capturedTime; // fourth lap
+			}
+			if (!lapTime3 && lapTime2 !== 0 && lapTime !== 0) {
+				lapTime3 = capturedTime; // third lap
+			}
+			if (!lapTime2 && lapTime !== 0) {
+				lapTime2 = capturedTime; // second lap
+			}
+			if (!lapTime) {
+				lapTime = capturedTime; // first lap
+			}
+		};
+
 		// Reset all variables
-		this.reset = function() {
-				elapsedTime = capturedTime = lapTime = lapTime2 = lapTime3 = lapTime4 = lapTime5 = startAt = 0;
-			};
+		this.reset = function () {
+			elapsedTime = capturedTime = lapTime = lapTime2 = lapTime3 = lapTime4 = lapTime5 = startAt = 0;
+		};
 
 		// Capture first lap time
-		this.lap = function() {
-				return lapTime;
-			};
-			
+		this.lap = function () {
+			return lapTime;
+		};
+
 		// Capture second lap time
-		this.lap2 = function() {
-				return lapTime2;
-			};
-			
+		this.lap2 = function () {
+			return lapTime2;
+		};
+
 		// Capture third lap time
-		this.lap3 = function() {
-				return lapTime3;
-			};
-						
+		this.lap3 = function () {
+			return lapTime3;
+		};
+
 		// Capture fourth lap time
-		this.lap4 = function() {
-				return lapTime4;
-			};
-						
+		this.lap4 = function () {
+			return lapTime4;
+		};
+
 		// Capture fifth lap time
-		this.lap5 = function() {
-				return lapTime5;
-			};
-			
-	};
+		this.lap5 = function () {
+			return lapTime5;
+		};
+
+		// Create array to store lap variables
+		this.createLapVariables = function () {
+			var lap = [];
+			for (var i = 0; i <= 100; ++i) {
+				lap[i] = startAt ? elapsedTime + now() - startAt : elapsedTime;
+			}
+			return lap;
+		};
+	}
+}
 
 var x = new stopwatch();
 var $time;
 var $lap;
 var clocktimer;
-var showLap = 0;
+var button = document.getElementById("start");
 
 function pad(num, size) {
 	var s = "0000" + num;
@@ -153,27 +148,22 @@ function show() {
 function onStart() {  
   start();
   document.getElementById("capture").style.visibility = 'visible'; // show capture button
+  document.getElementById("start").innerHTML = "Stop & Capture";
   
-  var button = document.getElementById("start");
-  label = "Stop & Capture";
-  document.getElementById("start").innerHTML = label;
-  
-  button.addEventListener('click', function() {
-  onStop();
-  label = "Start";
-  document.getElementById("start").innerHTML = label; 
-  },false);
+  button.addEventListener("click", function _listener1() {
+	  onStop();
+	  button.removeEventListener("click", _listener1, false); // remove the EventListener
+  	},false);
 }
 
 function onStop() {  
   stop();
-  document.getElementById("capture").style.visibility = 'hidden'; // hide capture button
-    
-  var button = document.getElementById("start");
-  
-  button.addEventListener('click', function() {
-  document.getElementById("capture").style.visibility = 'visible'; // hide capture button
-  onStart();
+  document.getElementById("capture").style.visibility = 'hidden'; // hide capture button 
+  document.getElementById("start").innerHTML = "Start";
+
+  button.addEventListener("click", function _listener2() {
+	  onStart();
+	  button.removeEventListener("click", _listener2, false); // remove the EventListener
   },false);
 }
 
