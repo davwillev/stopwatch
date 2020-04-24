@@ -24,32 +24,15 @@ var	stopwatch = function() {
 			return elapsedTime + (startAt ? now() - startAt : 0);
 		};
 
-		// Stop timer and capture time
+		// Stop timer
 		this.stop = function () {
 			elapsedTime = startAt ? elapsedTime + now() - startAt : elapsedTime;
-			// Capture time for laps
-			if (!lapTime5 && lapTime4 !== 0 && lapTime3 !== 0 && lapTime2 !== 0 && lapTime !== 0) {
-				lapTime5 = elapsedTime; // fifth lap
-			}
-			if (!lapTime4 && lapTime3 !== 0 && lapTime2 !== 0 && lapTime !== 0) {
-				lapTime4 = elapsedTime; // fourth lap
-			}
-			if (!lapTime3 && lapTime2 !== 0 && lapTime !== 0) {
-				lapTime3 = elapsedTime; // third lap
-			}
-			if (!lapTime2 && lapTime !== 0) {
-				lapTime2 = elapsedTime; // second lap
-			}
-			if (!lapTime) {
-				lapTime = elapsedTime; // first lap
-			}
 			startAt = 0; // Resets startAt so that timer does not continue
 		};
 
-		// Capture time without stopping timer
+		// Capture time
 		this.capture = function () {
 			capturedTime = startAt ? elapsedTime + now() - startAt : elapsedTime;
-			// Capture time for laps without stopping timer
 			if (!lapTime5 && lapTime4 !== 0 && lapTime3 !== 0 && lapTime2 !== 0 && lapTime !== 0) {
 				lapTime5 = capturedTime; // fifth lap
 			}
@@ -155,9 +138,10 @@ function onStart() {
   document.getElementById("start").innerHTML = "Stop & Capture";
   
   button.addEventListener("click", function() {
+	  onCapture();
 	  onStop();
 	  button.removeEventListener("click", arguments.callee, false); // remove this EventListener
-  	},false);
+  	}, false);
 }
 
 function onStop() {  
@@ -168,7 +152,7 @@ function onStop() {
   button.addEventListener("click", function() {
 	  onStart();
 	  button.removeEventListener("click", arguments.callee, false); // remove this EventListener
-  },false);
+  }, false);
 }
 
 function onCapture() {
