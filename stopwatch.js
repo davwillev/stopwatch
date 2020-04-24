@@ -1,111 +1,91 @@
-//	To start the stopwatch:
-//		obj.start();
-//
-//	To get the duration in milliseconds without pausing / resuming:
-//		var	x = obj.time();
-//
-//	To pause the stopwatch:
-//		var	x = obj.stop();	// Result is duration in milliseconds
-//
-//	To resume a paused stopwatch
-//		var	x = obj.start();	// Result is duration in milliseconds
-//
-//	To reset a paused stopwatch
-//		obj.stop();
-//
+
 var	stopwatch = function() {
 		// Private vars
 		var	startAt	=  0;	// Time of last start / resume (0 if not already running)
 		var	elapsedTime	= 0;
-		len = 5;			 // arbitrary length for laps
-		var lap = [];
-	
-		
+		var count_laps=0;
+		var max_laps = 10; // maximum number of laps (arbitrary)
+		var lap = new Array(max_laps).fill(0);
 
 		var	now	= function() {
-				return (new Date()).getTime(); // captures current time
+				return (new Date()).getTime(); // captures current time value in milliseconds
 			}; 
  
 		/* Public methods */
 		
 		// Start or resume
 		this.start = function() {
-				  startAt	= startAt ? startAt : now();
-			};
+			startAt = startAt ? startAt : now();
+		};
 		
 		// Duration
 		this.time = function() {
-				return elapsedTime + (startAt ? now() - startAt : 0);
-			};
+			return elapsedTime + (startAt ? now() - startAt : 0);
+		};
 
-		// Stop timer and capture time
+		// Stop timer
 		this.stop = function() {
 			elapsedTime = startAt ? elapsedTime + now() - startAt : elapsedTime;
 			startAt = 0; // Resets startAt so that timer does not continue
-			};
+		};
 			
-			// Capture time
-		
+		// Capture time for multiple laps
 		this.capture = function() {
-				// Capture time for laps without stopping timer
-				//var button = document.getElementById("start");
-				//button.addEventListener('click', AddLap());
-				count_laps=0;	
+			capturedTime = startAt ? elapsedTime + now() - startAt : elapsedTime;
 				
-				capturedTime	= startAt ? elapsedTime + now() - startAt : elapsedTime;
-				
-				while (count_laps<len){
-				if (!lap[count_laps]) {
-				  lap[count_laps]=(capturedTime); // first lap
-				  capturedTime =0;}
-				  count_laps=count_laps+1;
-				 }
-				 return lap;
-			};
+			while (count_laps < max_laps){
+			if (!lap[count_laps]) {
+				lap[count_laps] = capturedTime; // first lap
+				capturedTime = 0;
+			}
+			count_laps++;
+			}
+			return lap;
+		};
 
 			
-				/* AddLap=function(){
-				count_laps=0;			
-				capturedTime	= startAt ? elapsedTime + now() - startAt : elapsedTime;
-				while(!count_laps){
-				if (!lap[count_laps]) {
-				  lap[count_laps] = capturedTime; // first lap
-				  capturedTime =0;}
-				 count_laps=count_laps+1;
-				 }}
-			
-			 */
+			/* AddLap=function(){
+			count_laps=0;			
+			capturedTime	= startAt ? elapsedTime + now() - startAt : elapsedTime;
+			while(!count_laps){
+			if (!lap[count_laps]) {
+				lap[count_laps] = capturedTime; // first lap
+			  	capturedTime =0;}
+				count_laps=count_laps+1;
+			}}
+		
+		 */
 
 			
 		// Reset all variables
 		this.reset = function() {
-				elapsedTime = capturedTime = lap[0] = lap[1] = lap[2] = lap[3] = lap[4] = startAt = 0;
-			};
+			elapsedTime = capturedTime = startAt = lap[0] = lap[1] = lap[2] = lap[3] = lap[4] = 0;
+		};
 
-		// Capture  lap time
-		
-	this.lap = function() {
-				return lap[0];
-			};
+		// Capture first lap time
+		this.lap = function() {
+			return lap[0];
+		};
+
 		// Capture second lap time
 		this.lap2 = function() {
-				return lap[1];
-			};
+			return lap[1];
+		};
 			
 		// Capture third lap time
 		this.lap3 = function() {
-				return lap[2];
-			};
+			return lap[2];
+		};
 						
 		// Capture fourth lap time
 		this.lap4 = function() {
-				return lap[3];
-			};
+			return lap[3];
+		};
 						
 		// Capture fifth lap time
 		this.lap5 = function() {
-				return lap[4];
-			};
+			return lap[4];
+		};
 			 
 	};
 
@@ -196,7 +176,7 @@ function start() {
 function stop() {
 	x.stop();
 	clearInterval(clocktimer);
-	//update();
+	update();
 }
 
 function capture() {
