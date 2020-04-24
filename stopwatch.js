@@ -100,7 +100,8 @@ var $lap3 = '';
 var $lap4 = '';
 var $lap5 = '';
 var clocktimer;
-var button = document.getElementById("start");
+var startButton = document.getElementById("start");
+var captureButton = document.getElementById("capture");
 
 function pad(num, size) {
 	var s = "0000" + num;
@@ -132,27 +133,27 @@ function show() {
 	update();
 }
 
-function onStart() {  
-  start();
-  document.getElementById("capture").style.visibility = 'visible'; // show capture button
-  document.getElementById("start").innerHTML = "Stop & Capture";
+function onStart() {
+	start();
+  	captureButton.style.visibility = 'visible'; // show capture button
+  	startButton.innerHTML = "Stop & Capture";
   
-  button.addEventListener("click", function() {
-	  onCapture();
-	  onStop();
-	  button.removeEventListener("click", arguments.callee, false); // remove this EventListener
+	startButton.addEventListener("click", function() {
+	onCapture(); 
+	onStop();
+	startButton.removeEventListener("click", arguments.callee, false); // remove this EventListener
   	}, false);
 }
 
-function onStop() {  
-  stop();
-  document.getElementById("capture").style.visibility = 'hidden'; // hide capture button 
-  document.getElementById("start").innerHTML = "Start";
-
-  button.addEventListener("click", function() {
-	  onStart();
-	  button.removeEventListener("click", arguments.callee, false); // remove this EventListener
-  }, false);
+function onStop() {
+	stop();
+	captureButton.style.visibility = 'hidden'; // hide capture button 
+	startButton.innerHTML = "Start";
+	
+	startButton.addEventListener("click", function() {
+	onStart();
+	startButton.removeEventListener("click", arguments.callee, false); // remove this EventListener
+  	}, false);
 }
 
 function onCapture() {
@@ -173,7 +174,7 @@ function update() {
 }
 
 function start() {
-	clocktimer = setInterval("update()", 1);
+	clocktimer = setInterval("update()", 1); // set timer with 1 ms intervals
 	x.start();
 }
 
@@ -184,8 +185,8 @@ function stop() {
 }
 
 function capture() {
-  x.capture();
-  update();
+  	x.capture();
+  	update();
 }
 
 function reset() {
