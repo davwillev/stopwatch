@@ -1,105 +1,119 @@
-
+//	To start the stopwatch:
+//		obj.start();
+//
+//	To get the duration in milliseconds without pausing / resuming:
+//		var	x = obj.time();
+//
+//	To pause the stopwatch:
+//		var	x = obj.stop();	// Result is duration in milliseconds
+//
+//	To resume a paused stopwatch
+//		var	x = obj.start();	// Result is duration in milliseconds
+//
+//	To reset a paused stopwatch
+//		obj.stop();
+//
 var	stopwatch = function() {
 		// Private vars
-		var startAt = 0; // Time of last start / resume (0 if timer has not already run)
-		var elapsedTime = 0;
-		var lapTime = 0; // Time saved 
-		var lapTime2 = 0; // Time saved
-		var lapTime3 = 0; // Time saved
-		var lapTime4 = 0; // Time saved
-		var lapTime5 = 0; // Time saved
+		var	startAt	=  0;	// Time of last start / resume (0 if not already running)
+		var	elapsedTime	= 0;
+		len = 5;			 // arbitrary length for laps
+		var lap = [];
+	
+		
 
-		var now = function () {
-			return (new Date()).getTime(); // captures current time
-		};
-
+		var	now	= function() {
+				return (new Date()).getTime(); // captures current time
+			}; 
+ 
 		/* Public methods */
+		
 		// Start or resume
-		this.start = function () {
-			startAt = startAt ? startAt : now();
-		};
-
+		this.start = function() {
+				  startAt	= startAt ? startAt : now();
+			};
+		
 		// Duration
-		this.time = function () {
-			return elapsedTime + (startAt ? now() - startAt : 0);
-		};
+		this.time = function() {
+				return elapsedTime + (startAt ? now() - startAt : 0);
+			};
 
-		// Stop timer
-		this.stop = function () {
+		// Stop timer and capture time
+		this.stop = function() {
 			elapsedTime = startAt ? elapsedTime + now() - startAt : elapsedTime;
 			startAt = 0; // Resets startAt so that timer does not continue
-		};
+			};
+			
+			// Capture time
+		
+		this.capture = function() {
+				// Capture time for laps without stopping timer
+				//var button = document.getElementById("start");
+				//button.addEventListener('click', AddLap());
+				count_laps=0;	
+				
+				capturedTime	= startAt ? elapsedTime + now() - startAt : elapsedTime;
+				
+				while (count_laps<len){
+				if (!lap[count_laps]) {
+				  lap[count_laps]=(capturedTime); // first lap
+				  capturedTime =0;}
+				  count_laps=count_laps+1;
+				 }
+				 return lap;
+			};
 
-		// Capture time
-		this.capture = function () {
-			capturedTime = startAt ? elapsedTime + now() - startAt : elapsedTime;
-			if (!lapTime5 && lapTime4 !== 0 && lapTime3 !== 0 && lapTime2 !== 0 && lapTime !== 0) {
-				lapTime5 = capturedTime; // fifth lap
-			}
-			if (!lapTime4 && lapTime3 !== 0 && lapTime2 !== 0 && lapTime !== 0) {
-				lapTime4 = capturedTime; // fourth lap
-			}
-			if (!lapTime3 && lapTime2 !== 0 && lapTime !== 0) {
-				lapTime3 = capturedTime; // third lap
-			}
-			if (!lapTime2 && lapTime !== 0) {
-				lapTime2 = capturedTime; // second lap
-			}
-			if (!lapTime) {
-				lapTime = capturedTime; // first lap
-			}
-		};
+			
+				/* AddLap=function(){
+				count_laps=0;			
+				capturedTime	= startAt ? elapsedTime + now() - startAt : elapsedTime;
+				while(!count_laps){
+				if (!lap[count_laps]) {
+				  lap[count_laps] = capturedTime; // first lap
+				  capturedTime =0;}
+				 count_laps=count_laps+1;
+				 }}
+			
+			 */
 
+			
 		// Reset all variables
-		this.reset = function () {
-			elapsedTime = capturedTime = lapTime = lapTime2 = lapTime3 = lapTime4 = lapTime5 = startAt = 0;
-		};
+		this.reset = function() {
+				elapsedTime = capturedTime = lap[0] = lap[1] = lap[2] = lap[3] = lap[4] = startAt = 0;
+			};
 
-		// Capture first lap time
-		this.lap = function () {
-			return lapTime;
-		};
-
+		// Capture  lap time
+		
+	this.lap = function() {
+				return lap[0];
+			};
 		// Capture second lap time
-		this.lap2 = function () {
-			return lapTime2;
-		};
-
+		this.lap2 = function() {
+				return lap[1];
+			};
+			
 		// Capture third lap time
-		this.lap3 = function () {
-			return lapTime3;
-		};
-
+		this.lap3 = function() {
+				return lap[2];
+			};
+						
 		// Capture fourth lap time
-		this.lap4 = function () {
-			return lapTime4;
-		};
-
+		this.lap4 = function() {
+				return lap[3];
+			};
+						
 		// Capture fifth lap time
-		this.lap5 = function () {
-			return lapTime5;
-		};
-
-		// Create array to store lap variables
-		/*this.createLapVariables = function () {
-			var lap = [];
-			for (var i = 0; i <= 100; ++i) {
-				lap[i] = startAt ? elapsedTime + now() - startAt : elapsedTime;
-			}
-			return lap;
-		};
-		*/
-
-};
+		this.lap5 = function() {
+				return lap[4];
+			};
+			 
+	};
 
 var x = new stopwatch();
 var $time;
-var $lap = '';
-var $lap2 = '';
-var $lap3 = '';
-var $lap4 = '';
-var $lap5 = '';
+
 var clocktimer;
+var showLap = 0;
 var startButton = document.getElementById("start");
 var captureButton = document.getElementById("capture");
 
@@ -125,7 +139,8 @@ function formatTime(time) {
 
 function show() {
 	$time = document.getElementById('time');
-	$lap = document.getElementById('lap');
+	$lap = document.getElementById('lap');	
+	
 	$lap2 = document.getElementById('lap2');
 	$lap3 = document.getElementById('lap3');
 	$lap4 = document.getElementById('lap4');
@@ -138,14 +153,15 @@ function onStart() {
   	captureButton.style.visibility = 'visible'; // show capture button
   	startButton.innerHTML = "Stop & Capture";
   
-	startButton.addEventListener("click", function() {
+ 	startButton.addEventListener("click", function() {
 	onCapture(); 
 	onStop();
 	startButton.removeEventListener("click", arguments.callee, false); // remove this EventListener
   	}, false);
 }
 
-function onStop() {
+
+  function onStop() {
 	stop();
 	captureButton.style.visibility = 'hidden'; // hide capture button 
 	startButton.innerHTML = "Start";
@@ -157,11 +173,10 @@ function onStop() {
 }
 
 function onCapture() {
-	capture();
-  	//if ($lap4 == '') {
-	//  document.getElementById("capture").style.visibility = 'visible'; // show capture button until last lap
-	//  }
-	//else document.getElementById("capture").style.visibility = 'hidden';
+  capture();
+  if ($lap4.innerHTML === '') {
+  document.getElementById("capture").style.visibility = 'visible'; // show capture button until last lap
+  }
 }
 
 function update() {
@@ -174,19 +189,19 @@ function update() {
 }
 
 function start() {
-	clocktimer = setInterval("update()", 1); // set timer with 1 ms intervals
+	clocktimer = setInterval("update()", 1);
 	x.start();
 }
 
 function stop() {
 	x.stop();
 	clearInterval(clocktimer);
-	update();
+	//update();
 }
 
 function capture() {
-  	x.capture();
-  	update();
+  x.capture();
+  update();
 }
 
 function reset() {
