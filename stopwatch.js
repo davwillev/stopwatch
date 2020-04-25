@@ -1,5 +1,6 @@
 
 var	stopwatch = function() {
+	
 	// Private vars
 	var startAt = 0; // Time of last start / resume (0 if not already running)
 	var elapsedTime	= 0;
@@ -10,13 +11,6 @@ var	stopwatch = function() {
 	var	now	= function() {
 		return (new Date()).getTime(); // captures current time value in milliseconds
 	};
-
-	var myVariables = {}
-   	,varNames = ["name1","name2","name3"];
-	for (var i=0; i < varNames.length; i +=1) {
-  	myVariables[varNames[i]] = 0;
-	}
-	myVariables.name1; //=> 0
  
 	/* Public methods */
 		
@@ -36,25 +30,29 @@ var	stopwatch = function() {
 		startAt = 0; // resets startAt so that timer does not continue
 	};
 
+	// Boolean to check if startTime is zero
+	this.started = function() {
+		return this.startTime == 0 ? false : true;
+	};
+
 	// Capture time for multiple laps
 	this.capture = function() {
 		capturedTime = startAt ? elapsedTime + now() - startAt : elapsedTime;
 			if (lap[lap_count] == 0) {
 				lap[lap_count] = capturedTime;
 			}
-		lap_count += 1; // increase count by one after each assignment
+		lap_count += 1; // increase lap count by one after each assignment
 		return lap;
 	};
-			
+
 	// Reset all variables
 	this.reset = function() {
-		elapsedTime = capturedTime = startAt = 0;
+		elapsedTime = capturedTime = startAt = lap_count = 0;
 		lap.fill(0);
-		lap_count = 0;
 	};
 
-	// Number of laps counted
-	this.countLaps = function() {
+	// Capture number of laps counted
+	this.lapCount = function() {
 		return lap_count;	
 	}
 
@@ -99,7 +97,7 @@ var $lap4 = '';
 var $lap5 = '';
 var clocktimer;
 var max = x.maxLaps();
-var count = x.countLaps();
+var count = x.lapCount();
 
 function pad(num, size) {
 	var s = "0000" + num;
@@ -188,11 +186,5 @@ function capture() {
 
 function reset() {
 	x.reset();
-	$time.innerHTML = '';
-	$lap1.innerHTML = '';
-	$lap2.innerHTML = '';
-	$lap3.innerHTML = '';
-	$lap4.innerHTML = '';
-	$lap5.innerHTML = '';
 	update();
 }
