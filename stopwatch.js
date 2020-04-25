@@ -4,7 +4,7 @@ var	stopwatch = function() {
 	var startAt = 0; // Time of last start / resume (0 if not already running)
 	var elapsedTime	= 0;
 	var lap_count = 0;
-	var max_laps = 5; // maximum number of laps (arbitrary)
+	var max_laps = 5; // maximum number of laps (to be set by user)
 	var lap = new Array(max_laps).fill(0);
 
 	var	now	= function() {
@@ -33,55 +33,30 @@ var	stopwatch = function() {
 	// Stop timer
 	this.stop = function() {
 		elapsedTime = startAt ? elapsedTime + now() - startAt : elapsedTime;
-		startAt = 0; // Resets startAt so that timer does not continue
+		startAt = 0; // resets startAt so that timer does not continue
 	};
 
 	// Capture time for multiple laps
 	this.capture = function() {
 		capturedTime = startAt ? elapsedTime + now() - startAt : elapsedTime;
-		
-		//while (lap.length <= max_laps) {
-		//for (var i=0; i<lap.length; i++) {
 			if (lap[lap_count] == 0) {
 				lap[lap_count] = capturedTime;
 			}
-		//}
 		lap_count += 1; // increase count by one after each assignment
 		return lap;
 	};
-		
-	
-	// Capture time
-	this.capture1 = function () {
-		capturedTime = startAt ? elapsedTime + now() - startAt : elapsedTime;
-		if (lap[4] == 0 && lap[3] !== 0 && lap[2] !== 0 && lap[1] !== 0 && lap[0] !== 0) {
-			lap[4] = capturedTime; // fifth lap
-		}
-		if (lap[3] == 0 && lap[2] !== 0 && lap[1] !== 0 && lap[0] !== 0) {
-			lap[3] = capturedTime; // fourth lap
-		}
-		if (lap[2] == 0 && lap[1] !== 0 && lap[0] !== 0) {
-			lap[2] = capturedTime; // third lap
-		}
-		if (lap[1] == 0 && lap[0] !== 0) {
-			lap[1] = capturedTime; // second lap
-		}
-		if (lap[0] == 0) {
-			lap[0] = capturedTime; // first lap
-		}
-	};
-
 			
 	// Reset all variables
 	this.reset = function() {
 		elapsedTime = capturedTime = startAt = 0;
 		lap.fill(0);
+		lap_count = 0;
 	};
 
 	// Number of laps counted
-	//this.countLaps = function() {
-	//	return lap_count;	
-	//}
+	this.countLaps = function() {
+		return lap_count;	
+	}
 
 	// Capture lap times
 	this.lap = function() {
