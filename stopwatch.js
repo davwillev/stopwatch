@@ -3,13 +3,20 @@ var	stopwatch = function() {
 	// Private vars
 	var startAt = 0; // Time of last start / resume (0 if not already running)
 	var elapsedTime	= 0;
-	var count_laps = 0;
+	var lap_count = 0;
 	var max_laps = 5; // maximum number of laps (arbitrary)
 	var lap = new Array(max_laps).fill(0);
 
 	var	now	= function() {
 		return (new Date()).getTime(); // captures current time value in milliseconds
-	}; 
+	};
+
+	var myVariables = {}
+   	,varNames = ["name1","name2","name3"];
+	for (var i=0; i < varNames.length; i +=1) {
+  	myVariables[varNames[i]] = 0;
+	}
+	myVariables.name1; //=> 0
  
 	/* Public methods */
 		
@@ -32,68 +39,57 @@ var	stopwatch = function() {
 	// Capture time for multiple laps
 	this.capture = function() {
 		capturedTime = startAt ? elapsedTime + now() - startAt : elapsedTime;
-				
-		while (count_laps < max_laps){
-			//if (!lap[count_laps]) {
-				lap[count_laps] = capturedTime;
-				capturedTime = 0;
-			//}
-		}
-		count_laps++; // increase count by one after each method call
+		
+		//while (lap.length <= max_laps) {
+		//for (var i=0; i<lap.length; i++) {
+			if (lap[lap_count] == 0) {
+				lap[lap_count] = capturedTime;
+			}
+		//}
+		lap_count += 1; // increase count by one after each assignment
 		return lap;
 	};
-
-			
-			/* 
-			
-			
-		// Capture time
-		this.capture = function () {
-			capturedTime = startAt ? elapsedTime + now() - startAt : elapsedTime;
-			if (!lapTime5 && lapTime4 !== 0 && lapTime3 !== 0 && lapTime2 !== 0 && lapTime !== 0) {
-				lapTime5 = capturedTime; // fifth lap
-			}
-			if (!lapTime4 && lapTime3 !== 0 && lapTime2 !== 0 && lapTime !== 0) {
-				lapTime4 = capturedTime; // fourth lap
-			}
-			if (!lapTime3 && lapTime2 !== 0 && lapTime !== 0) {
-				lapTime3 = capturedTime; // third lap
-			}
-			if (!lapTime2 && lapTime !== 0) {
-				lapTime2 = capturedTime; // second lap
-			}
-			if (!lapTime) {
-				lapTime = capturedTime; // first lap
-			}
-		};
-			
-			
-			
-			AddLap=function(){
-			count_laps=0;			
-			capturedTime	= startAt ? elapsedTime + now() - startAt : elapsedTime;
-			while(!count_laps){
-			if (!lap[count_laps]) {
-				lap[count_laps] = capturedTime; // first lap
-			  	capturedTime =0;}
-				count_laps=count_laps+1;
-			}}
 		
-		 */
+	
+	// Capture time
+	this.capture1 = function () {
+		capturedTime = startAt ? elapsedTime + now() - startAt : elapsedTime;
+		if (lap[4] == 0 && lap[3] !== 0 && lap[2] !== 0 && lap[1] !== 0 && lap[0] !== 0) {
+			lap[4] = capturedTime; // fifth lap
+		}
+		if (lap[3] == 0 && lap[2] !== 0 && lap[1] !== 0 && lap[0] !== 0) {
+			lap[3] = capturedTime; // fourth lap
+		}
+		if (lap[2] == 0 && lap[1] !== 0 && lap[0] !== 0) {
+			lap[2] = capturedTime; // third lap
+		}
+		if (lap[1] == 0 && lap[0] !== 0) {
+			lap[1] = capturedTime; // second lap
+		}
+		if (lap[0] == 0) {
+			lap[0] = capturedTime; // first lap
+		}
+	};
 
 			
 	// Reset all variables
 	this.reset = function() {
-		elapsedTime = capturedTime = startAt = lap[0] = lap[1] = lap[2] = lap[3] = lap[4] = 0;
+		elapsedTime = capturedTime = startAt = 0;
+		lap.fill(0);
 	};
 
 	// Number of laps counted
-	this.countLaps = function() {
-		return count_laps;	
-	}
+	//this.countLaps = function() {
+	//	return lap_count;	
+	//}
+
+	// Capture lap times
+	this.lap = function() {
+		return lap[lap_count];
+	};
 
 	// Capture first lap time
-	this.lap = function() {
+	this.lap1 = function() {
 		return lap[0];
 	};
 
@@ -121,11 +117,14 @@ var	stopwatch = function() {
 
 var x = new stopwatch();
 var $time;
+var $lap1 = '';
+var $lap2 = '';
+var $lap3 = '';
+var $lap4 = '';
+var $lap5 = '';
 var clocktimer;
 var max = x.maxLaps();
 var count = x.countLaps();
-var startButton = document.getElementById("start");
-var captureButton = document.getElementById("capture");
 
 function pad(num, size) {
 	var s = "0000" + num;
@@ -149,7 +148,7 @@ function formatTime(time) {
 
 function show() {
 	$time = document.getElementById('time');
-	$lap = document.getElementById('lap');
+	$lap1 = document.getElementById('lap1');
 	$lap2 = document.getElementById('lap2');
 	$lap3 = document.getElementById('lap3');
 	$lap4 = document.getElementById('lap4');
@@ -159,37 +158,37 @@ function show() {
 
 function onStart() {
 	start();
-  	captureButton.style.visibility = 'visible'; // show capture button
-  	startButton.innerHTML = "Stop & Capture";
+	document.getElementById("capture").style.visibility = 'visible'; // show capture button
+  	document.getElementById("start").innerHTML = "Stop & Capture";
   
- 	startButton.addEventListener("click", function() {
+	document.getElementById("start").addEventListener("click", function() {
 	onCapture(); 
 	onStop();
-	startButton.removeEventListener("click", arguments.callee, false); // remove this EventListener
+	document.getElementById("start").removeEventListener("click", arguments.callee, false); // remove this EventListener
   	}, false);
 }
 
   function onStop() {
 	stop();
-	captureButton.style.visibility = 'hidden'; // hide capture button 
-	startButton.innerHTML = "Start";
+	document.getElementById("capture").style.visibility = 'hidden'; // hide capture button 
+	document.getElementById("start").innerHTML = "Start";
 	
-	startButton.addEventListener("click", function() {
+	document.getElementById("start").addEventListener("click", function() {
 	onStart();
-	startButton.removeEventListener("click", arguments.callee, false); // remove this EventListener
+	document.getElementById("start").removeEventListener("click", arguments.callee, false); // remove this EventListener
   	}, false);
 }
 
 function onCapture() {
   capture();
   //if (count === (max - 1)) {
-	//captureButton.style.visibility = 'hidden'; // show capture button until last lap
+	//document.getElementById("capture").style.visibility = 'hidden'; // show capture button until last lap
   //}
 }
 
 function update() {
 	$time.innerHTML = formatTime(x.time());
-	$lap.innerHTML = "Lap: " + formatTime(x.lap());
+	$lap1.innerHTML = "Lap 1: " + formatTime(x.lap1());
 	$lap2.innerHTML = "Lap 2: " + formatTime(x.lap2());
 	$lap3.innerHTML = "Lap 3: " + formatTime(x.lap3());
 	$lap4.innerHTML = "Lap 4: " + formatTime(x.lap4());
@@ -197,7 +196,7 @@ function update() {
 }
 
 function start() {
-	clocktimer = setInterval("update()", 1);
+	clocktimer = setInterval("update()", 1); // set timer with 1 ms intervals
 	x.start();
 }
 
@@ -208,14 +207,14 @@ function stop() {
 }
 
 function capture() {
-  x.capture();
-  update();
+	x.capture();
+	update();
 }
 
 function reset() {
 	x.reset();
 	$time.innerHTML = '';
-	$lap.innerHTML = '';
+	$lap1.innerHTML = '';
 	$lap2.innerHTML = '';
 	$lap3.innerHTML = '';
 	$lap4.innerHTML = '';
