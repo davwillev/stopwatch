@@ -128,6 +128,7 @@ var $lap10 = '';
 var clocktimer;
 var max = x.maxLaps();
 var count = x.lapCount();
+var lapId = 0; // used by the addLap() function to keep track of IDs
 
 function pad(num, size) {
 	var s = "0000" + num;
@@ -164,36 +165,6 @@ function show() {
 	update();
 }
 
-function onStart() {
-	start();
-	document.getElementById("capture").style.visibility = 'visible'; // show capture button
-  	document.getElementById("start").innerHTML = "Stop & Capture";
-  
-	document.getElementById("start").addEventListener("click", function() {
-	onCapture(); 
-	onStop();
-	document.getElementById("start").removeEventListener("click", arguments.callee, false); // remove this EventListener
-  	}, false);
-}
-
-  function onStop() {
-	stop();
-	document.getElementById("capture").style.visibility = 'hidden'; // hide capture button 
-	document.getElementById("start").innerHTML = "Start";
-	
-	document.getElementById("start").addEventListener("click", function() {
-	onStart();
-	document.getElementById("start").removeEventListener("click", arguments.callee, false); // remove this EventListener
-  	}, false);
-}
-
-function onCapture() {
-  capture();
-  //if (count === (max - 1)) {
-	//document.getElementById("capture").style.visibility = 'hidden'; // show capture button until last lap
-  //}
-}
-
 function update() {
 	$time.innerHTML = formatTime(x.time());
 	$lap1.innerHTML = "Lap 1: " + formatTime(x.lap1());
@@ -206,6 +177,45 @@ function update() {
 	$lap8.innerHTML = "Lap 8: " + formatTime(x.lap8());
 	$lap9.innerHTML = "Lap 9: " + formatTime(x.lap9());
 	$lap10.innerHTML = "Lap 10: " + formatTime(x.lap10());
+}
+
+//function addLap() {
+//	lapId++; // increment lapId to get a unique ID for each new element
+//	var html = '<a href="" onclick="javascript:removeElement('Lap ' + lapId + ''); return false;">Remove</a>';
+//	addElement('Lap', 'p', 'Lap' + lapId, innerHtml);
+//}
+
+function addElement(parentId, elementTag, elementId, innerHtml) {
+	// Adds an element to the document
+	var p = document.getElementById(parentId);
+	var newElement = document.createElement(elementTag);
+	newElement.setAttribute('id', elementId);
+	newElement.innerHTML = innerHtml;
+	p.appendChild(newElement);
+}
+
+function removeElement(elementId) {
+	// Removes an element from the document
+	var element = document.getElementById(elementId);
+	element.parentNode.removeChild(element);
+}
+
+function onStart() {
+	document.getElementById("start").removeEventListener("click", listener2, false);
+	start();
+	document.getElementById("capture").style.visibility = 'visible'; // show capture button
+  	document.getElementById("start").innerHTML = "Stop & Capture";
+  
+	document.getElementById("start").addEventListener("click", listener1, false);
+}
+
+function listener1() {
+	onCapture();
+	onStop();
+}
+
+function listener2() {
+	onStart();
 }
 
 function start() {
@@ -221,7 +231,24 @@ function stop() {
 
 function capture() {
 	x.capture();
+	//addLap();
 	update();
+}
+
+ function onStop() {
+	document.getElementById("start").removeEventListener("click", listener1, false);
+	stop();
+	document.getElementById("capture").style.visibility = 'hidden'; // hide capture button 
+	document.getElementById("start").innerHTML = "Start";
+	
+	document.getElementById("start").addEventListener("click", listener2, false);
+}
+
+function onCapture() {
+  capture();
+  //if (count === (max - 1)) {
+	//document.getElementById("capture").style.visibility = 'hidden'; // show capture button until last lap
+  //}
 }
 
 function reset() {
