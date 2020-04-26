@@ -201,21 +201,20 @@ function removeElement(elementId) {
 }
 
 function onStart() {
-	document.getElementById("start").removeEventListener("click", listener2, false);
+	document.getElementById("start").removeEventListener("click", onStart, false); // remove listener
 	start();
 	document.getElementById("capture").style.visibility = 'visible'; // show capture button
   	document.getElementById("start").innerHTML = "Stop & Capture";
-  
-	document.getElementById("start").addEventListener("click", listener1, false);
+	document.getElementById("start").addEventListener("click", onStop, false); // add listener
 }
 
-function listener1() {
+function onStop() {
+	document.getElementById("start").removeEventListener("click", onStop, false); // remove listener
 	onCapture();
-	onStop();
-}
-
-function listener2() {
-	onStart();
+	stop();
+	document.getElementById("capture").style.visibility = 'hidden'; // hide capture button 
+	document.getElementById("start").innerHTML = "Start";
+	document.getElementById("start").addEventListener("click", onStart, false);  // add listener
 }
 
 function start() {
@@ -235,21 +234,12 @@ function capture() {
 	update();
 }
 
- function onStop() {
-	document.getElementById("start").removeEventListener("click", listener1, false);
-	stop();
-	document.getElementById("capture").style.visibility = 'hidden'; // hide capture button 
-	document.getElementById("start").innerHTML = "Start";
-	
-	document.getElementById("start").addEventListener("click", listener2, false);
-}
-
 function onCapture() {
-  capture();
-  //if (count === (max - 1)) {
-	//document.getElementById("capture").style.visibility = 'hidden'; // show capture button until last lap
-  //}
-}
+	capture();
+	//if (count === (max - 1)) {
+	  //document.getElementById("capture").style.visibility = 'hidden'; // show capture button until last lap
+	//}
+  }
 
 function reset() {
 	x.reset();
