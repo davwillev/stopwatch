@@ -5,7 +5,7 @@ var	stopwatch = function() {
 	var startAt = 0; // Time of last start / resume (0 if not already running)
 	var elapsedTime	= 0;
 	var lap_count = 0;
-	var max_laps = 5; // maximum number of laps (to be set by user)
+	var max_laps = 10; // maximum number of laps (to be set by user)
 	var lap = new Array(max_laps).fill(0);
 
 	var	now	= function() {
@@ -85,6 +85,31 @@ var	stopwatch = function() {
 	this.lap5 = function() {
 		return lap[4];
 	};
+
+	// Capture sixth lap time
+	this.lap6 = function() {
+		return lap[5];
+	};
+
+	// Capture seventh lap time
+	this.lap7 = function() {
+		return lap[6];
+	};
+
+	// Capture eigth lap time
+	this.lap8 = function() {
+		return lap[7];
+	};
+
+	// Capture ninth lap time
+	this.lap9 = function() {
+		return lap[8];
+	};
+
+	// Capture tenth lap time
+	this.lap10 = function() {
+		return lap[9];
+	};
 			 
 };
 
@@ -95,6 +120,11 @@ var $lap2 = '';
 var $lap3 = '';
 var $lap4 = '';
 var $lap5 = '';
+var $lap6 = '';
+var $lap7 = '';
+var $lap8 = '';
+var $lap9 = '';
+var $lap10 = '';
 var clocktimer;
 var max = x.maxLaps();
 var count = x.lapCount();
@@ -126,6 +156,11 @@ function show() {
 	$lap3 = document.getElementById('lap3');
 	$lap4 = document.getElementById('lap4');
 	$lap5 = document.getElementById('lap5');
+	$lap6 = document.getElementById('lap6');
+	$lap7 = document.getElementById('lap7');
+	$lap8 = document.getElementById('lap8');
+	$lap9 = document.getElementById('lap9');
+	$lap10 = document.getElementById('lap10');
 	update();
 }
 
@@ -166,6 +201,11 @@ function update() {
 	$lap3.innerHTML = "Lap 3: " + formatTime(x.lap3());
 	$lap4.innerHTML = "Lap 4: " + formatTime(x.lap4());
 	$lap5.innerHTML = "Lap 5: " + formatTime(x.lap5());
+	$lap6.innerHTML = "Lap 6: " + formatTime(x.lap6());
+	$lap7.innerHTML = "Lap 7: " + formatTime(x.lap7());
+	$lap8.innerHTML = "Lap 8: " + formatTime(x.lap8());
+	$lap9.innerHTML = "Lap 9: " + formatTime(x.lap9());
+	$lap10.innerHTML = "Lap 10: " + formatTime(x.lap10());
 }
 
 function start() {
