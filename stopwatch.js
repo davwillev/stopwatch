@@ -223,10 +223,12 @@ function capture() {
 
 function reset() {
 	onStop();
+	show();
 	x.reset();
 	lap_count = 1;
-	update();
 }
+
+/* Methods for avoiding setting number of laps */
 
 function addLap() {
 	lapId++; // increment lapId to get a unique ID for each new element
