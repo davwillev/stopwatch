@@ -1,2 +1,2 @@
 # Stopwatch
-JavaScript stopwatch
+JavaScript stopwatch that captures duration instances.
