@@ -236,9 +236,8 @@ function onCapture() {
 }
 
 function reset() {
+	onStop();
 	x.reset();
 	lap_count = 1;
-	document.getElementById("start").innerHTML = "Start"; // display start button
-	document.getElementById("capture").style.visibility = 'hidden'; // hide capture button 
 	update();
 }
