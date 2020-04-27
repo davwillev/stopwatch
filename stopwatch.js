@@ -238,6 +238,7 @@ function onCapture() {
 function reset() {
 	x.reset();
 	lap_count = 1;
-	document.getElementById("start").innerHTML = "Start";
+	document.getElementById("start").innerHTML = "Start"; // display start button
+	document.getElementById("capture").style.visibility = 'hidden'; // hide capture button 
 	update();
 }
