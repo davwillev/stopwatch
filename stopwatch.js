@@ -171,22 +171,52 @@ function update() {
 
 function onStart() {
 	document.getElementById("start").removeEventListener("click", onStart, false); // remove listener
+	document.getElementById("capture").removeEventListener("click", onReset, false); // remove listener
+
 	start();
-	if (lap_count <= (max - 1)) {
-		document.getElementById("capture").style.visibility = 'visible'; // show capture button until last lap
-	}
+	//if (lap_count <= (max - 1)) {
+	//	document.getElementById("capture").style.visibility = 'visible'; // show capture button until last lap
+	//}
+
+	document.getElementById("capture").innerHTML = "Capture";
+	document.getElementById("capture").addEventListener("click", onCapture, false); // add listener
+
   	document.getElementById("start").innerHTML = "Stop & Capture";
 	document.getElementById("start").addEventListener("click", onStop, false); // add listener
 }
 
 function onStop() {
 	document.getElementById("start").removeEventListener("click", onStop, false); // remove listener
+	document.getElementById("capture").removeEventListener("click", onCapture, false); // remove listener
 	onCapture();
+
 	stop();
-	document.getElementById("capture").style.visibility = 'hidden'; // hide capture button 
+	//document.getElementById("capture").style.visibility = 'hidden'; // hide capture button
+
+	document.getElementById("capture").innerHTML = "Reset";
+	document.getElementById("capture").addEventListener("click", onReset, false); // add listener
+
 	document.getElementById("start").innerHTML = "Start";
 	document.getElementById("start").addEventListener("click", onStart, false); // add listener
 }
+
+function onCapture() {
+	document.getElementById("capture").removeEventListener("click", onCapture, false); // remove listener
+	capture();
+	if (lap_count <= (max - 1)) {
+		document.getElementById("capture").style.visibility = 'visible'; // show capture button until last lap
+	}
+  	//document.getElementById("capture").innerHTML = "Reset";
+	//document.getElementById("capture").addEventListener("click", onReset, false); // add listener
+}
+
+function onReset() {
+	document.getElementById("capture").removeEventListener("click", onReset, false); // remove listener
+	reset();
+	document.getElementById("capture").innerHTML = "Capture";
+	document.getElementById("capture").addEventListener("click", onCapture, false); // add listener
+}
+
 
 function start() {
 	clocktimer = setInterval("update()", 1); // set timer with 1 ms intervals
@@ -205,14 +235,14 @@ function capture() {
 	update();
 }
 
-function onCapture() {
-	capture();
+//function onCapture() {
+	//capture();
 	//addLap();
-	if (lap_count <= (max - 1)) {
-		document.getElementById("capture").style.visibility = 'visible'; // show capture button until last lap
-	}
-	else document.getElementById("capture").style.visibility = 'hidden'; // hide capture button during last lap
-}
+	//if (lap_count <= (max - 1)) {
+	//	document.getElementById("capture").style.visibility = 'visible'; // show capture button until last lap
+	//}
+	//else document.getElementById("capture").style.visibility = 'hidden'; // hide capture button during last lap
+//}
 
 function reset() {
 	onStop();
