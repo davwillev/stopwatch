@@ -152,35 +152,31 @@ function show() {
 	$lap8 = document.getElementById('lap8');
 	$lap9 = document.getElementById('lap9');
 	$lap10 = document.getElementById('lap10');
+	document.getElementById("capture").setAttribute("disabled","disabled"); // disable capture button until start
 	update();
 }
 
 function update() {
 	$time.innerHTML = formatTime(x.time());
-	$lap1.innerHTML = "Lap 1: " + formatTime(x.lap1());
-	$lap2.innerHTML = "Lap 2: " + formatTime(x.lap2());
-	$lap3.innerHTML = "Lap 3: " + formatTime(x.lap3());
-	$lap4.innerHTML = "Lap 4: " + formatTime(x.lap4());
-	$lap5.innerHTML = "Lap 5: " + formatTime(x.lap5());
-	$lap6.innerHTML = "Lap 6: " + formatTime(x.lap6());
-	$lap7.innerHTML = "Lap 7: " + formatTime(x.lap7());
-	$lap8.innerHTML = "Lap 8: " + formatTime(x.lap8());
-	$lap9.innerHTML = "Lap 9: " + formatTime(x.lap9());
-	$lap10.innerHTML = "Lap 10: " + formatTime(x.lap10());
+	$lap1.innerHTML = "Capture 1: " + formatTime(x.lap1());
+	$lap2.innerHTML = "Capture 2: " + formatTime(x.lap2());
+	$lap3.innerHTML = "Capture 3: " + formatTime(x.lap3());
+	$lap4.innerHTML = "Capture 4: " + formatTime(x.lap4());
+	$lap5.innerHTML = "Capture 5: " + formatTime(x.lap5());
+	$lap6.innerHTML = "Capture 6: " + formatTime(x.lap6());
+	$lap7.innerHTML = "Capture 7: " + formatTime(x.lap7());
+	$lap8.innerHTML = "Capture 8: " + formatTime(x.lap8());
+	$lap9.innerHTML = "Capture 9: " + formatTime(x.lap9());
+	$lap10.innerHTML = "Capture 10: " + formatTime(x.lap10());
 }
 
 function onStart() {
 	document.getElementById("start").removeEventListener("click", onStart, false); // remove listener
 	document.getElementById("capture").removeEventListener("click", onReset, false); // remove listener
-
+	document.getElementById("capture").removeAttribute("disabled"); // enable capture button upon start
 	start();
-	//if (lap_count <= (max - 1)) {
-	//	document.getElementById("capture").style.visibility = 'visible'; // show capture button until last lap
-	//}
-
 	document.getElementById("capture").innerHTML = "Capture";
 	document.getElementById("capture").addEventListener("click", onCapture, false); // add listener
-
   	document.getElementById("start").innerHTML = "Stop & Capture";
 	document.getElementById("start").addEventListener("click", onStop, false); // add listener
 }
@@ -189,13 +185,9 @@ function onStop() {
 	document.getElementById("start").removeEventListener("click", onStop, false); // remove listener
 	document.getElementById("capture").removeEventListener("click", onCapture, false); // remove listener
 	onCapture();
-
 	stop();
-	//document.getElementById("capture").style.visibility = 'hidden'; // hide capture button
-
 	document.getElementById("capture").innerHTML = "Reset";
 	document.getElementById("capture").addEventListener("click", onReset, false); // add listener
-
 	document.getElementById("start").innerHTML = "Start";
 	document.getElementById("start").addEventListener("click", onStart, false); // add listener
 }
@@ -203,11 +195,6 @@ function onStop() {
 function onCapture() {
 	document.getElementById("capture").removeEventListener("click", onCapture, false); // remove listener
 	capture();
-	if (lap_count <= (max - 1)) {
-		document.getElementById("capture").style.visibility = 'visible'; // show capture button until last lap
-	}
-  	//document.getElementById("capture").innerHTML = "Reset";
-	//document.getElementById("capture").addEventListener("click", onReset, false); // add listener
 }
 
 function onReset() {
@@ -216,7 +203,6 @@ function onReset() {
 	document.getElementById("capture").innerHTML = "Capture";
 	document.getElementById("capture").addEventListener("click", onCapture, false); // add listener
 }
-
 
 function start() {
 	clocktimer = setInterval("update()", 1); // set timer with 1 ms intervals
@@ -230,19 +216,10 @@ function stop() {
 }
 
 function capture() {
-	lap_count++;
 	x.capture();
 	update();
+	lap_count++;
 }
-
-//function onCapture() {
-	//capture();
-	//addLap();
-	//if (lap_count <= (max - 1)) {
-	//	document.getElementById("capture").style.visibility = 'visible'; // show capture button until last lap
-	//}
-	//else document.getElementById("capture").style.visibility = 'hidden'; // hide capture button during last lap
-//}
 
 function reset() {
 	onStop();
