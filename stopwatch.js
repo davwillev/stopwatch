@@ -169,27 +169,6 @@ function update() {
 	$lap10.innerHTML = "Lap 10: " + formatTime(x.lap10());
 }
 
-function addLap() {
-	lapId++; // increment lapId to get a unique ID for each new element
-	var html = '<input type="file" name="lap_times[]" /> ';
-	addElement('Laps', 'p', 'Lap-' + lapId, html);
-}
-
-function addElement(parentId, elementTag, elementId, html) {
-	// Adds an element to the document
-	var p = document.getElementById(parentId);
-	var newElement = document.createElement(elementTag);
-	newElement.setAttribute('id', elementId);
-	newElement.innerHTML = html;
-	p.appendChild(newElement);
-}
-
-function removeElement(elementId) {
-	// Removes an element from the document
-	var element = document.getElementById(elementId);
-	element.parentNode.removeChild(element);
-}
-
 function onStart() {
 	document.getElementById("start").removeEventListener("click", onStart, false); // remove listener
 	start();
@@ -230,9 +209,9 @@ function onCapture() {
 	capture();
 	//addLap();
 	if (lap_count <= (max - 1)) {
-		document.getElementById("capture").style.visibility = 'visible';
+		document.getElementById("capture").style.visibility = 'visible'; // show capture button until last lap
 	}
-	else document.getElementById("capture").style.visibility = 'hidden'; // show capture button until last lap
+	else document.getElementById("capture").style.visibility = 'hidden'; // hide capture button during last lap
 }
 
 function reset() {
@@ -240,4 +219,25 @@ function reset() {
 	x.reset();
 	lap_count = 1;
 	update();
+}
+
+function addLap() {
+	lapId++; // increment lapId to get a unique ID for each new element
+	var html = '<input type="file" name="lap_times[]" /> ';
+	addElement('Laps', 'p', 'Lap-' + lapId, html);
+}
+
+function addElement(parentId, elementTag, elementId, html) {
+	// Adds an element to the document
+	var p = document.getElementById(parentId);
+	var newElement = document.createElement(elementTag);
+	newElement.setAttribute('id', elementId);
+	newElement.innerHTML = html;
+	p.appendChild(newElement);
+}
+
+function removeElement(elementId) {
+	// Removes an element from the document
+	var element = document.getElementById(elementId);
+	element.parentNode.removeChild(element);
 }
