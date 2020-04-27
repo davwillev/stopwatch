@@ -238,5 +238,6 @@ function onCapture() {
 function reset() {
 	x.reset();
 	lap_count = 1;
+	document.getElementById("start").innerHTML = "Start";
 	update();
 }
