@@ -2,11 +2,11 @@
 var	stopwatch = function() {
 	
 	// Private vars
-	var startAt = 0; // Time of last start / resume (0 if not already running)
+	var startAt = 0; // start / resume time, initialized at zero
 	var elapsedTime	= 0;
 	var lap_count = 0;
 	var max_laps = 10; // maximum number of laps (to be set by user)
-	var lap = new Array(max_laps).fill(0);
+	var lap = new Array(max_laps).fill(0); // array initialized with zero values
 
 	var	now	= function() {
 		return (new Date()).getTime(); // captures current time value in milliseconds
@@ -30,12 +30,7 @@ var	stopwatch = function() {
 		startAt = 0; // resets startAt so that timer does not continue
 	};
 
-	// Boolean to check if startTime is zero
-	this.started = function() {
-		return this.startTime == 0 ? false : true;
-	};
-
-	// Capture time for multiple laps
+	// Capture time for multiple laps in an array
 	this.capture = function() {
 		capturedTime = startAt ? elapsedTime + now() - startAt : elapsedTime;
 			if (lap[lap_count] == 0) {
@@ -51,10 +46,14 @@ var	stopwatch = function() {
 		lap.fill(0);
 	};
 
+	this.maxLaps = function () {
+		return max_laps;
+	};
+
 	// Capture number of laps counted
 	this.lapCount = function() {
 		return lap_count;	
-	}
+	};
 
 	// Capture lap times
 	this.lap = function() {
@@ -115,20 +114,11 @@ var	stopwatch = function() {
 
 var x = new stopwatch();
 var $time;
-var $lap1 = '';
-var $lap2 = '';
-var $lap3 = '';
-var $lap4 = '';
-var $lap5 = '';
-var $lap6 = '';
-var $lap7 = '';
-var $lap8 = '';
-var $lap9 = '';
-var $lap10 = '';
+var $lap1 = $lap2 = $lap3 = $lap4 = $lap5= $lap6= $lap7= $lap8= $lap9= $lap10 = '';
 var clocktimer;
 var max = x.maxLaps();
-var count = x.lapCount();
-var lapId = 0; // used by the addLap() function to keep track of IDs
+var lap_count = 1;
+var lapId = 0; // used by addLap() function to keep track of IDs
 
 function pad(num, size) {
 	var s = "0000" + num;
@@ -179,18 +169,18 @@ function update() {
 	$lap10.innerHTML = "Lap 10: " + formatTime(x.lap10());
 }
 
-//function addLap() {
-//	lapId++; // increment lapId to get a unique ID for each new element
-//	var html = '<a href="" onclick="javascript:removeElement('Lap ' + lapId + ''); return false;">Remove</a>';
-//	addElement('Lap', 'p', 'Lap' + lapId, innerHtml);
-//}
+function addLap() {
+	lapId++; // increment lapId to get a unique ID for each new element
+	var html = '<input type="file" name="lap_times[]" /> ';
+	addElement('Laps', 'p', 'Lap-' + lapId, html);
+}
 
-function addElement(parentId, elementTag, elementId, innerHtml) {
+function addElement(parentId, elementTag, elementId, html) {
 	// Adds an element to the document
 	var p = document.getElementById(parentId);
 	var newElement = document.createElement(elementTag);
 	newElement.setAttribute('id', elementId);
-	newElement.innerHTML = innerHtml;
+	newElement.innerHTML = html;
 	p.appendChild(newElement);
 }
 
@@ -203,7 +193,9 @@ function removeElement(elementId) {
 function onStart() {
 	document.getElementById("start").removeEventListener("click", onStart, false); // remove listener
 	start();
-	document.getElementById("capture").style.visibility = 'visible'; // show capture button
+	if (lap_count <= (max - 1)) {
+		document.getElementById("capture").style.visibility = 'visible'; // show capture button until last lap
+	}
   	document.getElementById("start").innerHTML = "Stop & Capture";
 	document.getElementById("start").addEventListener("click", onStop, false); // add listener
 }
@@ -214,7 +206,7 @@ function onStop() {
 	stop();
 	document.getElementById("capture").style.visibility = 'hidden'; // hide capture button 
 	document.getElementById("start").innerHTML = "Start";
-	document.getElementById("start").addEventListener("click", onStart, false);  // add listener
+	document.getElementById("start").addEventListener("click", onStart, false); // add listener
 }
 
 function start() {
@@ -229,19 +221,22 @@ function stop() {
 }
 
 function capture() {
+	lap_count++;
 	x.capture();
-	//addLap();
 	update();
 }
 
 function onCapture() {
 	capture();
-	//if (count === (max - 1)) {
-	  //document.getElementById("capture").style.visibility = 'hidden'; // show capture button until last lap
-	//}
-  }
+	//addLap();
+	if (lap_count <= (max - 1)) {
+		document.getElementById("capture").style.visibility = 'visible';
+	}
+	else document.getElementById("capture").style.visibility = 'hidden'; // show capture button until last lap
+}
 
 function reset() {
 	x.reset();
+	lap_count = 1;
 	update();
 }
