@@ -1,5 +1,5 @@
 <?php
-namespace UniversityOfBirmingham\Stopwatch;
+namespace UoB\Stopwatch;
 
 class Stopwatch extends \ExternalModules\AbstractExternalModule {
 	public function __construct() {
