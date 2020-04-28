@@ -1,0 +1,57 @@
+{
+	"name": "Stopwatch",
+
+	"namespace": "UniversityOfBirmingham\\Stopwatch",
+
+	"description": "A stopwatch field that captures a time interval in milliseconds, as the timer is running (via the 'capture' button) or when the timer is stopped (via the 'stop' button'), which can be reset (via the 'reset' button.",
+
+	"documentation": "README.md",
+
+	"authors": [		{
+			"name": "Nadege Haouidji-Javayx",
+			"email": "n.c.haouidji-javaux@bham.ac.uk",
+			"institution": "University of Birmingham"
+		},		{
+			"name": "David W. Evans",
+			"email": "d.w.evans@bham.ac.uk",
+			"institution": "University of Birmingham"
+		}
+	],
+
+	"permissions": [
+
+		"redcap_save_record",
+		"redcap_data_entry_form"
+	],
+	
+	"enable-every-page-hooks-on-system-pages":false,	
+
+	"links": {
+		"project": [
+		],
+		"control-center": [
+		]
+	},
+
+	"no-auth-pages": [
+		"public-page"
+	],
+
+	"project-settings": [
+
+	],
+
+	"system-settings": [
+
+	],
+
+	"crons": [
+	],
+
+	"compatibility": {
+		"php-version-min": "5.4.0",
+		"php-version-max": "",
+		"redcap-version-min": "8.0.0",
+		"redcap-version-max": ""
+	}
+}

@@ -1,2 +1,1 @@
-# Stopwatch
-JavaScript stopwatch that captures duration instances.
+#A stopwatch field that captures a time interval in milliseconds, as the timer is running (via the 'capture' button) or when the timer is stopped (via the 'stop' button'), which can be reset (via the 'reset' button.
