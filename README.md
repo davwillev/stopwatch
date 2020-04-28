@@ -1,1 +1,1 @@
-#A stopwatch field that captures the value of a time interval with millisecond accuracy, as the timer is running (via the 'capture' button) or when the timer is stopped (via the 'stop' button'), which can be reset (via the 'reset' button).
+A stopwatch field that captures the value of a time interval with millisecond accuracy, as the timer is running (via the 'capture' button) or when the timer is stopped (via the 'stop' button'), which can be reset (via the 'reset' button).
