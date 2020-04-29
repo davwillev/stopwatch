@@ -198,10 +198,13 @@ function onCapture() {
 }
 
 function onReset() {
-	document.getElementById("capture").removeEventListener("click", onReset, false); // remove listener
-	reset();
-	document.getElementById("capture").innerHTML = "Capture";
-	document.getElementById("capture").addEventListener("click", onCapture, false); // add listener
+	var choice = confirm("Are you sure you want to reset? \nDoing so will delete all times captured by this stopwatch!");
+	if (choice) {
+		document.getElementById("capture").removeEventListener("click", onReset, false); // remove listener
+		reset();
+		document.getElementById("capture").innerHTML = "Capture";
+		document.getElementById("capture").addEventListener("click", onCapture, false); // add listener
+	}
 }
 
 function start() {
