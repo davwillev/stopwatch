@@ -6,7 +6,7 @@ var	stopwatch = function() {
 	var elapsedTime	= 0;
 	var lap_count = 0;
 	var max_laps = 10; // maximum number of laps (to be set by user)
-	var lap = new Array(max_laps).fill(0); // array initialized with zero values
+	var lap = new Array(max_laps).fill(0); // array initialized with zero values so that capture values display
 
 	var	now	= function() {
 		return (new Date()).getTime(); // captures current time value in milliseconds
@@ -33,10 +33,10 @@ var	stopwatch = function() {
 	// Capture time for multiple laps in an array
 	this.capture = function() {
 		capturedTime = startAt ? elapsedTime + now() - startAt : elapsedTime;
-			if (lap[lap_count] == 0) {
+			if (lap[lap_count] === 0) {
 				lap[lap_count] = capturedTime;
 			}
-		lap_count += 1; // increase lap count by one after each assignment
+		lap_count ++; // increase lap count by one after each assignment
 		return lap;
 	};
 
@@ -114,10 +114,11 @@ var	stopwatch = function() {
 
 var x = new stopwatch();
 var $time;
-var $lap1 = $lap2 = $lap3 = $lap4 = $lap5= $lap6= $lap7= $lap8= $lap9= $lap10 = '';
+var $lap1 = $lap2 = $lap3 = $lap4 = $lap5 = $lap6 = $lap7 = $lap8 = $lap9 = $lap10 = '';
 var clocktimer;
 var max = x.maxLaps();
-var lap_count = 1;
+var $lap = new Array(max);
+var $lap_count = 1;
 var lapId = 0; // used by addLap() function to keep track of IDs
 
 function pad(num, size) {
@@ -171,65 +172,56 @@ function update() {
 }
 
 function onStart() {
-	document.getElementById("start").removeEventListener("click", onStart, false); // remove listener
-	document.getElementById("capture").removeEventListener("click", onReset, false); // remove listener
+	// Remove any previous listeners
+	document.getElementById("start").removeEventListener("click", onStart, false);
+	document.getElementById("capture").removeEventListener("click", onReset, false);
+	// Start timer with 1 ms intervals
+	clocktimer = setInterval("update()", 1);
+	x.start();
 	document.getElementById("capture").removeAttribute("disabled"); // enable capture button upon start
-	start();
-	document.getElementById("capture").innerHTML = "Capture";
-	document.getElementById("capture").addEventListener("click", onCapture, false); // add listener
-  	document.getElementById("start").innerHTML = "Stop & Capture";
-	document.getElementById("start").addEventListener("click", onStop, false); // add listener
-}
-
-function onStop() {
-	document.getElementById("start").removeEventListener("click", onStop, false); // remove listener
-	document.getElementById("capture").removeEventListener("click", onCapture, false); // remove listener
-	onCapture();
-	stop();
-	document.getElementById("capture").innerHTML = "Reset";
-	document.getElementById("capture").addEventListener("click", onReset, false); // add listener
-	document.getElementById("start").innerHTML = "Start";
-	document.getElementById("start").addEventListener("click", onStart, false); // add listener
+	// Prepare Stop button
+	document.getElementById("start").innerHTML = "Stop & Capture"; // change label
+	document.getElementById("start").addEventListener("click", onStop, false); // add listener pointing to onStop()
+	// Prepare capture button
+	document.getElementById("capture").removeAttribute("disabled"); // enable button upon initiation
+	document.getElementById("capture").innerHTML = "Capture"; // change label
+	document.getElementById("capture").addEventListener("click", onCapture, false); // add listener pointing to onCapture()
 }
 
 function onCapture() {
-	document.getElementById("capture").removeEventListener("click", onCapture, false); // remove listener
-	capture();
+	x.capture();
+	$lap_count++; // increment lap count by +1
+}
+
+function onStop() {
+	// Remove previous listeners
+	document.getElementById("start").removeEventListener("click", onStop, false);
+	document.getElementById("capture").removeEventListener("click", onCapture, false);
+	// Capture time and pause timer
+	onCapture();
+	x.stop();
+	clearInterval(clocktimer);
+	// Prepare start button
+	document.getElementById("start").innerHTML = "Start"; // change label
+	document.getElementById("start").addEventListener("click", onStart, false); // add listener pointing to onStart()
+	// Prepare reset button
+	document.getElementById("capture").innerHTML = "Reset"; // change label
+	document.getElementById("capture").addEventListener("click", onReset, false); // add listener pointing to onReset()
 }
 
 function onReset() {
-	var choice = confirm("Are you sure you want to reset? \nDoing so will delete all times captured by this stopwatch!");
+	var choice = confirm("Are you sure you want to reset? \nDoing so will delete all time values captured by this stopwatch!");
 	if (choice) {
-		document.getElementById("capture").removeEventListener("click", onReset, false); // remove listener
-		reset();
+		document.getElementById("capture").removeEventListener("click", onReset, false); // remove listener pointing to onReset()
+		show();
+		x.reset();
+		$lap_count = 1; // reset lap count
+		// Prepare capture button
 		document.getElementById("capture").innerHTML = "Capture";
-		document.getElementById("capture").addEventListener("click", onCapture, false); // add listener
+		document.getElementById("capture").addEventListener("click", onCapture, false); // add listener pointing to onCapture()
 	}
 }
 
-function start() {
-	clocktimer = setInterval("update()", 1); // set timer with 1 ms intervals
-	x.start();
-}
-
-function stop() {
-	x.stop();
-	clearInterval(clocktimer);
-	update();
-}
-
-function capture() {
-	x.capture();
-	update();
-	lap_count++;
-}
-
-function reset() {
-	onStop();
-	show();
-	x.reset();
-	lap_count = 1;
-}
 
 /* Methods for avoiding setting number of laps */
 
