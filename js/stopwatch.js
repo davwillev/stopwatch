@@ -8,7 +8,7 @@ var	stopwatch = function() {
 	var max_laps = 10; // maximum number of laps (to be set by user)
 	var lap = new Array(max_laps).fill(0); // array initialized with zero values so that capture values display
 
-	var	now	= function() {
+	var now = function() {
 		return (new Date()).getTime(); // captures current time value in milliseconds
 	};
  
