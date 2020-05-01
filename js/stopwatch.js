@@ -8,7 +8,7 @@ var	stopwatch = function() {
 	var max_laps = 10; // maximum number of laps (to be set by user)
 	var lap = new Array(max_laps).fill(0); // array initialized with zero values so that capture values display
 
-	var now = function() {
+	var	now	= function() {
 		return (new Date()).getTime(); // captures current time value in milliseconds
 	};
  
@@ -178,14 +178,13 @@ function onStart() {
 	// Start timer with 1 ms intervals
 	clocktimer = setInterval("update()", 1);
 	x.start();
-	document.getElementById("capture").removeAttribute("disabled"); // enable capture button upon start
 	// Prepare Stop button
 	document.getElementById("start").innerHTML = "Stop & Capture"; // change label
-	document.getElementById("start").addEventListener("click", onStop, false); // add listener pointing to onStop()
+	document.getElementById("start").addEventListener("click", onStop, false); // add listener
 	// Prepare capture button
 	document.getElementById("capture").removeAttribute("disabled"); // enable button upon initiation
 	document.getElementById("capture").innerHTML = "Capture"; // change label
-	document.getElementById("capture").addEventListener("click", onCapture, false); // add listener pointing to onCapture()
+	document.getElementById("capture").addEventListener("click", onCapture, false); // add listener
 }
 
 function onCapture() {
@@ -203,22 +202,22 @@ function onStop() {
 	clearInterval(clocktimer);
 	// Prepare start button
 	document.getElementById("start").innerHTML = "Start"; // change label
-	document.getElementById("start").addEventListener("click", onStart, false); // add listener pointing to onStart()
+	document.getElementById("start").addEventListener("click", onStart, false); // add listener
 	// Prepare reset button
 	document.getElementById("capture").innerHTML = "Reset"; // change label
-	document.getElementById("capture").addEventListener("click", onReset, false); // add listener pointing to onReset()
+	document.getElementById("capture").addEventListener("click", onReset, false); // add listener
 }
 
 function onReset() {
-	var choice = confirm("Are you sure you want to reset? \nDoing so will delete all time values captured by this stopwatch!");
+	var choice = confirm("Are you sure you want to reset?\n\nDoing so will delete all time values captured by this stopwatch!");
 	if (choice) {
 		document.getElementById("capture").removeEventListener("click", onReset, false); // remove listener pointing to onReset()
 		show();
 		x.reset();
 		$lap_count = 1; // reset lap count
 		// Prepare capture button
-		document.getElementById("capture").innerHTML = "Capture";
-		document.getElementById("capture").addEventListener("click", onCapture, false); // add listener pointing to onCapture()
+		document.getElementById("capture").innerHTML = "Capture"; // change label
+		document.getElementById("capture").addEventListener("click", onCapture, false); // add listener
 	}
 }
 
