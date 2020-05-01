@@ -3,14 +3,14 @@
 	var startAt = 0; // start / resume time, initialized at zero
 	var elapsedTime	= 0;
 	var lap_count = 0;
-	var max_laps = 10; // maximum number of laps (to be set by user)
-	var lap = new Array(max_laps).fill(0); // array initialized with zero values so that capture values display
+	var max_laps = 10; // maximum number of laps (to be set by user) - see if we can lose this!
+	var lap = [];
 
-	var	now	= function now () {
+	var	now	= function() {
 		return (new Date()).getTime(); // captures current time value in milliseconds
 	};
 		
-	// Start or resume
+	// Start or resume timer
 	var start = function() {
 		startAt = startAt ? startAt : now();
 	};
@@ -26,10 +26,11 @@
 		startAt = 0; // resets startAt so that timer does not continue
 	};
 
-	// Capture time for multiple laps in an array
+	// Capture time values in an array
 	var capture = function() {
 		capturedTime = startAt ? elapsedTime + now() - startAt : elapsedTime;
-			if (lap[lap_count] === 0) {
+			//if (lap[lap_count] === 0) {
+			if (!lap[lap_count]) {
 				lap[lap_count] = capturedTime;
 			}
 		lap_count ++; // increase lap count by one after each assignment
@@ -81,6 +82,15 @@
 
 	function update() {
 		$time.innerHTML = formatTime(time());
+
+		/*
+		for(var i = 0; i <= max_laps; i++) {
+			if (!lap[i]) {
+		$lap[lap_count].innerHTML = `Capture${i} :${formatTime(lap[lap_count])}`;
+			}
+		}
+		*/
+		
 		$lap1.innerHTML = "Capture 1: " + formatTime(lap[0]);
 		$lap2.innerHTML = "Capture 2: " + formatTime(lap[1]);
 		$lap3.innerHTML = "Capture 3: " + formatTime(lap[2]);
@@ -142,7 +152,7 @@
 		}
 	}
 
-	
+
 	/* Methods for avoiding setting number of laps */
 
 	function addLap() {
