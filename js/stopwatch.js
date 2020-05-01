@@ -6,17 +6,6 @@
 	var max_laps = 10; // maximum number of laps (to be set by user)
 	var lap = new Array(max_laps).fill(0); // array initialized with zero values so that capture values display
 
-	//var x = new stopwatch();
-	var $time;
-	var $lap1 = $lap2 = $lap3 = $lap4 = $lap5 = $lap6 = $lap7 = $lap8 = $lap9 = $lap10 = '';
-	//var clocktimer;
-	//var max = x.maxLaps();
-	//var $lap = x.lap;
-	//var $lap = [];
-	//var $lap_count = 1;
-	var lapId = 0; // used by addLap() function to keep track of IDs
-
-
 	var	now	= function now () {
 		return (new Date()).getTime(); // captures current time value in milliseconds
 	};
@@ -52,72 +41,6 @@
 		elapsedTime = capturedTime = startAt = lap_count = 0;
 		lap.fill(0);
 	};
-
-	//var maxLaps = function () {
-	//	return max_laps;
-	//};
-
-	/*
-	// Capture number of laps counted
-	var lapCount = function() {
-		return lap_count;	
-	};
-
-	// Capture all lap times
-	var lap = function() {
-		return lap;
-	};
-
-	// Capture first lap time
-	var lap1 = function() {
-		return lap[0];
-	};
-
-	// Capture second lap time
-	var lap2 = function() {
-		return lap[1];
-	};
-			
-	// Capture third lap time
-	var lap3 = function() {
-		return lap[2];
-	};
-						
-	// Capture fourth lap time
-	var lap4 = function() {
-		return lap[3];
-	};
-						
-	// Capture fifth lap time
-	var lap5 = function() {
-		return lap[4];
-	};
-
-	// Capture sixth lap time
-	var lap6 = function() {
-		return lap[5];
-	};
-
-	// Capture seventh lap time
-	var lap7 = function() {
-		return lap[6];
-	};
-
-	// Capture eigth lap time
-	var lap8 = function() {
-		return lap[7];
-	};
-
-	// Capture ninth lap time
-	var lap9 = function() {
-		return lap[8];
-	};
-
-	// Capture tenth lap time
-	var lap10 = function() {
-		return lap[9];
-	};
-	*/
 
 	function pad(num, size) {
 		var s = "0000" + num;
@@ -158,17 +81,6 @@
 
 	function update() {
 		$time.innerHTML = formatTime(time());
-		//$lap1.innerHTML = "Capture 1: " + formatTime(lap1());
-		//$lap2.innerHTML = "Capture 2: " + formatTime(lap2());
-		//$lap3.innerHTML = "Capture 3: " + formatTime(lap3());
-		//$lap4.innerHTML = "Capture 4: " + formatTime(lap4());
-		//$lap5.innerHTML = "Capture 5: " + formatTime(lap5());
-		//$lap6.innerHTML = "Capture 6: " + formatTime(lap6());
-		//$lap7.innerHTML = "Capture 7: " + formatTime(lap7());
-		//$lap8.innerHTML = "Capture 8: " + formatTime(lap8());
-		//$lap9.innerHTML = "Capture 9: " + formatTime(lap9());
-		//$lap10.innerHTML = "Capture 10: " + formatTime(lap10());
-
 		$lap1.innerHTML = "Capture 1: " + formatTime(lap[0]);
 		$lap2.innerHTML = "Capture 2: " + formatTime(lap[1]);
 		$lap3.innerHTML = "Capture 3: " + formatTime(lap[2]);
@@ -199,8 +111,6 @@
 
 	function onCapture() {
 		capture();
-		//$lap_count++; // increment lap count by +1
-		//$lap = x.lap;
 		update();
 	}
 
@@ -209,7 +119,7 @@
 		document.getElementById("start").removeEventListener("click", onStop, false);
 		document.getElementById("capture").removeEventListener("click", onCapture, false);
 		// Capture time and pause timer
-		onCapture();
+		capture();
 		stop();
 		clearInterval(clocktimer);
 		// Prepare start button
@@ -226,13 +136,13 @@
 			document.getElementById("capture").removeEventListener("click", onReset, false); // remove listener pointing to onReset()
 			show();
 			reset();
-			//$lap_count = 1; // reset lap count
 			// Prepare capture button
 			document.getElementById("capture").innerHTML = "Capture"; // change label
 			document.getElementById("capture").addEventListener("click", onCapture, false); // add listener
 		}
 	}
 
+	
 	/* Methods for avoiding setting number of laps */
 
 	function addLap() {
