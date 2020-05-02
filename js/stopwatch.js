@@ -4,50 +4,50 @@
 	var elapsedTime	= 0;
 	var lap_count = 0;
 	var max_laps = 10; // maximum number of laps (to be set by user) - see if we can lose this!
-	var lap = [];
+	var laps = [];
+	var display_laps = [];
 
-	var	now	= function() {
+	function now() {
 		return (new Date()).getTime(); // captures current time value in milliseconds
 	};
 		
 	// Start or resume timer
-	var start = function() {
+	function start() {
 		startAt = startAt ? startAt : now();
 	};
 		
 	// Duration
-	var time = function() {
+	function time() {
 		return elapsedTime + (startAt ? now() - startAt : 0);
 	};
 
 	// Stop timer
-	var stop = function() {
+	function stop() {
 		elapsedTime = startAt ? elapsedTime + now() - startAt : elapsedTime;
 		startAt = 0; // resets startAt so that timer does not continue
 	};
 
 	// Capture time values in an array
-	var capture = function() {
+	function capture() {
 		capturedTime = startAt ? elapsedTime + now() - startAt : elapsedTime;
-			//if (lap[lap_count] === 0) {
-			if (!lap[lap_count]) {
-				lap[lap_count] = capturedTime;
+			if (!laps[lap_count]) {
+				laps[lap_count] = capturedTime;
 			}
 		lap_count ++; // increase lap count by one after each assignment
-		return lap;
+		return laps;
 	};
 
 	// Reset all variables
-	var reset = function() {
+	function reset() {
 		elapsedTime = capturedTime = startAt = lap_count = 0;
-		lap.fill(0);
+		laps.length = 0;
 	};
 
 	function pad(num, size) {
 		var s = "0000" + num;
 		return s.substr(s.length - size);
 	}
-
+	
 	function formatTime(time) {
 		var h = m = s = ms = 0;
 		var newTime = '';
@@ -66,41 +66,19 @@
 	function show() {
 		$time = document.getElementById('time');
 		document.getElementById("capture").setAttribute("disabled","disabled"); // disable capture button until start
-
-		$lap1 = document.getElementById('lap1');
-		$lap2 = document.getElementById('lap2');
-		$lap3 = document.getElementById('lap3');
-		$lap4 = document.getElementById('lap4');
-		$lap5 = document.getElementById('lap5');
-		$lap6 = document.getElementById('lap6');
-		$lap7 = document.getElementById('lap7');
-		$lap8 = document.getElementById('lap8');
-		$lap9 = document.getElementById('lap9');
-		$lap10 = document.getElementById('lap10');
 		update();
 	}
 
 	function update() {
 		$time.innerHTML = formatTime(time());
+	}
 
-		/*
-		for(var i = 0; i <= max_laps; i++) {
-			if (!lap[i]) {
-		$lap[lap_count].innerHTML = `Capture${i} :${formatTime(lap[lap_count])}`;
-			}
-		}
-		*/
-		
-		$lap1.innerHTML = "Capture 1: " + formatTime(lap[0]);
-		$lap2.innerHTML = "Capture 2: " + formatTime(lap[1]);
-		$lap3.innerHTML = "Capture 3: " + formatTime(lap[2]);
-		$lap4.innerHTML = "Capture 4: " + formatTime(lap[3]);
-		$lap5.innerHTML = "Capture 5: " + formatTime(lap[4]);
-		$lap6.innerHTML = "Capture 6: " + formatTime(lap[5]);
-		$lap7.innerHTML = "Capture 7: " + formatTime(lap[6]);
-		$lap8.innerHTML = "Capture 8: " + formatTime(lap[7]);
-		$lap9.innerHTML = "Capture 9: " + formatTime(lap[8]);
-		$lap10.innerHTML = "Capture 10: " + formatTime(lap[9]);
+	function addLapToDisplay() {
+	if (laps == "" || laps.length == 0) {
+		return false; // stop the function if the value is empty
+	}
+	var inner = `Capture ${lap_count}: ${formatTime(laps[lap_count-1])}`;
+	document.getElementById("laps").innerHTML += '<li>' + inner + '</li>';
 	}
 
 	function onStart() {
@@ -122,6 +100,7 @@
 	function onCapture() {
 		capture();
 		update();
+		addLapToDisplay();
 	}
 
 	function onStop() {
@@ -130,6 +109,7 @@
 		document.getElementById("capture").removeEventListener("click", onCapture, false);
 		// Capture time and pause timer
 		capture();
+		addLapToDisplay();
 		stop();
 		clearInterval(clocktimer);
 		// Prepare start button
@@ -145,6 +125,7 @@
 		if (choice) {
 			document.getElementById("capture").removeEventListener("click", onReset, false); // remove listener pointing to onReset()
 			show();
+			document.getElementById("laps").innerHTML = '';
 			reset();
 			// Prepare capture button
 			document.getElementById("capture").innerHTML = "Capture"; // change label
@@ -152,28 +133,5 @@
 		}
 	}
 
-
-	/* Methods for avoiding setting number of laps */
-
-	function addLap() {
-		lapId++; // increment lapId to get a unique ID for each new element
-		var html = '<input type="file" name="lap_times[]" /> ';
-		addElement('Laps', 'p', 'Lap-' + lapId, html);
-	}
-
-	function addElement(parentId, elementTag, elementId, html) {
-		// Adds an element to the document
-		var p = document.getElementById(parentId);
-		var newElement = document.createElement(elementTag);
-		newElement.setAttribute('id', elementId);
-		newElement.innerHTML = html;
-		p.appendChild(newElement);
-	}
-
-	function removeElement(elementId) {
-		// Removes an element from the document
-		var element = document.getElementById(elementId);
-		element.parentNode.removeChild(element);
-	}
 
 //}());
