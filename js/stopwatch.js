@@ -3,9 +3,7 @@
 	var startAt = 0; // start / resume time, initialized at zero
 	var elapsedTime	= 0;
 	var lap_count = 0;
-	var max_laps = 10; // maximum number of laps (to be set by user) - see if we can lose this!
 	var laps = [];
-	var display_laps = [];
 
 	function now() {
 		return (new Date()).getTime(); // captures current time value in milliseconds
@@ -29,7 +27,7 @@
 
 	// Capture time values in an array
 	function capture() {
-		capturedTime = startAt ? elapsedTime + now() - startAt : elapsedTime;
+		var capturedTime = startAt ? elapsedTime + now() - startAt : elapsedTime;
 			if (!laps[lap_count]) {
 				laps[lap_count] = capturedTime;
 			}
@@ -39,7 +37,7 @@
 
 	// Reset all variables
 	function reset() {
-		elapsedTime = capturedTime = startAt = lap_count = 0;
+		elapsedTime = startAt = lap_count = 0;
 		laps.length = 0;
 	};
 
@@ -74,11 +72,11 @@
 	}
 
 	function addLapToDisplay() {
-	if (laps == "" || laps.length == 0) {
-		return false; // stop the function if the value is empty
-	}
-	var inner = `Capture ${lap_count}: ${formatTime(laps[lap_count-1])}`;
-	document.getElementById("laps").innerHTML += '<li>' + inner + '</li>';
+		if (laps == "" || laps.length == 0) {
+			return false; // stop the function if the value is empty
+		}
+		var inner = `<b>Capture ${lap_count}:</b> ${formatTime(laps[lap_count - 1])}`;
+		document.getElementById("laps").innerHTML += '<li>' + inner + '</li>';
 	}
 
 	function onStart() {
@@ -99,7 +97,6 @@
 
 	function onCapture() {
 		capture();
-		update();
 		addLapToDisplay();
 	}
 
