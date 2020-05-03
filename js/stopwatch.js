@@ -4,6 +4,7 @@
 	var elapsedTime	= 0;
 	var lap_count = 0;
 	var laps = [];
+	var stops = []; // value of 1 is assigned if captured with a stop, else value is 0
 
 	function now() {
 		return (new Date()).getTime(); // captures current time value in milliseconds
@@ -18,27 +19,34 @@
 	function time() {
 		return elapsedTime + (startAt ? now() - startAt : 0);
 	};
-
-	// Stop timer
-	function stop() {
-		elapsedTime = startAt ? elapsedTime + now() - startAt : elapsedTime;
-		startAt = 0; // resets startAt so that timer does not continue
-	};
-
+	
 	// Capture time values in an array
 	function capture() {
 		var capturedTime = startAt ? elapsedTime + now() - startAt : elapsedTime;
 			if (!laps[lap_count]) {
 				laps[lap_count] = capturedTime;
 			}
+			if (!stops[lap_count]) {
+				stops[lap_count] = 0; // default value
+			}
 		lap_count ++; // increase lap count by one after each assignment
 		return laps;
+	};
+
+	// Stop timer
+	function stop() {
+		elapsedTime = startAt ? elapsedTime + now() - startAt : elapsedTime;
+		startAt = 0; // resets startAt so that timer does not continue
+		if (!stops[lap_count-1] || stops[lap_count-1] == 0) {
+			stops[lap_count-1] = 1; // replaces value of 0 with 1 when timer is stopped
+		}
 	};
 
 	// Reset all variables
 	function reset() {
 		elapsedTime = startAt = lap_count = 0;
 		laps.length = 0;
+		stops.length = 0;
 	};
 
 	function pad(num, size) {
@@ -63,7 +71,7 @@
 
 	function show() {
 		$time = document.getElementById('time');
-		document.getElementById("capture").setAttribute("disabled","disabled"); // disable capture button until start
+		document.getElementById("capture").setAttribute("disabled","disabled"); // disable capture button until timer started
 		update();
 	}
 
@@ -75,16 +83,21 @@
 		if (laps == "" || laps.length == 0) {
 			return false; // stop the function if the value is empty
 		}
-		var inner = `<b>Capture ${lap_count}:</b> ${formatTime(laps[lap_count - 1])}`;
-		document.getElementById("laps").innerHTML += '<li>' + inner + '</li>';
+		if (stops[lap_count - 1] === 1) {
+			var inner = `<b>Capture ${lap_count}:</b> ${formatTime(laps[lap_count - 1])} &#10060;`;
+			document.getElementById("laps").innerHTML += '<li>' + inner + '</li>';	
+		} else {
+			var inner = `<b>Capture ${lap_count}:</b> ${formatTime(laps[lap_count - 1])}`;
+			document.getElementById("laps").innerHTML += '<li>' + inner + '</li>';
+		}
 	}
 
 	function onStart() {
 		// Remove any previous listeners
 		document.getElementById("start").removeEventListener("click", onStart, false);
 		document.getElementById("capture").removeEventListener("click", onReset, false);
-		// Start timer with 1 ms intervals
-		clocktimer = setInterval("update()", 1);
+		// Update timer with 1 ms intervals
+		clocktimer = setInterval("update()", 1); // TODO: see if we can change this to avoid requiring the update() method
 		start();
 		// Prepare Stop button
 		document.getElementById("start").innerHTML = "Stop & Capture"; // change label
@@ -106,8 +119,8 @@
 		document.getElementById("capture").removeEventListener("click", onCapture, false);
 		// Capture time and pause timer
 		capture();
-		addLapToDisplay();
 		stop();
+		addLapToDisplay();
 		clearInterval(clocktimer);
 		// Prepare start button
 		document.getElementById("start").innerHTML = "Start"; // change label
