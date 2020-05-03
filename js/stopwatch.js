@@ -84,7 +84,7 @@
 			return false; // stop the function if the value is empty
 		}
 		if (stops[lap_count - 1] === 1) {
-			var inner = `<b>Capture ${lap_count}:</b> ${formatTime(laps[lap_count - 1])} &#10060;`;
+			var inner = `<b>Capture ${lap_count}:</b> ${formatTime(laps[lap_count - 1])} &#128721;`; // add a 'stop' sign when timer has been stopped
 			document.getElementById("laps").innerHTML += '<li>' + inner + '</li>';	
 		} else {
 			var inner = `<b>Capture ${lap_count}:</b> ${formatTime(laps[lap_count - 1])}`;
