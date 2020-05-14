@@ -17,6 +17,7 @@
 
 var stopwatchEM = stopwatchEM || {};
 
+	// Logging
 	stopwatchEM.log = function() {
     	// Make console logging more resilient to Redmond
     	try {
@@ -105,19 +106,6 @@ var stopwatchEM = stopwatchEM || {};
 		$time.innerHTML = stopwatchEM.formatTime(time());
 	};
 
-	stopwatchEM.addLapToDisplay = function() {
-		if (laps == "" || laps.length == 0) {
-			return false; // stop the function if the value is empty
-		}
-		if (stops[lap_count - 1] === 1) {
-			var inner = `<b>Capture ${lap_count}:</b> ${formatTime(laps[lap_count - 1])} &#128721;`; // add a 'stop' sign when timer has been stopped
-			document.getElementById("laps").innerHTML += '<li>' + inner + '</li>';	
-		} else {
-			var inner = `<b>Capture ${lap_count}:</b> ${formatTime(laps[lap_count - 1])}`;
-			document.getElementById("laps").innerHTML += '<li>' + inner + '</li>';
-		}
-	};
-
 	stopwatchEM.onStart = function() {
 		// Remove any previous listeners
 		document.getElementById("start").removeEventListener("click", stopwatchEM.onStart, false);
@@ -169,6 +157,19 @@ var stopwatchEM = stopwatchEM || {};
 		}
 	};
 
+	stopwatchEM.addLapToDisplay = function() {
+		if (laps == "" || laps.length == 0) {
+			return false; // stop the function if the value is empty
+		}
+		if (stops[lap_count - 1] === 1) {
+			var inner = `<b>Capture ${lap_count}:</b> ${formatTime(laps[lap_count - 1])} &#128721;`; // add a 'stop' sign when timer has been stopped
+			document.getElementById("laps").innerHTML += '<li>' + inner + '</li>';	
+		} else {
+			var inner = `<b>Capture ${lap_count}:</b> ${formatTime(laps[lap_count - 1])}`;
+			document.getElementById("laps").innerHTML += '<li>' + inner + '</li>';
+		}
+	};
+
 	stopwatchEM.show = function() {
 
 		$time = document.getElementById('time');
@@ -206,6 +207,13 @@ var stopwatchEM = stopwatchEM || {};
 		var result = $('input[name="' + params.field + '"]', tr);
 		//stopwatchEM.log("Result Field");stopwatchEM.log(result);
 	
+    	// // Hide the note (except on online-designer)
+    	// if (page == "DataEntry/index.php" || page == "surveys/index.php") {
+    	//     $(note).css('display','none');
+    	// } else {
+    	//     $(note).append('<br><em>This note will not be visible on the survey or data entry form</em>');
+    	// }
+		
 		// Hide the checkbox input on surveys and data entry forms
 		if (page == "DataEntry/index.php" || page == "surveys/index.php") {
 			// Hide Checkbox/Radio Fields
@@ -239,10 +247,10 @@ var stopwatchEM = stopwatchEM || {};
 		}
 	
     	// Determine if multiselect (default) or single-select
-		var singleSelect = (params.singleSelect == true);
+		////var singleSelect = (params.singleSelect == true);
 
 		// Allow customizable fillColor
-		var fillColor = 'fillColor' in params ? params.fillColor : 'ff0000';
+		////var fillColor = 'fillColor' in params ? params.fillColor : 'ff0000';
 	
     	// Load saved values
     	stopwatchEM.loadAreaList(params.field);
@@ -307,19 +315,19 @@ var stopwatchEM = stopwatchEM || {};
 
    	 // If text - then process from list
     	$('input[type=text][name="'+field_name+'"]', tr).each(function() {
-    	    $(img).mapster('set',true,$(this).val());
+    	    ////$(img).mapster('set',true,$(this).val());
     	});
 
     	// For radio button questions, the main input is here - use it to set value
     	$('input[name="'+field_name+'"]', tr).each(function() {
-    	    $(img).mapster('set',true,$(this).val());
+    	    ////$(img).mapster('set',true,$(this).val());
     	});
 	
 	};
 
 	// Takes the values from the stopwatch and saves them to the redcap form
 	stopwatchEM.updateAreaList = function(image, data) {
-    	var field_name = $(image).attr('field');
+    	var field_name = $(image).attr('field');    //// with what should we replace 'image'?
 	    var tr = $('tr[sq_id='+field_name+']');
 
     	// Handle radio buttons as an option
@@ -342,19 +350,20 @@ var stopwatchEM = stopwatchEM || {};
         	}
     	});
 
+	//// don't think we need this...	
     	// If input field is used to hold list, then update list
-    	$('input[type=text][name="'+field_name+'"]', tr).each(function() {
+    ////	$('input[type=text][name="'+field_name+'"]', tr).each(function() {
     	    // Update input with value from mapster image
-    	    var sel = $(image).mapster('get');
-    	    if (sel) {
-    	        var selSort = sel.split(',').sort().join(',');
-    	        $(this).val(selSort);
-       	 } else {
-    	        $(this).val('');
-     	   }
-     	   $(this).blur();
-     	   $(this).change();
-    	});
+    ////	    var sel = $(image).mapster('get');
+    ////	    if (sel) {
+    ////	        var selSort = sel.split(',').sort().join(',');
+    ////	        $(this).val(selSort);
+    ////   	 } else {
+    ////	        $(this).val('');
+    //// 	   }
+    //// 	   $(this).blur();
+    //// 	   $(this).change();
+    ////	});
 	};
 
 $(document).ready(function(){
