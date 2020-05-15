@@ -247,18 +247,17 @@ var stopwatchEM = stopwatchEM || {};
 		}
 	
     	// Determine if multiselect (default) or single-select
-		////var singleSelect = (params.singleSelect == true);
+		var singleSelect = (params.singleSelect == true);
 
 		// Allow customizable fillColor
-		////var fillColor = 'fillColor' in params ? params.fillColor : 'ff0000';
+		var fillColor = 'fillColor' in params ? params.fillColor : 'ff0000';
 	
     	// Load saved values
     	stopwatchEM.loadAreaList(params.field);
 
 		// If bound to a checkbox, handle checking the checkbox inputs directly to update the map
 		$('input[type=checkbox]', tr).parent().bind('click', function() {
-			// Prevent this code from happening twice when the event is fired from a click
-			// on the stopwatch
+			// Prevent this code from happening twice when the event is fired from a click on the stopwatch
 			if(event.isTrusted) {
 				// stopwatchEM.log(this, event);
 				var tr = $(this).closest('tr');
@@ -273,18 +272,18 @@ var stopwatchEM = stopwatchEM || {};
 				//stopwatchEM.log(code);
 				var checked = checkbox.is(":checked");
 				//stopwatchEM.log(checked);
-				$(img).mapster('set',checked,code);
+				$(img).mapster('set',checked,code); //// need to replace this
 			}
-    });
+    	});
 
-    // If bound to radio, capture radio changes and update stopwatch
-    $('input[type=radio]', tr).bind('click', function() {
-        var tr = $(this).closest('tr');
-        //stopwatchEM.log(tr + ' clicked');
-        var field_name = $(tr).attr('sq_id');
-        //stopwatchEM.log(field_name);
-        stopwatchEM.loadAreaList(field_name);
-    });
+    	// If bound to radio, capture radio changes and update stopwatch
+    	$('input[type=radio]', tr).bind('click', function() {
+    	    var tr = $(this).closest('tr');
+    	    //stopwatchEM.log(tr + ' clicked');
+    	    var field_name = $(tr).attr('sq_id');
+    	    //stopwatchEM.log(field_name);
+    	    stopwatchEM.loadAreaList(field_name);
+    	});
 		
 		// Bind to reset button
 		$('a:contains("reset")', tr).bind('click',function() {
@@ -292,7 +291,7 @@ var stopwatchEM = stopwatchEM || {};
 			//stopwatchEM.log(tr);
 			var field_name = $(tr).attr('sq_id');
 			//stopwatchEM.log(field_name);
-			var img = $('img[field="'+field_name+'"]', tr).not(".mapster_el");
+			var img = $('img[field="'+field_name+'"]', tr).not(".mapster_el"); //// need to replace this
 		});
 	};
 
@@ -302,25 +301,25 @@ var stopwatchEM = stopwatchEM || {};
 	    var tr = $('tr[sq_id='+field_name+']');
 	    //stopwatchEM.log ('tr');stopwatchEM.log(tr);
 
-	    img = $('img[field="'+field_name+'"]', tr).not(".mapster_el");
- 	   //stopwatchEM.log ('img');stopwatchEM.log(img);
+	    img = $('img[field="'+field_name+'"]', tr).not(".mapster_el"); //// need to replace this
+ 	   	//stopwatchEM.log ('img');stopwatchEM.log(img);
 
  	   // If checkboxes are used, then update stopwatch from values
-  	  $('input[type=checkbox]:checked', tr).each(function() {
-  	      // (this) is redcap checkbox field.
-   	     var code = $(this).attr('code');
-   	     //stopwatchEM.log('Code: ' + code);
-   	     $(img).mapster('set',true,code);
-   	 });
+  	  	$('input[type=checkbox]:checked', tr).each(function() {
+  	    	// (this) is redcap checkbox field.
+   	    	var code = $(this).attr('code');
+   	    	//stopwatchEM.log('Code: ' + code);
+   	    	$(img).mapster('set',true,code); //// need to replace this
+   		});
 
    	 // If text - then process from list
     	$('input[type=text][name="'+field_name+'"]', tr).each(function() {
-    	    ////$(img).mapster('set',true,$(this).val());
+    		$(img).mapster('set',true,$(this).val()); //// need to replace this
     	});
 
     	// For radio button questions, the main input is here - use it to set value
     	$('input[name="'+field_name+'"]', tr).each(function() {
-    	    ////$(img).mapster('set',true,$(this).val());
+    		$(img).mapster('set',true,$(this).val()); //// need to replace this
     	});
 	
 	};
@@ -339,16 +338,16 @@ var stopwatchEM = stopwatchEM || {};
     	// If checkbox exists - make sure they are in-sync
     	$('input[type=checkbox][code="'+data.key+'"]', tr).each(function() {
         	//stopwatchEM.log ('Found checkbox ' + data.key);
- 	       //stopwatchEM.log (cb);
- 	       var checked = $(this).is(":checked");
- 	       //stopwatchEM.log ('is checked: ' + checked);
- 	       var selected = data.selected;
-  	      //stopwatchEM.log ('is selected: ' + selected);
-  	      if (checked !== selected) {
-  	          $(this).click().trigger('onclick');
-  	          //$(this).blur();
-        	}
-    	});
+ 	    	//stopwatchEM.log (cb);
+ 	    	var checked = $(this).is(":checked");
+ 	    	//stopwatchEM.log ('is checked: ' + checked);
+ 	    	var selected = data.selected;
+  	    	//stopwatchEM.log ('is selected: ' + selected);
+  	    	if (checked !== selected) {
+  	        	$(this).click().trigger('onclick');
+				  //$(this).blur();
+			}
+		});
 
 	//// don't think we need this...	
     	// If input field is used to hold list, then update list
