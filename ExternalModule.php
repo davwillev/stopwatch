@@ -27,24 +27,40 @@ class ExternalModule extends AbstractExternalModule {
             echo "<script>var stopwatchEM = stopwatchEM || {};</script>";
             echo "<script>stopwatchEM.helpUrl = " . json_encode($this->getUrl('documentation.php')) . ";</script>";
             ////echo "<script>stopwatchEM.maps = " . json_encode($this->getstopwatchParams()) . ";</script>";
-            echo "
-                <style>
-                    span.stopwatch {
-                        margin-right: 5px;
-                        overflow-wrap: normal;
-                        word-wrap: normal;
-                    }
+            ////echo "
+            ////    <style>
+            ////        span.stopwatch {
+            ////            margin-right: 5px;
+            ////            overflow-wrap: normal;
+            ////            word-wrap: normal;
+            ////        }
 
-                    div.stopwatch-container {
-                        overflow-wrap: normal;
-                        -ms-hyphens: auto;
-                        -moz-hyphens: auto;
-                        -webkit-hyphens: auto;
-                        hyphens: auto;
-                    }
-                </style>
-             ";
+            ////        div.stopwatch-container {
+            ////            overflow-wrap: normal;
+            ////            -ms-hyphens: auto;
+            ////            -moz-hyphens: auto;
+            ////            -webkit-hyphens: auto;
+            ////            hyphens: auto;
+            ////        }
+            ////    </style>
+            //// ";
 
+            echo "<script>stopwatchEM.laps = " . json_encode($this->getstopwatchParams()) . ";</script>";
+
+            echo '   
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+            </head>
+            <body onload="stopwatchEM.show()">
+	            <div>Time: <span id="time"></span></div>
+	            <button onclick="stopwatchEM.onStart()" id="start" style="width:150px">Start</button>
+                <button id="capture" style="width:150px">Capture</button>
+                <div id="laps"><ul></ul></div>
+            </body>
+            </html>
+            ';
+            
             $this->includeJs('js/helper.js');
         }
 
@@ -75,7 +91,6 @@ class ExternalModule extends AbstractExternalModule {
                 continue;
             }
 
-
             $row = $this->getDefaultConfig($display_mode); //// uncommented this
             ////$row = $this->getstopwatchParams($display_mode);
 
@@ -99,7 +114,6 @@ class ExternalModule extends AbstractExternalModule {
 
                 $settings[] = $row;
             }
-
 
         }
 
