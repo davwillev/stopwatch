@@ -230,6 +230,32 @@ var stopwatchEM = stopwatchEM || {};
 			}
 		}
 
+		/*
+   		// Get the image map (with IDs based on the question so you can have multiple of the same image maps on a single page)
+    	var id = params.field + '_' + params.name;
+    	var imgTag = $('<img/>', {
+        	name: params.name,
+        	field: params.field,
+        	src: params.src,
+        	width: params.width,
+        	id: params.field + '_' + params.name,
+        	usemap: '#map_' + id,
+        	alt: params.alt,
+        	border: 0
+    	});
+    	//imageMapEM.log('imgTag');imageMapEM.log($(imgTag));
+    	var mapTag = $('<map/>', {
+        	order: 1,
+        	name: 'map_' + id
+		}).html(params.areas);
+		*/
+
+    //Set the mouse-over title - in this case, the data-set attribute in the image map
+    $('area:not([data-key=""])[title=""]',mapTag).each(function() {
+        $(this).attr('title', $(this).attr('data-key'));
+    });
+
+
 		var stopwatch = $('<div style="margin-right:auto;margin-left:auto;width:'+params.width+'px"/>').addClass('stopwatch').append(imgTag).append(mapTag);
 		//stopwatchEM.log('stopwatch');stopwatchEM.log($(stopwatch));
 
@@ -255,7 +281,7 @@ var stopwatchEM = stopwatchEM || {};
     	// Load saved values
     	stopwatchEM.loadAreaList(params.field);
 
-		// If bound to a checkbox, handle checking the checkbox inputs directly to update the map
+		// If bound to a checkbox, handle checking the checkbox inputs directly to update
 		$('input[type=checkbox]', tr).parent().bind('click', function() {
 			// Prevent this code from happening twice when the event is fired from a click on the stopwatch
 			if(event.isTrusted) {
