@@ -103,7 +103,7 @@ var stopwatchEM = stopwatchEM || {};
 	};
 
 	stopwatchEM.update = function() {
-		$time.innerHTML = stopwatchEM.formatTime(time());
+		stopwatchEM.$time.innerHTML = stopwatchEM.formatTime(stopwatchEM.time());
 	};
 
 	stopwatchEM.onStart = function() {
@@ -111,7 +111,7 @@ var stopwatchEM = stopwatchEM || {};
 		document.getElementById("start").removeEventListener("click", stopwatchEM.onStart, false);
 		document.getElementById("capture").removeEventListener("click", stopwatchEM.onReset, false);
 		// Update timer with 1 ms intervals
-		clocktimer = setInterval("update()", 1); // TODO: see if we can change this to avoid requiring the update() method
+		clocktimer = setInterval("stopwatchEM.update()", 1); // TODO: see if we can change this to avoid requiring the update() method
 		stopwatchEM.start();
 		// Prepare Stop button
 		document.getElementById("start").innerHTML = "Stop & Capture"; // change label
@@ -162,17 +162,17 @@ var stopwatchEM = stopwatchEM || {};
 			return false; // stop the function if the value is empty
 		}
 		if (stops[lap_count - 1] === 1) {
-			var inner = `<b>Capture ${lap_count}:</b> ${formatTime(laps[lap_count - 1])} &#128721;`; // add a 'stop' sign when timer has been stopped
+			var inner = `<b>Capture ${lap_count}:</b> ${stopwatchEM.formatTime(laps[lap_count - 1])} &#128721;`; // add a 'stop' sign when timer has been stopped
 			document.getElementById("laps").innerHTML += '<li>' + inner + '</li>';	
 		} else {
-			var inner = `<b>Capture ${lap_count}:</b> ${formatTime(laps[lap_count - 1])}`;
+			var inner = `<b>Capture ${lap_count}:</b> ${stopwatchEM.formatTime(laps[lap_count - 1])}`;
 			document.getElementById("laps").innerHTML += '<li>' + inner + '</li>';
 		}
 	};
 
 	stopwatchEM.show = function() {
 
-		$time = document.getElementById('time');
+		stopwatchEM.$time = document.getElementById('time');
 		document.getElementById("capture").setAttribute("disabled","disabled"); // disable capture button until timer started
 		stopwatchEM.update();
 
