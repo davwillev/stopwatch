@@ -85,6 +85,9 @@ class StopwatchExternalModule extends AbstractExternalModule {
                         "error" => "Invalid JSON supplied for {$this->STOPWATCH} action tag of field '{$field}'."
                     );
                 }
+                if (!isset($params["digits"])) {
+                    $params["digits"] = 3;
+                }
                 $field_params[$field] = $params;
             }
         }
