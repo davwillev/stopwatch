@@ -33,13 +33,33 @@ class StopwatchExternalModule extends AbstractExternalModule {
             if (!class_exists("\RUB\Utility\InjectionHelper")) include_once("classes/InjectionHelper.php");
             $ih = InjectionHelper::init($this);
             $ih->js("js/stopwatch-em.js", $isSurvey);
+            $ih->css("css/stopwatch-em.css", $isSurvey);
             $debug = $this->getProjectSetting("debug-js") == true;
+            // Transfer data to the JavaScript implementation.
             ?>
             <script>
                 var DTO = window.ExternalModules.StopwatchEM_DTO;
                 DTO.debug = <?=json_encode($debug)?>;
                 DTO.fields = <?=json_encode($fields)?>;
             </script>
+            <template data-stopwatch-em="basic">
+                <div class="stopwatch-em stopwatch-em-container" aria-label="Stopwatch EM">
+                    <div class="input-group input-group-sm">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text"><i class="far fa-hourglass"></i></div>
+                        </div>
+                        <div class="input-group-append">
+                            <div class="input-group-text stopwatch-em-timerdisplay"></div>
+                        </div>
+                        <div class="input-group-append">
+                            <button role="button" class="btn btn-secondary stopwatch-em-startstop">Start</button>
+                        </div>
+                        <div class="input-group-append">
+                            <button role="button" class="btn btn-secondary stopwatch-em-reset">Reset</button>
+                        </div>
+                    </div>
+                </div>
+            </template>
             <?php
         }
     }
