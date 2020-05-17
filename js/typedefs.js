@@ -30,6 +30,7 @@
  * @type {{
  *  id: string
  *  $display: JQuery
+ *  $hourglass: JQuery
  *  params: StopwatchParams
  *  running: boolean
  *  elapsed: number

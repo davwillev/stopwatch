@@ -88,34 +88,42 @@ function error(id, error, $tr) {
 
 /**
  * Create HTML for a Stopwatch.
+ * TODO: This will have to be adapted to work with various modes.
  * @param {string} id 
  * @param {StopwatchParams} params 
  * @param {JQuery} $tr
  * @param {JQuery} $input
  */
 function create(id, params, $tr, $input) {
-    // Determine decimal char.
+    // Determine decimal char and digits (for time_mm_ss).
     var fv = $input.attr('fv')
     params.decimal = (fv.includes('number') && fv.includes('comma')) ? ',' : '.'
+    if (fv == 'time_mm_ss') params.digits = 0
+    // Is there a previously saved value?
+    var val = $input.val()
     // Template.
     var $sw = getTemplate('basic')
     $sw.attr('data-stopwatch-em-id', id)
-    // Display component.
+    // Display components.
     var $display = $sw.find('.stopwatch-em-timerdisplay')
+    var $hourglass = $sw.find('.stopwatch-em-hourglass')
     // Init data structure and update display.
+    var elapsed = calculateElapsed(params, $input)
     SWD[id] = {
         id: id,
         $display: $display,
+        $hourglass: $hourglass,
         params: params,
-        elapsed: 0,
+        elapsed: elapsed,
         running: false,
         laps: []
     }
-    update(id)
+    updateElapsed(id)
+    updateHourglass(id)
     // Buttons
     var $reset = $sw.find('.stopwatch-em-reset')
     $reset.attr('data-stopwatch-em-id', id)
-    $reset.prop('disabled', true)
+    $reset.prop('disabled', elapsed == 0)
     $reset.on('click', function(e) {
         e.preventDefault()
         reset(id)
@@ -123,6 +131,7 @@ function create(id, params, $tr, $input) {
     })
     var $startStop = $sw.find('.stopwatch-em-startstop')
     $startStop.attr('data-stopwatch-em-id', id)
+    $startStop.prop('disabled', elapsed > 0)
     $startStop.on('click', function(e) {
         e.preventDefault()
         if (SWD[id].running) {
@@ -151,6 +160,10 @@ function create(id, params, $tr, $input) {
     if ($insertionPoint.length == 0) {
         $insertionPoint = $tr.find('div.space')
     }
+    if ($insertionPoint.length == 0) {
+        $insertionPoint = $tr.find('td.labelrc').last()
+    }
+
     $insertionPoint.prepend($sw)
     log('Added Stopwatch to \'' + id + '\'', $insertionPoint)
 }
@@ -185,7 +198,35 @@ function insertElapsed(sw, $input) {
         var elapsed = format(sw.elapsed, sw.params)
         $input.val(elapsed.mm_ss)
     }
+    // Trigger change so that REDCap will do branching etc.
+    $input.trigger('change')
 }
+
+
+/**
+ * Gets a time value from a target field and calculates the elapsed time.
+ * @param {StopwatchParams} params 
+ * @param {JQuery} $input 
+ * @returns {number} The elapsed time in ms.
+ */
+function calculateElapsed(params, $input) {
+    var val = $input.val().toString()
+    if (val == '') return 0
+    var fv = $input.attr('fv')
+    if (fv == 'integer') {
+        return parseInt(val)
+    }
+    else if (fv.startsWith('number')) {
+        return Math.round(parseFloat(val.split(params.decimal).join('.')) * 1000)
+    }
+    else if (fv == 'time_mm_ss') {
+        var m_s = val.split(':')
+        var m = parseInt(m_s[0])
+        var s = parseInt(m_s[1])
+        return (m * 60 + s) * 1000
+    }
+}
+
 
 /**
  * Calculates the time (in ms) elapsed since the last start of the stopwatch.
@@ -197,20 +238,32 @@ function getElapsed(id) {
         var now = new Date()
         return sw.elapsed + (now.getTime() - sw.lapStartTime.getTime())
     }
-    return 0
+    return sw.elapsed
 }
 
 /**
  * Updates the stopwatch display.
  * @param {string} id 
- * @param {number} elapsed Override
  */
-function update(id, elapsed = null) {
+function updateElapsed(id) {
     var sw = SWD[id]
-    elapsed = elapsed === null ? getElapsed(id) : elapsed
+    var elapsed = getElapsed(id)
     var text = format(elapsed, sw.params).string
     sw.$display.text(text)
 }
+
+/**
+ * Updates the hourglass display.
+ * @param {string} id 
+ */
+function updateHourglass(id) {
+    var sw = SWD[id]
+    sw.$hourglass.removeClass(['fa-hourglass-start', 'fa-hourglass-half', 'fa-hourglass-end'])
+    var hourglass = 'fa-hourglass-' + (sw.running ? 'half' : (sw.elapsed > 1 ? 'end' : 'start'))
+    sw.$hourglass.addClass(hourglass)
+}
+
+
 
 /**
  * Start or resume timer.
@@ -224,9 +277,10 @@ function start(id) {
         sw.startTime = now
         sw.running = true
         sw.clocktimer = setInterval(function() {
-            update(id)
+            updateElapsed(id)
         }, TIMERINTERVAL)
     }
+    updateHourglass(id)
     log('Stopwatch [' + id + '] has been started at ' + now.toLocaleTimeString() + '.')
 }
 
@@ -250,7 +304,8 @@ function stop(id) {
         isStop: true
     })
     // Update displayed time so there is no discrepancy.
-    update(id, sw.elapsed)
+    updateElapsed(id)
+    updateHourglass(id)
     log('Stopwatch [' + id + '] has been stopped at ' + now.toLocaleTimeString() + '. Elapsed: ' + format(elapsed, sw.params).string )
 }
 
@@ -259,18 +314,18 @@ function stop(id) {
  * @param {string} id 
  */
 function reset(id) {
-    if (SWD[id].running) return
-
-    var params = SWD[id].params
-    var $display = SWD[id].$display
-    SWD[id] = {
-        id: id,
-        $display: $display,
-        params: params,
-        elapsed: 0,
-        running: false,
-        laps: []
-    }
+    var sw = SWD[id]
+    if (sw.running) return
+    // Reset.
+    sw.elapsed = 0
+    sw.startTime = null
+    sw.stopTime = null
+    sw.lapStartTime = null
+    sw.lapStopTime = null
+    sw.laps = []
+    sw.running = false
+    updateElapsed(id)
+    updateHourglass(id)
     log('Stopwatch [' + id + '] has been reset.')
 }
 
