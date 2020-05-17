@@ -46,7 +46,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
                 <div class="stopwatch-em stopwatch-em-container" aria-label="Stopwatch EM">
                     <div class="input-group input-group-sm">
                         <div class="input-group-prepend">
-                            <div class="input-group-text"><i class="far fa-hourglass"></i></div>
+                            <div class="input-group-text"><i class="fas fa-hourglass-start stopwatch-em-hourglass"></i></div>
                         </div>
                         <div class="input-group-append">
                             <div class="input-group-text stopwatch-em-timerdisplay"></div>
