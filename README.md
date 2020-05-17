@@ -14,6 +14,7 @@ A REDCap External Module that provides a stopwatch widget that can be integrated
 - To include a stopwatch on a form or survey, add the @STOPWATCH action tag to any field. 
 - The stopwatch widget is appended to this field's label.
 - Multiple stopwatches can be used on the same form.
+- But only one action tag can ever be used for each field.
 
 ## Configuration
 
