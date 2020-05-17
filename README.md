@@ -33,7 +33,7 @@ Elapsed time will be stored as follows:
 
 ## Acknowledgements
 
-This module uses some code from Andy Martin (ActionTagHelper).
+This module uses some code from Andy Martin (ActionTagHelper and other bits).
 
 ## Changelog
 
