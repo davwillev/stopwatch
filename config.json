@@ -1,7 +1,7 @@
 {
     "name": "Stopwatch",
 
-    "namespace": "UoB\\StopwatchExternalModule",
+    "namespace": "Stopwatch\\StopwatchExternalModule",
     
     "description": "A REDCap External Module that provides a stopwatch widget that can be integrated into data entry forms or surveys. Results (elapsed time, times started/stopped) can be captured in a number of ways.",
     
@@ -11,9 +11,9 @@
 
     "authors": [
         {
-            "name": "Nadege Haouidji-Javayx",
-            "email": "n.c.haouidji-javaux@bham.ac.uk",
-            "institution": "University of Birmingham"
+            "name": "Günther Rezniczek",
+            "email": "guenther.rezniczek@rub.de",
+            "institution": "Ruhr-Universität Bochum"
         },
         {
             "name": "David W. Evans",
@@ -21,9 +21,9 @@
             "institution": "University of Birmingham"
         },
         {
-            "name": "Günther Rezniczek",
-            "email": "guenther.rezniczek@rub.de",
-            "institution": "Ruhr-Universität Bochum"
+            "name": "Nadege Haouidji-Javayx",
+            "email": "n.c.haouidji-javaux@bham.ac.uk",
+            "institution": "University of Birmingham"
         }
     ],
 
