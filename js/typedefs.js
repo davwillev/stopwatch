@@ -25,6 +25,11 @@
  *  group_separator: string
  *  unset_display_symbol : string
  *  digits: number
+ *  h_digits: number
+ *  m_digits: number
+ *  s_digits: number
+ *  no_hours: boolean
+ *  no_minutes: boolean
  *  display_format: string
  *  store_format: string
  *  error: string

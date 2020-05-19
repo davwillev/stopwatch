@@ -98,7 +98,7 @@ function error(id, error, $tr) {
  */
 function createBasic(id, params, $tr, $input) {
     // Is there a previously saved value?
-    var val = $input.val()
+    var val = $input.val().toString()
     // Template.
     var $sw = getTemplate('basic')
     $sw.attr('data-stopwatch-em-id', id)
@@ -106,7 +106,7 @@ function createBasic(id, params, $tr, $input) {
     var $display = $sw.find('.stopwatch-em-timerdisplay')
     var $hourglass = $sw.find('.stopwatch-em-hourglass')
     // Init data structure and update display.
-    var elapsed = calculateElapsed(params, $input)
+    var elapsed = parseValue(params, val)
     SWD[id] = {
         id: id,
         $display: $display,
@@ -155,7 +155,8 @@ function createBasic(id, params, $tr, $input) {
     })
     // Hookup change event.
     $input.on('change', function() {
-        var elapsed = calculateElapsed(params, $input)
+        var val = $input.val().toString()
+        var elapsed = parseValue(params, val)
         // Set stopwatch to value (forcing stop if necessary) and update display.
         set(id, elapsed)
         $startStop.text('Start')
@@ -196,38 +197,14 @@ function insertElapsed(sw, $input) {
     if (sw.params.is_mm_ss && sw.elapsed > 3599499) {
         // TODO: tt-fy, nicer alert
         alert('Elapsed times > 59:59 cannot be inserted! Reseting to stored value (or blank).')
-        var elapsed = calculateElapsed(sw.params, $input)
+        var val = $input.val().toString()
+        var elapsed = parseValue(sw.params, val)
         set(sw.id, elapsed)
     }
     else {
         $input.val(format(sw.elapsed, sw.params).store)
         // Trigger change so that REDCap will do branching etc.
         $input.trigger('change')
-    }
-}
-
-
-/**
- * Gets a time value from a target field and calculates the elapsed time.
- * @param {StopwatchParams} params 
- * @param {JQuery} $input 
- * @returns {number} The elapsed time in ms.
- */
-function calculateElapsed(params, $input) {
-    var val = $input.val().toString()
-    if (val == '') return -1
-    var fv = $input.attr('fv')
-    if (fv == 'integer') {
-        return parseInt(val)
-    }
-    else if (fv.startsWith('number')) {
-        return Math.round(parseFloat(val.split(params.decimal_separator).join('.')) * 1000)
-    }
-    else if (fv == 'time_mm_ss') {
-        var m_s = val.split(':')
-        var m = parseInt(m_s[0])
-        var s = parseInt(m_s[1])
-        return (m * 60 + s) * 1000
     }
 }
 
@@ -361,8 +338,12 @@ function reset(id) {
  * @param {string} fill
  */
 function lpad(v, digits, fill = '0') {
-    var s = fill.repeat(digits) + v
-    return s.substr(s.length - digits)
+    var s = '' + v
+    if (s.length < digits) {
+        s = fill.repeat(digits) + s
+        return s.substr(s.length - digits)
+    }
+    return s
 }
 
 /**
@@ -389,9 +370,9 @@ function format(time_ms, params) {
         time_ms: time_ms,
         S: params.unset_display_symbol,
         F: params.unset_display_symbol,
-        h: params.unset_display_symbol,
-        m: lpad(params.unset_display_symbol, 2, params.unset_display_symbol),
-        s: lpad(params.unset_display_symbol, 2, params.unset_display_symbol),
+        h: lpad(params.unset_display_symbol, params.h_digits, params.unset_display_symbol),
+        m: lpad(params.unset_display_symbol, params.m_digits, params.unset_display_symbol),
+        s: lpad(params.unset_display_symbol, params.s_digits, params.unset_display_symbol),
         f: rpad(params.unset_display_symbol, params.digits, params.unset_display_symbol),
         d: params.decimal_separator,
         g: params.group_separator
@@ -399,10 +380,17 @@ function format(time_ms, params) {
     if (time_ms >= 0) {
         var S, F, h, m, s, ms, ms_rounded, f, rest
         F = time_ms
-        h = Math.floor(time_ms / 3600000) // 60 * 60 * 1000
-        rest = time_ms - h * 3600000
-        m = Math.floor(rest / 60000) // 60 * 1000
-        rest -= m * 60000
+        rest = F
+        h = 0
+        if (!params.no_hours) {
+            h = Math.floor(time_ms / 3600000) // 60 * 60 * 1000
+            rest = rest - h * 3600000
+        }
+        m = 0
+        if (!params.no_minutes) {
+            m = Math.floor(rest / 60000) // 60 * 1000
+            rest = rest - m * 60000
+        }
         s = Math.floor(rest / 1000)
         ms = rest - s * 1000
         ms_rounded = (ms / 1000).toFixed(params.digits).substr(2)
@@ -417,13 +405,13 @@ function format(time_ms, params) {
         if (params.digits > 0) S = S + params.decimal_separator + f.toString()
         rv.S = S 
         rv.F = F.toString()
-        rv.h = h.toString()
-        rv.m = lpad(m, 2)
-        rv.s = lpad(s, 2)
+        rv.h = lpad(h, params.h_digits)
+        rv.m = lpad(m, params.m_digits)
+        rv.s = lpad(s, params.s_digits)
         rv.f = f
     }
-    rv.display = parseFormat(params.display_format, rv)
-    rv.store = parseFormat(params.store_format, rv)
+    rv.display = formatValue(params.display_format, rv)
+    rv.store = formatValue(params.store_format, rv)
     return rv
 }
 
@@ -432,7 +420,7 @@ function format(time_ms, params) {
  * @param {string} f 
  * @param {FormattedTime} t 
  */
-function parseFormat(f, t) {
+function formatValue(f, t) {
     var r = []
     var known = 'SFhmsfdg'
     var esc = '/'
@@ -451,6 +439,47 @@ function parseFormat(f, t) {
     }
     return r.join('')
 }
+
+/**
+ * Reads a elapsed time based on a storage format.
+ * @param {StopwatchParams} params
+ * @param {string} val The value to parse
+ * @return {number} Elapsed time
+ */
+function parseValue(params, val) {
+    // Empty.
+    if (val == '') return -1
+    var f = params.store_format
+    // Common storage formats.
+    if (f == '/F') return parseInt(val)
+    if (f == '/S') return parseFloat(val.replace(params.decimal_separator, '.')) * 1000
+    if (f == '/m/g/s') {
+        var m_s = val.split(params.group_separator)
+        var m = parseInt(m_s[0]) * 60000
+        var s = parseInt(m_s[1]) * 1000
+        return m + s
+    }
+    // Need to parse.
+    var data = {}
+    var known = 'SFhmsfdg'
+    var esc = '/'
+    var escaped = false
+    for (var i = 0; i < f.length; i++) {
+        var c = f[i]
+        if (c == esc && !escaped) {
+            escaped = true
+        } 
+        else if (escaped) {
+            // r.push(known.includes(c) ? t[c] : c)
+            escaped = false
+        } else {
+            // r.push(c)
+        }
+    }
+    log('Stopwatch - Advanced parsing of fields is not implemented yet - ' + f)
+    return -1
+}
+
 
 
 // Setup stopwatches when the page is ready.

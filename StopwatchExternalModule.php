@@ -125,10 +125,28 @@ class StopwatchExternalModule extends AbstractExternalModule {
         if ($params["mode"] == "basic" && !isset($params["target"])) {
             $params["target"] = $field;
         }
+        if (!isset($params["no_hours"])) {
+            $params["no_hours"] = false;
+        }
+        if (!isset($params["no_minutes"])) {
+            $params["no_minutes"] = false;
+        }
         if (!isset($params["digits"])) {
             $params["digits"] = 3;
         }
         $params["digits"] = min(3, max($params["digits"], 0));
+        if (!isset($params["h_digits"])) {
+            $params["h_digits"] = 1;
+        }
+        $params["h_digits"] = max($params["h_digits"], 1);
+        if (!isset($params["m_digits"])) {
+            $params["m_digits"] = 2;
+        }
+        $params["m_digits"] = min(2, max($params["m_digits"], 1));
+        if (!isset($params["s_digits"])) {
+            $params["s_digits"] = 2;
+        }
+        $params["s_digits"] = min(2, max($params["s_digits"], 1));
         if (!isset($params["decimal_separator"])) {
             $params["decimal_separator"] = $GLOBALS["default_number_format_decimal"];
         }
@@ -159,7 +177,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
                 }
                 else if ($validation == "time_mm_ss") {
                     $params["display_format"] = "/m/g/s";
-                    $params["store_format"] = "m/g/s";
+                    $params["store_format"] = "/m/g/s";
                     $params["digits"] = 0;
                     $params["is_mm_ss"] = true;
                 }
