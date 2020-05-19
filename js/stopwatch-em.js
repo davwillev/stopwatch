@@ -192,10 +192,18 @@ function getTemplate(name) {
  * @param {JQuery} $input 
  */
 function insertElapsed(sw, $input) {
-    var elapsed = format(sw.elapsed, sw.params)
-    $input.val(elapsed.store)
-    // Trigger change so that REDCap will do branching etc.
-    $input.trigger('change')
+    // Hard time_mm_ss limit (59:59)?
+    if (sw.params.is_mm_ss && sw.elapsed > 3599499) {
+        // TODO: tt-fy, nicer alert
+        alert('Elapsed times > 59:59 cannot be inserted! Reseting to stored value (or blank).')
+        var elapsed = calculateElapsed(sw.params, $input)
+        set(sw.id, elapsed)
+    }
+    else {
+        $input.val(format(sw.elapsed, sw.params).store)
+        // Trigger change so that REDCap will do branching etc.
+        $input.trigger('change')
+    }
 }
 
 
