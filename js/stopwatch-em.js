@@ -61,9 +61,11 @@ function setup() {
             error(field, params.error, $tr)
         }
         else {
-            var $input = $('input[name="' + params.elapsed + '"]')
+            var $input = $('input[name="' + params.target + '"]')
             if ($tr.length && $input.length) {
-                create(field, params, $tr, $input)
+                if (params.mode == 'basic') {
+                    createBasic(field, params, $tr, $input)
+                }
             }
         }
     })
@@ -87,18 +89,14 @@ function error(id, error, $tr) {
 }
 
 /**
- * Create HTML for a Stopwatch.
+ * Create HTML for a basic Stopwatch.
  * TODO: This will have to be adapted to work with various modes.
  * @param {string} id 
  * @param {StopwatchParams} params 
  * @param {JQuery} $tr
  * @param {JQuery} $input
  */
-function create(id, params, $tr, $input) {
-    // Determine decimal char and digits (for time_mm_ss).
-    var fv = $input.attr('fv')
-    params.decimal = (fv.includes('number') && fv.includes('comma')) ? ',' : '.'
-    if (fv == 'time_mm_ss') params.digits = 0
+function createBasic(id, params, $tr, $input) {
     // Is there a previously saved value?
     var val = $input.val()
     // Template.
@@ -123,7 +121,7 @@ function create(id, params, $tr, $input) {
     // Buttons
     var $reset = $sw.find('.stopwatch-em-reset')
     $reset.attr('data-stopwatch-em-id', id)
-    $reset.prop('disabled', elapsed == 0)
+    $reset.prop('disabled', elapsed < 0)
     $reset.on('click', function(e) {
         e.preventDefault()
         reset(id)
@@ -131,7 +129,7 @@ function create(id, params, $tr, $input) {
     })
     var $startStop = $sw.find('.stopwatch-em-startstop')
     $startStop.attr('data-stopwatch-em-id', id)
-    $startStop.prop('disabled', elapsed > 0)
+    $startStop.prop('disabled', elapsed > -1)
     $startStop.on('click', function(e) {
         e.preventDefault()
         if (SWD[id].running) {
@@ -155,6 +153,16 @@ function create(id, params, $tr, $input) {
         $startStop.prop('disabled', false)
         $input.val('')
     })
+    // Hookup change event.
+    $input.on('change', function() {
+        var elapsed = calculateElapsed(params, $input)
+        // Set stopwatch to value (forcing stop if necessary) and update display.
+        set(id, elapsed)
+        $startStop.text('Start')
+        $startStop.removeClass('stopwatch-em-running')
+        $startStop.prop('disabled', elapsed > -1)
+        $reset.prop('disabled', elapsed < 0)
+    })
     // Determine insertion point.
     var $insertionPoint = $tr.find('td.data')
     if ($insertionPoint.length == 0) {
@@ -163,7 +171,6 @@ function create(id, params, $tr, $input) {
     if ($insertionPoint.length == 0) {
         $insertionPoint = $tr.find('td.labelrc').last()
     }
-
     $insertionPoint.prepend($sw)
     log('Added Stopwatch to \'' + id + '\'', $insertionPoint)
 }
@@ -185,19 +192,8 @@ function getTemplate(name) {
  * @param {JQuery} $input 
  */
 function insertElapsed(sw, $input) {
-    var fv = $input.attr('fv')
-    if (fv == 'integer') {
-        $input.val(sw.elapsed)
-    }
-    else if (fv.startsWith('number')) {
-        var elapsed = format(sw.elapsed, sw.params)
-        var val = elapsed.time_s + (elapsed.ms_digits > 0 ? elapsed.ms_decimal + elapsed.ms : '')
-        $input.val(val)
-    }
-    else if (fv == 'time_mm_ss') {
-        var elapsed = format(sw.elapsed, sw.params)
-        $input.val(elapsed.mm_ss)
-    }
+    var elapsed = format(sw.elapsed, sw.params)
+    $input.val(elapsed.store)
     // Trigger change so that REDCap will do branching etc.
     $input.trigger('change')
 }
@@ -211,13 +207,13 @@ function insertElapsed(sw, $input) {
  */
 function calculateElapsed(params, $input) {
     var val = $input.val().toString()
-    if (val == '') return 0
+    if (val == '') return -1
     var fv = $input.attr('fv')
     if (fv == 'integer') {
         return parseInt(val)
     }
     else if (fv.startsWith('number')) {
-        return Math.round(parseFloat(val.split(params.decimal).join('.')) * 1000)
+        return Math.round(parseFloat(val.split(params.decimal_separator).join('.')) * 1000)
     }
     else if (fv == 'time_mm_ss') {
         var m_s = val.split(':')
@@ -248,7 +244,7 @@ function getElapsed(id) {
 function updateElapsed(id) {
     var sw = SWD[id]
     var elapsed = getElapsed(id)
-    var text = format(elapsed, sw.params).string
+    var text = format(elapsed, sw.params).display
     sw.$display.text(text)
 }
 
@@ -259,7 +255,7 @@ function updateElapsed(id) {
 function updateHourglass(id) {
     var sw = SWD[id]
     sw.$hourglass.removeClass(['fa-hourglass-start', 'fa-hourglass-half', 'fa-hourglass-end'])
-    var hourglass = 'fa-hourglass-' + (sw.running ? 'half' : (sw.elapsed > 1 ? 'end' : 'start'))
+    var hourglass = 'fa-hourglass-' + (sw.running ? 'half' : (sw.elapsed > 0 ? 'end' : 'start'))
     sw.$hourglass.addClass(hourglass)
 }
 
@@ -306,8 +302,29 @@ function stop(id) {
     // Update displayed time so there is no discrepancy.
     updateElapsed(id)
     updateHourglass(id)
-    log('Stopwatch [' + id + '] has been stopped at ' + now.toLocaleTimeString() + '. Elapsed: ' + format(elapsed, sw.params).string )
+    log('Stopwatch [' + id + '] has been stopped at ' + now.toLocaleTimeString() + '. Elapsed: ' + format(elapsed, sw.params).display)
 }
+
+/**
+ * Sets the stopwatch to a value.
+ * @param {string} id 
+ * @param {number} elapsed
+ */
+function set(id, elapsed) {
+    var sw = SWD[id]
+    if (sw.running) {
+        clearInterval(sw.clocktimer)
+        sw.running = false
+    }
+    sw.elapsed = elapsed
+    sw.laps = []
+    // Update displayed time so there is no discrepancy.
+    updateElapsed(id)
+    updateHourglass(id)
+    log('Stopwatch [' + id + '] has been set to ' + format(elapsed, sw.params).display)
+}
+
+
 
 /**
  * Resets the timer.
@@ -317,7 +334,7 @@ function reset(id) {
     var sw = SWD[id]
     if (sw.running) return
     // Reset.
-    sw.elapsed = 0
+    sw.elapsed = -1
     sw.startTime = null
     sw.stopTime = null
     sw.lapStartTime = null
@@ -331,50 +348,75 @@ function reset(id) {
 
 /**
  * Left-pads a number with zeros.
- * @param {number} num 
+ * @param {any} v 
  * @param {number} digits 
+ * @param {string} fill
  */
-function pad(num, digits) {
-    var s = '0'.repeat(digits) + num
+function lpad(v, digits, fill = '0') {
+    var s = fill.repeat(digits) + v
     return s.substr(s.length - digits)
 }
 
 /**
- * Formats a time value (in ms) as a string of the format 'hours:mm:ss.nnn'
+ * Right-pads a number with zeros.
+ * @param {any} v 
+ * @param {number} digits 
+ * @param {string} fill
+ */
+function rpad(v, digits, fill = '0') {
+    var s = v + fill.repeat(digits)
+    return s.substr(0, digits)
+}
+
+
+/**
+ * Formats a time value (in ms)
  * @param {number} time_ms 
  * @param {StopwatchParams} params
  * @return {FormattedTime}
  */
 function format(time_ms, params) {
-    var ms_digits = params.digits
-    var ms_decimal = params.decimal
-    ms_digits = Math.max(0, Math.min(3, ms_digits))
-    var h = Math.floor(time_ms / 3600000) // 60 * 60 * 1000
-    var rest = time_ms - h * 3600000
-    var m = Math.floor(rest / 60000) // 60 * 1000
-    rest -= m * 60000
-    var s = Math.floor(rest / 1000)
-    var ms = rest - s * 1000
-    ms = Math.round(ms / Math.pow(10, 3 - ms_digits))
-    // Add ms to s in case of rounding to 0 digits.
-    s = ms_digits == 0 ? s + ms : s
-    var formatted = [h, pad(m, 2), pad(s, 2)].join(':') + (ms_digits > 0 ? ms_decimal + pad(ms, ms_digits) : '')
-    var mm_ss = m < 60 ? [pad(m, 2), pad(s, 2)].join(':') : '' // Max is 59:59
-    return {
+    /** @type {FormattedTime} */
+    var rv = {
         time_ms: time_ms,
-        time_s: Math.floor(time_ms / 1000),
-        h: h.toString(),
-        m: m.toString(),
-        s: s.toString(),
-        ms: ms_digits == 0 ? '' : ms.toString(),
-        ms_digits: ms_digits,
-        ms_decimal: ms_decimal,
-        string: formatted,
-        mm_ss: mm_ss
+        S: params.unset_display_symbol,
+        F: params.unset_display_symbol,
+        h: params.unset_display_symbol,
+        m: lpad(params.unset_display_symbol, 2, params.unset_display_symbol),
+        s: lpad(params.unset_display_symbol, 2, params.unset_display_symbol),
+        f: rpad(params.unset_display_symbol, params.digits, params.unset_display_symbol),
+        d: params.decimal_separator,
+        g: params.group_separator
     }
+    if (time_ms >= 0) {
+        var S, F, h, m, s, ms, ms_rounded, f, rest
+        F = time_ms
+        h = Math.floor(time_ms / 3600000) // 60 * 60 * 1000
+        rest = time_ms - h * 3600000
+        m = Math.floor(rest / 60000) // 60 * 1000
+        rest -= m * 60000
+        s = Math.floor(rest / 1000)
+        ms = rest - s * 1000
+        S = h * 3600 + m * 60 + s
+        ms_rounded = (ms / 1000).toFixed(params.digits).substr(2)
+        f = rpad(ms_rounded, params.digits)
+        // Add ms to s in case of rounding to 0 digits.
+        if (params.digits == 0) {
+            s = Math.round(s + ms / 1000)
+            if (s == 60) { s = 0; m = m + 1; }
+            if (m == 60) { m = 0; h = h + 1; }
+        }
+        rv.S = S.toString() + params.decimal_separator + f.toString()
+        rv.F = F.toString()
+        rv.h = h.toString()
+        rv.m = lpad(m, 2)
+        rv.s = lpad(s, 2)
+        rv.f = f
+    }
+    rv.display = params.display_format.split('').map(function(c) { return rv[c] }).join('')
+    rv.store = params.store_format.split('').map(function(c) { return rv[c] }).join('')
+    return rv
 }
-
-
 
 
 // Setup stopwatches when the page is ready.

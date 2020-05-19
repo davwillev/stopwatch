@@ -18,10 +18,16 @@
 /**
  * @typedef StopwatchParams
  * @type {{
- *  elapsed: string
- *  decimal?: string
+ *  mode: string
+ *  is_mm_ss : boolean
+ *  target: string
+ *  decimal_separator: string
+ *  group_separator: string
+ *  unset_display_symbol : string
  *  digits: number
- *  error?: string
+ *  display_format: string
+ *  store_format: string
+ *  error: string
  * }}
  */
 
@@ -57,14 +63,15 @@
  * @typedef FormattedTime
  * @type {{
  *  time_ms: number
- *  time_s: number
+ *  S: string
+ *  F: string
  *  h: string
  *  m: string
  *  s: string
- *  ms: string
- *  ms_digits: number
- *  ms_decimal : string
- *  string: string
- *  mm_ss: string
+ *  f: string
+ *  d: string
+ *  g: string
+ *  display?: string
+ *  store?: string
  * }}
  */
