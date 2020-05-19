@@ -3,7 +3,7 @@
 use ExternalModules\AbstractExternalModule;
 use \REDCap;
 use \Stanford\Utility\ActionTagHelper as ActionTagHelper;
-use \RUB\Utility\InjectionHelper as InjectionHelper;
+use \DE\RUB\Utility\InjectionHelper as InjectionHelper;
 
 /**
  * ExternalModule class for Configuration Design Study.

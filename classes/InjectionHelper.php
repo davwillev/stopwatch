@@ -1,4 +1,4 @@
-<?php namespace RUB\Utility;
+<?php namespace DE\RUB\Utility;
 
 class InjectionHelper
 {
