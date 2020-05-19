@@ -1,7 +1,7 @@
 {
     "name": "Stopwatch",
 
-    "namespace": "Stopwatch\\StopwatchExternalModule",
+    "namespace": "DE\\RUB\\StopwatchExternalModule",
     
     "description": "A REDCap External Module that provides a stopwatch widget that can be integrated into data entry forms or surveys. Results (elapsed time, times started/stopped) can be captured in a number of ways.",
     
