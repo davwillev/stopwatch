@@ -1,4 +1,4 @@
-<?php namespace UoB\StopwatchExternalModule;
+<?php namespace Stopwatch\StopwatchExternalModule;
 
 use ExternalModules\AbstractExternalModule;
 use \REDCap;
