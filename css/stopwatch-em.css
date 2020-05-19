@@ -32,6 +32,5 @@
 .stopwatch-em-error {
     color: white;
     font-weight: bold;
-    padding: 0.5em;
     background-color: var(--danger);
 }
