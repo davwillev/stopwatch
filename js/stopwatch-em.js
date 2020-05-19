@@ -405,7 +405,6 @@ function format(time_ms, params) {
         rest -= m * 60000
         s = Math.floor(rest / 1000)
         ms = rest - s * 1000
-        S = h * 3600 + m * 60 + s
         ms_rounded = (ms / 1000).toFixed(params.digits).substr(2)
         f = rpad(ms_rounded, params.digits)
         // Add ms to s in case of rounding to 0 digits.
@@ -414,16 +413,43 @@ function format(time_ms, params) {
             if (s == 60) { s = 0; m = m + 1; }
             if (m == 60) { m = 0; h = h + 1; }
         }
-        rv.S = S.toString() + params.decimal_separator + f.toString()
+        S = (h * 3600 + m * 60 + s).toString()
+        if (params.digits > 0) S = S + params.decimal_separator + f.toString()
+        rv.S = S 
         rv.F = F.toString()
         rv.h = h.toString()
         rv.m = lpad(m, 2)
         rv.s = lpad(s, 2)
         rv.f = f
     }
-    rv.display = params.display_format.split('').map(function(c) { return rv[c] }).join('')
-    rv.store = params.store_format.split('').map(function(c) { return rv[c] }).join('')
+    rv.display = parseFormat(params.display_format, rv)
+    rv.store = parseFormat(params.store_format, rv)
     return rv
+}
+
+/**
+ * Formats an elapsed time.
+ * @param {string} f 
+ * @param {FormattedTime} t 
+ */
+function parseFormat(f, t) {
+    var r = []
+    var known = 'SFhmsfdg'
+    var esc = '/'
+    var escaped = false
+    for (var i = 0; i < f.length; i++) {
+        var c = f[i]
+        if (c == esc && !escaped) {
+            escaped = true
+        } 
+        else if (escaped) {
+            r.push(known.includes(c) ? t[c] : c)
+            escaped = false
+        } else {
+            r.push(c)
+        }
+    }
+    return r.join('')
 }
 
 

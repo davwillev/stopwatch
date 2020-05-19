@@ -146,6 +146,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
             $metadata = @$metadata[$targetField];
             $isAllowed = function($validation) {
                 return 
+                    $validation == "" ||
                     $validation == "integer" ||
                     substr($validation, 0, 6) == "number" ||
                     $validation == "time_mm_ss";
@@ -153,19 +154,19 @@ class StopwatchExternalModule extends AbstractExternalModule {
             $validation = @$metadata["text_validation_type_or_show_slider_number"];
             if (@$metadata["field_type"] == "text" && $isAllowed($validation)) {
                 if ($validation == "integer") {
-                    $params["display_format"] = "hgmgs" . ($params["digits"] > 0 ? "df" : "");
-                    $params["store_format"] = "F";
+                    $params["display_format"] = "/h/g/m/g/s" . ($params["digits"] > 0 ? "/d/f" : "");
+                    $params["store_format"] = "/F";
                 }
                 else if ($validation == "time_mm_ss") {
-                    $params["display_format"] = "mgs";
-                    $params["store_format"] = "mgs";
+                    $params["display_format"] = "/m/g/s";
+                    $params["store_format"] = "m/g/s";
                     $params["digits"] = 0;
                     $params["is_mm_ss"] = true;
                 }
-                else {
+                else if (strpos($validation, "comma") !== false) {
                     $params["decimal_separator"] = strpos($validation, "comma") === false ? "." : ",";
-                    $params["display_format"] = "hgmgs" . ($params["digits"] > 0 ? "df" : "");
-                    $params["store_format"] = "S";
+                    $params["display_format"] = "/h/g/m/g/s" . ($params["digits"] > 0 ? "/d/f" : "");
+                    $params["store_format"] = "/S";
                 }
             }
             else {
