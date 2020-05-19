@@ -23,6 +23,7 @@ A REDCap External Module that provides a stopwatch widget that can be integrated
 - The following parameters are supported. _All are optional._
   - `target`: The field to store the elapsed time in.
   - `digits`: The precisison to show (0, 1, 2, or 3).
+  - `h_digits`, `m_digits`, `s_digits`: (minimal) padding for hours, minutes, seconds.
   - `decimal_separator`: The decimal separator which is inserted between seconds and fractional seconds. This will be overriden by certain target field types.
   - `group_separator`: The character(s) inserted between hours, minutes, seconds.
   - `unset_display_symbol`: The symbol to be used as digit replacement when no value has been set yet.
