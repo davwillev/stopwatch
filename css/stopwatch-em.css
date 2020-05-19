@@ -1,0 +1,36 @@
+/* Stopwatch EM */
+
+.stopwatch-em-container {
+    margin: 0.5rem 0;
+    z-index: 1;
+}
+
+.stopwatch-em a {
+    color: white;
+}
+
+.stopwatch-em a:hover {
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+}
+
+.stopwatch-em-running,
+.stopwatch-em-running:focus,
+.stopwatch-em-running:hover {
+    background-color: rgba(207, 126, 126, 0.877);
+}
+
+.stopwatch-em-disabled,
+.stopwatch-em-disabled:hover {
+    color: rgb(133, 133, 133);
+    background-color: #6c757d;
+    border-color: #6c757d;
+    opacity: 0.5;
+}
+
+.stopwatch-em-error {
+    color: white;
+    font-weight: bold;
+    background-color: var(--danger);
+}
