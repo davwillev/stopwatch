@@ -51,10 +51,10 @@ class StopwatchExternalModule extends AbstractExternalModule {
                             <div class="input-group-text stopwatch-em-timerdisplay"></div>
                         </div>
                         <div class="input-group-append">
-                            <button role="button" class="btn btn-secondary stopwatch-em-startstop">Start</button>
+                            <button role="button" class="btn btn-secondary stopwatch-em-reset">Reset</button>
                         </div>
                         <div class="input-group-append">
-                            <button role="button" class="btn btn-secondary stopwatch-em-reset">Reset</button>
+                            <button role="button" class="btn btn-secondary stopwatch-em-startstop">Start</button>
                         </div>
                     </div>
                 </div>
