@@ -66,6 +66,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
 
     /**
      * Returns an array containing active fields and parameters for each field.
+     * TODO: This currently fails to alert the user about action tags with malformed JSON, as these are ignored by the ActionTagHelper.
      * @return array
      */
     private function getFieldParams($project_id, $instrument) {
@@ -125,11 +126,17 @@ class StopwatchExternalModule extends AbstractExternalModule {
         if ($params["mode"] == "basic" && !isset($params["target"])) {
             $params["target"] = $field;
         }
+        if (!isset($params["stops"])) {
+            $params["stops"] = false;
+        }
         if (!isset($params["no_hours"])) {
             $params["no_hours"] = false;
         }
         if (!isset($params["no_minutes"])) {
             $params["no_minutes"] = false;
+        }
+        if ($params["no_minutes"]) {
+            $params["no_hours"] = true;
         }
         if (!isset($params["digits"])) {
             $params["digits"] = 3;
@@ -148,7 +155,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
         }
         $params["s_digits"] = min(2, max($params["s_digits"], 1));
         if (!isset($params["decimal_separator"])) {
-            $params["decimal_separator"] = $GLOBALS["default_number_format_decimal"];
+            $params["decimal_separator"] = ".";
         }
         if (!isset($params["group_separator"])) {
             $params["group_separator"] = ":";
@@ -172,19 +179,27 @@ class StopwatchExternalModule extends AbstractExternalModule {
             $validation = @$metadata["text_validation_type_or_show_slider_number"];
             if (@$metadata["field_type"] == "text" && $isAllowed($validation)) {
                 if ($validation == "integer") {
+                    // Text Box with Integer validation.
                     $params["display_format"] = "/h/g/m/g/s" . ($params["digits"] > 0 ? "/d/f" : "");
                     $params["store_format"] = "/F";
                 }
                 else if ($validation == "time_mm_ss") {
+                    // Text Box with Time (MM:SS) validation.
                     $params["display_format"] = "/m/g/s";
                     $params["store_format"] = "/m/g/s";
                     $params["digits"] = 0;
                     $params["is_mm_ss"] = true;
                 }
                 else if (strpos($validation, "number") !== false) {
+                    // Text Box with Number (any) validation.
                     $params["decimal_separator"] = strpos($validation, "comma") === false ? "." : ",";
                     $params["display_format"] = "/h/g/m/g/s" . ($params["digits"] > 0 ? "/d/f" : "");
                     $params["store_format"] = "/S";
+                }
+                else {
+                    // Text Box without validation.
+                    $params["display_format"] = "/h/g/m/g/s" . ($params["digits"] > 0 ? "/d/f" : "");
+                    $params["store_format"] = "/h:/m:/s" . ($params["digits"] > 0 ? "./f" : "");
                 }
             }
             else {
