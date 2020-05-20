@@ -181,7 +181,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
                     $params["digits"] = 0;
                     $params["is_mm_ss"] = true;
                 }
-                else if (strpos($validation, "comma") !== false) {
+                else if (strpos($validation, "number") !== false) {
                     $params["decimal_separator"] = strpos($validation, "comma") === false ? "." : ",";
                     $params["display_format"] = "/h/g/m/g/s" . ($params["digits"] > 0 ? "/d/f" : "");
                     $params["store_format"] = "/S";
