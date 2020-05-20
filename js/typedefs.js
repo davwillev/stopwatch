@@ -20,6 +20,7 @@
  * @type {{
  *  mode: string
  *  is_mm_ss : boolean
+ *  stops: boolean
  *  target: string
  *  decimal_separator: string
  *  group_separator: string

@@ -152,7 +152,7 @@ function createBasic(id, params, $tr, $input) {
             $reset.prop('disabled', false)
             $startStop.text('Start')
             $startStop.removeClass('stopwatch-em-running')
-            $startStop.prop('disabled', true)
+            $startStop.prop('disabled', SWD[id].params.stops == false)
             insertElapsed(SWD[id], $input)
         }
         else {
@@ -176,7 +176,7 @@ function createBasic(id, params, $tr, $input) {
         set(id, elapsed)
         $startStop.text('Start')
         $startStop.removeClass('stopwatch-em-running')
-        $startStop.prop('disabled', elapsed > -1)
+        $startStop.prop('disabled', elapsed > -1 && SWD[id].params.stops == false)
         $reset.prop('disabled', elapsed < 0)
     })
     // Determine insertion point.
@@ -293,7 +293,7 @@ function timerTick() {
 }
 
 /**
- * Start or resume timer.
+ * Start a stopwatch.
  * @param {string} id 
  */
 function start(id) {
@@ -329,7 +329,7 @@ function stop(id) {
         sw.lapStopTime = now
         sw.stopTime = now
         var elapsed = now.getTime() - sw.lapStartTime.getTime()
-        sw.elapsed = elapsed
+        sw.elapsed = sw.elapsed < 0 ? elapsed : sw.elapsed + elapsed
     }
     else if (sw.params.mode.startsWith('capture')) {
         log('Stopwatch EM: Capture mode not implemented yet.')
