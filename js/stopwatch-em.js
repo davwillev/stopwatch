@@ -1,8 +1,8 @@
 // @ts-check
-
+//
 // Stopwatch External Module
+//
 ;(function() {
-
 // Setup data transfer object.
 // @ts-ignore
 var EM = window.ExternalModules
@@ -15,10 +15,20 @@ if (typeof EM == 'undefined') {
 var DTO = EM.StopwatchEM_DTO || {}
 EM.StopwatchEM_DTO = DTO
 
+//#region Globals --------------------------------------------------------------------------
+
 /** @type {Object<string, StopwatchData>} Holds data for each stopwatch widget (there can be multiple) */
 var SWD = {}
 /** @type {number} The interval (in ms) at which the stopwatch display is refreshed */
-var TIMERINTERVAL = 5
+var TICKINTERVAL = 5
+/** @type {number} The timer handle */
+var CLOCK
+/** @type {boolean} Indicates whether the clock is currently ticking */
+var TICKING = false
+
+//#endregion
+
+//#region Logging --------------------------------------------------------------------------
 
 /**
  * Logs stuff to the console when in debug mode.
@@ -27,27 +37,31 @@ function log() {
     if (DTO.debug) {
         switch(arguments.length) {
             case 1: 
-                console.log(arguments[0]); 
-                return;
+            console.log(arguments[0]); 
+            return;
             case 2: 
-                console.log(arguments[0], arguments[1]); 
-                return;
+            console.log(arguments[0], arguments[1]); 
+            return;
             case 3: 
-                console.log(arguments[0], arguments[1], arguments[2]); 
-                return;
+            console.log(arguments[0], arguments[1], arguments[2]); 
+            return;
             case 4:
                 console.log(arguments[0], arguments[1], arguments[2], arguments[3]); 
                 return;
-            default:
+                default:
                 try {
                     console.log(...arguments);
                 }
                 catch {
                     console.log(arguments);
                 }
+            }
         }
     }
-}
+    
+//#endregion
+    
+//#region HTML and Update ------------------------------------------------------------------
 
 /**
  * Initial setup.
@@ -114,7 +128,8 @@ function createBasic(id, params, $tr, $input) {
         params: params,
         elapsed: elapsed,
         running: false,
-        laps: []
+        laps: [],
+        captures: []
     }
     updateElapsed(id)
     updateHourglass(id)
@@ -210,19 +225,6 @@ function insertElapsed(sw, $input) {
 
 
 /**
- * Calculates the time (in ms) elapsed since the last start of the stopwatch.
- * @param {string} id 
- */
-function getElapsed(id) {
-    var sw = SWD[id]
-    if (sw.running) {
-        var now = new Date()
-        return sw.elapsed + (now.getTime() - sw.lapStartTime.getTime())
-    }
-    return sw.elapsed
-}
-
-/**
  * Updates the stopwatch display.
  * @param {string} id 
  */
@@ -244,7 +246,51 @@ function updateHourglass(id) {
     sw.$hourglass.addClass(hourglass)
 }
 
+//#endregion
 
+//#region Clock functionality --------------------------------------------------------------
+
+/**
+ * Calculates the time (in ms) elapsed since the last start of the stopwatch.
+ * @param {string} id 
+ */
+function getElapsed(id) {
+    var sw = SWD[id]
+    if (sw.running) {
+        var now = new Date()
+        return sw.elapsed + (now.getTime() - sw.lapStartTime.getTime())
+    }
+    return sw.elapsed
+}
+
+/**
+ * Controls the single timer for all stopwatches in a page.
+ */
+function timerSet() {
+    var on = false
+    Object.keys(SWD).forEach(function(id) {
+        on = on || SWD[id].running
+    })
+    if (on && !TICKING) {
+        CLOCK = setInterval(timerTick, TICKINTERVAL)
+        TICKING = true
+    }
+    else if (!on && TICKING) {
+        TICKING = false
+        clearInterval(CLOCK)
+    }
+}
+
+/**
+ * Executed each time the timer ticks - updates the running stopwatches.
+ */
+function timerTick() {
+    Object.keys(SWD).forEach(function(id) {
+        if (SWD[id].running) {
+            updateElapsed(id)
+        }
+    })
+}
 
 /**
  * Start or resume timer.
@@ -253,15 +299,21 @@ function updateHourglass(id) {
 function start(id) {
     var sw = SWD[id]
     var now = new Date()
-    sw.lapStartTime = now
-    if (!sw.running) {
-        sw.startTime = now
-        sw.running = true
-        sw.clocktimer = setInterval(function() {
-            updateElapsed(id)
-        }, TIMERINTERVAL)
+    if (sw.params.mode == 'basic') {
+        if (!sw.running) {
+            sw.lapStartTime = now
+            sw.startTime = now
+            sw.running = true
+        }
+    }
+    else if (sw.params.mode.startsWith('capture')) {
+        log('Stopwatch EM: Capture mode not implemented yet.')
+    }
+    else if (sw.params.mode.startsWith('lap')) {
+        log('Stopwatch EM: Laps mode not implemented yet.')
     }
     updateHourglass(id)
+    timerSet()
     log('Stopwatch [' + id + '] has been started at ' + now.toLocaleTimeString() + '.')
 }
 
@@ -272,19 +324,27 @@ function start(id) {
 function stop(id) {
     var sw = SWD[id]
     var now = new Date()
-    clearInterval(sw.clocktimer)
-    sw.running = false
-    sw.lapStopTime = now
-    sw.stopTime = now
-    var elapsed = now.getTime() - sw.lapStartTime.getTime()
-    sw.elapsed = elapsed
-    sw.laps.push({
-        lapStartTime: sw.lapStartTime,
-        lapStopTime: now,
-        elapsed: elapsed,
-        isStop: true
-    })
+    if (sw.params.mode == 'basic') {
+        sw.running = false
+        sw.lapStopTime = now
+        sw.stopTime = now
+        var elapsed = now.getTime() - sw.lapStartTime.getTime()
+        sw.elapsed = elapsed
+    }
+    else if (sw.params.mode.startsWith('capture')) {
+        log('Stopwatch EM: Capture mode not implemented yet.')
+    }
+    else if (sw.params.mode.startsWith('capture')) {
+        log('Stopwatch EM: Lap mode not implemented yet.')
+        // sw.laps.push({
+        //     lapStartTime: sw.lapStartTime,
+        //     lapStopTime: now,
+        //     elapsed: elapsed,
+        //     isStop: true
+        // })
+    }
     // Update displayed time so there is no discrepancy.
+    timerSet()
     updateElapsed(id)
     updateHourglass(id)
     log('Stopwatch [' + id + '] has been stopped at ' + now.toLocaleTimeString() + '. Elapsed: ' + format(elapsed, sw.params).display)
@@ -298,12 +358,13 @@ function stop(id) {
 function set(id, elapsed) {
     var sw = SWD[id]
     if (sw.running) {
-        clearInterval(sw.clocktimer)
         sw.running = false
     }
     sw.elapsed = elapsed
     sw.laps = []
+    sw.captures = []
     // Update displayed time so there is no discrepancy.
+    timerSet()
     updateElapsed(id)
     updateHourglass(id)
     log('Stopwatch [' + id + '] has been set to ' + format(elapsed, sw.params).display)
@@ -325,11 +386,17 @@ function reset(id) {
     sw.lapStartTime = null
     sw.lapStopTime = null
     sw.laps = []
+    sw.captures = []
     sw.running = false
+    timerSet()
     updateElapsed(id)
     updateHourglass(id)
     log('Stopwatch [' + id + '] has been reset.')
 }
+
+//#endregion
+
+//#region Formatting -----------------------------------------------------------------------
 
 /**
  * Left-pads a number with zeros.
@@ -411,6 +478,9 @@ function format(time_ms, params) {
         rv.f = f
     }
     rv.display = formatValue(params.display_format, rv)
+    // Always use two digits for m and s for storage.
+    rv.m = lpad(rv.m, 2)
+    rv.s = lpad(rv.s, 2)
     rv.store = formatValue(params.store_format, rv)
     return rv
 }
@@ -450,37 +520,62 @@ function parseValue(params, val) {
     // Empty.
     if (val == '') return -1
     var f = params.store_format
-    // Common storage formats.
-    if (f == '/F') return parseInt(val)
-    if (f == '/S') return parseFloat(val.replace(params.decimal_separator, '.')) * 1000
-    if (f == '/m/g/s') {
-        var m_s = val.split(params.group_separator)
-        var m = parseInt(m_s[0]) * 60000
-        var s = parseInt(m_s[1]) * 1000
-        return m + s
-    }
-    // Need to parse.
-    var data = {}
-    var known = 'SFhmsfdg'
-    var esc = '/'
-    var escaped = false
-    for (var i = 0; i < f.length; i++) {
-        var c = f[i]
-        if (c == esc && !escaped) {
-            escaped = true
-        } 
-        else if (escaped) {
-            // r.push(known.includes(c) ? t[c] : c)
-            escaped = false
-        } else {
-            // r.push(c)
+    try {
+        // Common storage formats.
+        if (f == '/F') return parseInt(val)
+        if (f == '/S') return parseFloat(val.replace(params.decimal_separator, '.')) * 1000
+        if (f == '/m/g/s') {
+            var m_s = val.split(params.group_separator)
+            var m = parseInt(m_s[0]) * 60000
+            var s = parseInt(m_s[1]) * 1000
+            return m + s
         }
+        // Need to parse. This is quite limited in capability. It relies on non-digit-separators being present between any digit groups.
+        var data = {
+            h: '',
+            m: '',
+            s: '',
+            f: ''
+        }
+        var known = 'hmsf'
+        var digits = '0123456789'
+        var esc = '/'
+        var escaped = false
+        var pos = 0 // Position in val
+            for (var i = 0; i < f.length; i++) {
+            var c = f[i]
+            if (c == esc && !escaped) {
+                escaped = true
+            } 
+            else if (escaped) {
+                if (known.includes(c)) {
+                    var num = ''
+                    do {
+                        var val_c = val.substr(pos, 1)
+                        if (digits.includes(val_c)) {
+                            num = num + val_c
+                            pos++
+                        }
+                        else break
+                    } while (pos < val.length)
+                    data[c] = num
+                }
+                escaped = false
+            } else {
+                pos++
+            }
+        }
+        data.f = rpad(data.f.substr(0, 3), 3, '0')
+        var elapsed = parseInt(data.h) * 3600000 + parseInt(data.m) * 60000 + parseInt(data.s) * 1000 + parseInt(data.f)
+        return elapsed
     }
-    log('Stopwatch - Advanced parsing of fields is not implemented yet - ' + f)
+    catch {
+        log('Stopwatch - Failed to parse stored value: ' + val)
+    }
     return -1
 }
 
-
+//#endregion
 
 // Setup stopwatches when the page is ready.
 $(function() {

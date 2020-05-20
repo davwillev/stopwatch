@@ -46,7 +46,7 @@
  *  running: boolean
  *  elapsed: number
  *  laps: LapInfo[]
- *  clocktimer?: number
+ *  captures: CaptureInfo[]
  *  startTime?: Date
  *  stopTime?: Date
  *  lapStartTime?: Date
@@ -59,6 +59,16 @@
  * @type {{
  *  lapStartTime: Date
  *  lapStopTime: Date
+ *  elapsed: number
+ *  isStop: boolean
+ * }}
+ */
+
+/**
+ * @typedef CaptureInfo
+ * @type {{
+ *  captureStartTime: Date
+ *  captureStopTime: Date
  *  elapsed: number
  *  isStop: boolean
  * }}
