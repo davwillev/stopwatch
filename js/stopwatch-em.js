@@ -134,15 +134,18 @@ function createBasic(id, params, $tr, $input) {
     updateElapsed(id)
     updateHourglass(id)
     // Buttons
+    var $startStop = $sw.find('.stopwatch-em-startstop')
     var $reset = $sw.find('.stopwatch-em-reset')
+    $reset.text(params.label_reset)
     $reset.attr('data-stopwatch-em-id', id)
     $reset.prop('disabled', elapsed < 0)
     $reset.on('click', function(e) {
         e.preventDefault()
+        $startStop.text(params.label_start)
         reset(id)
         return false
     })
-    var $startStop = $sw.find('.stopwatch-em-startstop')
+    $startStop.text(params.label_start)
     $startStop.attr('data-stopwatch-em-id', id)
     $startStop.prop('disabled', elapsed > -1)
     $startStop.on('click', function(e) {
@@ -150,14 +153,14 @@ function createBasic(id, params, $tr, $input) {
         if (SWD[id].running) {
             stop(id)
             $reset.prop('disabled', false)
-            $startStop.text('Start')
+            $startStop.text(params.stops ? params.label_resume : params.label_start)
             $startStop.removeClass('stopwatch-em-running')
-            $startStop.prop('disabled', SWD[id].params.stops == false)
+            $startStop.prop('disabled', params.stops == false)
             insertElapsed(SWD[id], $input)
         }
         else {
             $reset.prop('disabeld', true)
-            $startStop.text('Stop')
+            $startStop.text(params.label_stop)
             $startStop.addClass('stopwatch-em-running')
             start(id)
         }
@@ -174,9 +177,8 @@ function createBasic(id, params, $tr, $input) {
         var elapsed = parseValue(params, val)
         // Set stopwatch to value (forcing stop if necessary) and update display.
         set(id, elapsed)
-        $startStop.text('Start')
         $startStop.removeClass('stopwatch-em-running')
-        $startStop.prop('disabled', elapsed > -1 && SWD[id].params.stops == false)
+        $startStop.prop('disabled', elapsed > -1 && params.stops == false)
         $reset.prop('disabled', elapsed < 0)
     })
     // Determine insertion point.

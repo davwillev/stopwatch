@@ -19,6 +19,12 @@
  * @typedef StopwatchParams
  * @type {{
  *  mode: string
+ *  label_start: string
+ *  label_resume: string
+ *  label_stop: string
+ *  label_reset: string
+ *  label_lap: string
+ *  label_capture: string
  *  is_mm_ss : boolean
  *  stops: boolean
  *  target: string

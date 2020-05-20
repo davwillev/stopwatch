@@ -119,6 +119,24 @@ class StopwatchExternalModule extends AbstractExternalModule {
      */
     private function validateParams($pid, $instrument, $field, $params) {
         // Add defaults.
+        if (!isset($params["label_start"])) {
+            $params["label_start"] = "Start"; 
+        }
+        if (!isset($params["label_resume"])) {
+            $params["label_resume"] = "Resume";
+        }
+        if (!isset($params["label_stop"])) {
+            $params["label_stop"] = "Stop";
+        }
+        if (!isset($params["label_reset"])) {
+            $params["label_reset"] = "Reset";
+        }
+        if (!isset($params["label_lap"])) {
+            $params["label_lap"] = "Lap";
+        }
+        if (!isset($params["label_capture"])) {
+            $params["label_capture"] = "Capture";
+        }
         $parmas["is_mm_ss"] = false;
         if (!isset($params["mode"])) {
             $params["mode"] = "basic";
