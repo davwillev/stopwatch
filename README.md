@@ -111,4 +111,5 @@ This module uses some code from Andy Martin (ActionTagHelper and other bits).
 
 Version | Description
 ------- | ---------------------
+beta.2  | Bug fixes and behind-the-scenes updates.
 beta.1  | First beta release.
