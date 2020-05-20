@@ -101,7 +101,7 @@ To set the display format, these placeholders can be used:
 - `/g` - group separator
 - `/d` - decimal separator
 
-The display format for e.g. `0:02:33.12` can be written as `/h/g/m/g/s/d/f`, and `digits` would have to be set to `2`. 
+The display format for e.g. `0:02:33.12` can be written as `/h/g/m/g/s/d/f`, and `digits` would have to be set to `2`.
 
 ## Acknowledgements
 
