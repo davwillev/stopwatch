@@ -104,7 +104,7 @@ class ActionTagHelper
      *
      * https://regex101.com/r/fL2rM8/5
      * 
-     * An updated version of the regex is here:
+     * An updated version of the regex is here - but is not used. It doesn't work as intended in all cases.
      * https://regex101.com/r/dWEkmN/2
      *
      * @param $string           The string to be parsed for actiontags (in the format of <code>@FOO=BAR or @FOO={"param":"bar"}</code>
@@ -112,59 +112,31 @@ class ActionTagHelper
      * @return array|bool       returns the match array with the key equal to the tag and an array containing keys of 'params, params_json and params_text'
      */
     static function parseActionTags($string, $tag_only = null) {
-        // $re = "/(?(DEFINE)
-        //   (?<number>    -?  (?= [1-9]|0(?!\d) ) \d+ (\.\d+)? ([eE] [+-]? \d+)? )
-        //   (?<boolean>   true | false | null )
-        //   (?<string>    \" ([^\"\\\\]* | \\\\ [\"\\\\bfnrt\/] | \\\\ u [0-9a-f]{4} )* \" )
-        //   (?<array>     \[  (?:  (?&json)  (?: , (?&json)  )*  )?  \s* \] )
-        //   (?<pair>      \s* (?&string) \s* : (?&json)  )
-        //   (?<object>    \{  (?:  (?&pair)  (?: , (?&pair)  )*  )?  \s* \} )
-        //   (?<fieldname> [a-zA-Z0-9\_\-]+ )
-        //   (?<json>      \s* (?: (?&number) | (?&boolean) | (?&string) | (?&array) | (?&object) )  )
-        //   (?<fieldlist> (?: (?&fieldname) (?: , (?&fieldname) )+ )+ )  
-        // )
-        // (?'actiontag'
-        //   \@(?&fieldname)
-        // )
-        // (?:\=
-        //   (?'params'
-        //     (?:
-        //       (?'match_list'(?&fieldlist))
-        //       |
-        //       (?'match_json'(?&json))
-        //       |
-        //       (?'match_string'(?:[[:alnum:]\_\-]+))
-        //     )
-        //   )
-        // )?/ixm";
-        $re = '/(?(DEFINE)
-        (?<number>    -?  (?= [1-9]|0(?!\d) ) \d+ (\.\d+)? ([eE] [+-]? \d+)? )
-        (?<boolean>   true | false | null )
-        (?<string>    " ([^"\\\\\\\\]* | \\\\\\\\ ["\\\\\\\\bfnrt\/] | \\\\\\\\ u [0-9a-f]{4} )* " )
-        (?<array>     \[  (?:  (?&json)  (?: , (?&json)  )*  )?  \s* \] )
-        (?<pair>      \s* (?&string) \s* : (?&json)  )
-        (?<object>    \{  (?:  (?&pair)  (?: , (?&pair)  )*  )?  \s* \} )
-        (?<fieldname> [a-zA-Z0-9\_\-]+ )
-        (?<json>      \s* (?: (?&number) | (?&boolean) | (?&string) | (?&array) | (?&object) )  )
-        (?<fieldlist> (?: (?&fieldname) (?: , (?&fieldname) )+ )+ )
-        (?<invalidjson> \{ .* \} )  
+        $re = "/(?(DEFINE)
+          (?<number>    -?  (?= [1-9]|0(?!\d) ) \d+ (\.\d+)? ([eE] [+-]? \d+)? )
+          (?<boolean>   true | false | null )
+          (?<string>    \" ([^\"\\\\]* | \\\\ [\"\\\\bfnrt\/] | \\\\ u [0-9a-f]{4} )* \" )
+          (?<array>     \[  (?:  (?&json)  (?: , (?&json)  )*  )?  \s* \] )
+          (?<pair>      \s* (?&string) \s* : (?&json)  )
+          (?<object>    \{  (?:  (?&pair)  (?: , (?&pair)  )*  )?  \s* \} )
+          (?<fieldname> [a-zA-Z0-9\_\-]+ )
+          (?<json>      \s* (?: (?&number) | (?&boolean) | (?&string) | (?&array) | (?&object) )  )
+          (?<fieldlist> (?: (?&fieldname) (?: , (?&fieldname) )+ )+ )  
         )
-        (?\'actiontag\'
-        \@(?&fieldname)
+        (?'actiontag'
+          \@(?&fieldname)
         )
         (?:\=
-        (?\'params\'
+          (?'params'
             (?:
-            (?\'match_list\'(?&fieldlist))
-            |
-            (?\'match_json\'(?&json))
-            |
-            (?\'match_string\'(?:[[:alnum:]_-]+))
-            |
-            (?\'match_invalid\'(?&invalidjson))
+              (?'match_list'(?&fieldlist))
+              |
+              (?'match_json'(?&json))
+              |
+              (?'match_string'(?:[[:alnum:]\_\-]+))
             )
-        )
-        )?/ixm';
+          )
+        )?/ixm";
 
         preg_match_all($re, $string, $matches);
 
