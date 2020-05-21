@@ -87,7 +87,7 @@ function setup() {
  * @param {JQuery} $tr
  */
 function error(id, error, $tr) {
-    var $error = $('<span></span>').addClass('stopwatch-em-error').text(error)
+    var $error = $('<span></span>').addClass('stopwatch-em-error').text('@STOPWATCH: ' + error)
     // Determine insertion point.
     var $insertionPoint = $tr.find('td.data')
     if ($insertionPoint.length == 0) {
