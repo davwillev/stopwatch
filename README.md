@@ -27,7 +27,6 @@ A REDCap External Module that provides a stopwatch widget that can be integrated
     - `lap`: A stopwatch that can record multiple laps (see below for details).
   - `target`: The field to store the elapsed time in.
   - `hide_target`: Boolean (`true`|`false`) that determines whether the target input should be hidden (default to `true`).
-  - `data`: Sets the storage format for `capture` and `lap`
   - `stops`: Boolean (`true`|`false`) that determines whether stopping (and resuming) the timer is allowed (defaults to `false`).
   - `digits`: The precisison to show (0, 1, 2, or 3).
   - `h_digits`, `m_digits`, `s_digits`: The (minimal) number of digits to use for hours, minutes, seconds (when shorter, values will be padded with 0).
@@ -36,7 +35,7 @@ A REDCap External Module that provides a stopwatch widget that can be integrated
   - `decimal_separator`: The decimal separator which is inserted between seconds and fractional seconds. This will be overriden by certain target field types.
   - `group_separator`: The character(s) inserted between hours, minutes, seconds.
   - `unset_display_symbol`: The symbol to be used as digit replacement when no value has been set yet.
-  - `display_format`: The format for display in the stopwatch widget.
+  - `display_format`: The format for display in the stopwatch widget. This will only be in effect when then `target` has no validation.
 - In case the `target` parameter is missing, the field the `@STOPWATCH` is on will be used, if compatible (see below).
 
 ### Additional configuration for capture and lap modes
@@ -60,6 +59,12 @@ A REDCap External Module that provides a stopwatch widget that can be integrated
   - `stop`: Field name for the datetime the lap was (last) stopped.
   - `num_stops`: Field name for the number of times the timer was stopped during recording of a lap (the target field must be of type integer).
   - `event`: The event name (or numerical id) of the event the repeating form is on. If not specified, the current event is assumed.
+
+- `plain`: A JSON object with the following keys:
+  - `items`: An array of strings of (some or all of) the keys of the respective mapping, determining which and in which order these will be output. The default is `["start", "stop", "num_stops", "elapsed"]`.
+  - `delimiter`: The column delimiter. Default is tab.
+  - `header`: Boolean (`true`|`false`) determining whether a header row should be included in the output.
+  - `start`, `stop`, `num_stops`, `elapsed`: When a string value is provided, this will be used in the header.
 
 - `only_once`: Boolean (`true`|`false`), or a custom value in case of `repeating` (which then is stored in the field specified by `target`, which must be a _Text Box_ without or with matching validation). When used, the stopwatch is cannot be used again when a value is stored in `target` (after a form save). The default is `false`.
 
