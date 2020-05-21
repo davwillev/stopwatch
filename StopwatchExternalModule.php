@@ -41,7 +41,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
                 DTO.debug = <?=json_encode($debug)?>;
                 DTO.fields = <?=json_encode($fields)?>;
             </script>
-            <template data-stopwatch-em="basic">
+            <div style="display:none;" data-stopwatch-em="basic">
                 <div class="stopwatch-em stopwatch-em-container" aria-label="Stopwatch EM">
                     <div class="input-group input-group-sm">
                         <div class="input-group-prepend">
@@ -61,13 +61,13 @@ class StopwatchExternalModule extends AbstractExternalModule {
                         <table class="stopwatch-em-table"></table>
                     </div>
                 </div>
-            </template>
-            <template data-stopwatch-em="capture-row">
+            </div>
+            <div style="display:none;" data-stopwatch-em="capture-row">
                 <tr>
                     <td class="stopwatch-em-rowlabel"></td>
                     <td class="stopwatch-em-rowvalue"></td>
                 </tr>
-            </template>
+            </div>
             <?php
         }
     }

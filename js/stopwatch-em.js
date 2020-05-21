@@ -48,17 +48,12 @@ function log() {
             case 4:
                 console.log(arguments[0], arguments[1], arguments[2], arguments[3]); 
                 return;
-                default:
-                try {
-                    console.log(...arguments);
-                }
-                catch {
-                    console.log(arguments);
-                }
-            }
+            default:
+                console.log(arguments);
         }
     }
-    
+}
+
 //#endregion
     
 //#region HTML and Update ------------------------------------------------------------------
@@ -204,7 +199,7 @@ function createBasic(id, params, $tr, $input) {
  */
 function getTemplate(name) {
     // @ts-ignore
-    return $(document.querySelector('template[data-stopwatch-em=' + name + ']').content.firstElementChild.cloneNode(true))
+    return $('div[data-stopwatch-em=' + name + ']').first().children().first().clone()
 }
 
 
@@ -410,7 +405,8 @@ function reset(id) {
  * @param {number} digits 
  * @param {string} fill
  */
-function lpad(v, digits, fill = '0') {
+function lpad(v, digits, fill) {
+    if (typeof fill == 'undefined') fill = '0'
     var s = '' + v
     if (s.length < digits) {
         s = fill.repeat(digits) + s
@@ -425,7 +421,8 @@ function lpad(v, digits, fill = '0') {
  * @param {number} digits 
  * @param {string} fill
  */
-function rpad(v, digits, fill = '0') {
+function rpad(v, digits, fill) {
+    if (typeof fill == 'undefined') fill = '0'
     var s = v + fill.repeat(digits)
     return s.substr(0, digits)
 }
@@ -467,7 +464,7 @@ function format(time_ms, params) {
         s = Math.floor(rest / 1000)
         ms = rest - s * 1000
         ms_rounded = (ms / 1000).toFixed(params.digits).substr(2)
-        f = rpad(ms_rounded, params.digits)
+        f = rpad(ms_rounded, params.digits, '0')
         // Add ms to s in case of rounding to 0 digits.
         if (params.digits == 0) {
             s = Math.round(s + ms / 1000)
@@ -478,15 +475,15 @@ function format(time_ms, params) {
         if (params.digits > 0) S = S + params.decimal_separator + f.toString()
         rv.S = S 
         rv.F = F.toString()
-        rv.h = lpad(h, params.h_digits)
-        rv.m = lpad(m, params.m_digits)
-        rv.s = lpad(s, params.s_digits)
+        rv.h = lpad(h, params.h_digits, '0')
+        rv.m = lpad(m, params.m_digits, '0')
+        rv.s = lpad(s, params.s_digits, '0')
         rv.f = f
     }
     rv.display = formatValue(params.display_format, rv)
     // Always use two digits for m and s for storage.
-    rv.m = lpad(rv.m, 2)
-    rv.s = lpad(rv.s, 2)
+    rv.m = lpad(rv.m, 2, '0')
+    rv.s = lpad(rv.s, 2, '0')
     rv.store = formatValue(params.store_format, rv)
     return rv
 }
@@ -575,7 +572,7 @@ function parseValue(params, val) {
         var elapsed = parseInt(data.h) * 3600000 + parseInt(data.m) * 60000 + parseInt(data.s) * 1000 + parseInt(data.f)
         return elapsed
     }
-    catch {
+    catch (ex) {
         log('Stopwatch - Failed to parse stored value: ' + val)
     }
     return -1
