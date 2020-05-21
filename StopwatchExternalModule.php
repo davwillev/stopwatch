@@ -41,7 +41,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
                 DTO.debug = <?=json_encode($debug)?>;
                 DTO.fields = <?=json_encode($fields)?>;
             </script>
-            <template data-stopwatch-em="basic">
+            <div style="display:none;" data-stopwatch-em="basic">
                 <div class="stopwatch-em stopwatch-em-container" aria-label="Stopwatch EM">
                     <div class="input-group input-group-sm">
                         <div class="input-group-prepend">
@@ -51,14 +51,23 @@ class StopwatchExternalModule extends AbstractExternalModule {
                             <div class="input-group-text stopwatch-em-timerdisplay"></div>
                         </div>
                         <div class="input-group-append">
-                            <button role="button" class="btn btn-secondary stopwatch-em-startstop">Start</button>
-                        </div>
-                        <div class="input-group-append">
                             <button role="button" class="btn btn-secondary stopwatch-em-reset">Reset</button>
                         </div>
+                        <div class="input-group-append">
+                            <button role="button" class="btn btn-secondary stopwatch-em-startstop">Start</button>
+                        </div>
+                    </div>
+                    <div class="stopwatch-em-captures">
+                        <table class="stopwatch-em-table"></table>
                     </div>
                 </div>
-            </template>
+            </div>
+            <div style="display:none;" data-stopwatch-em="capture-row">
+                <tr>
+                    <td class="stopwatch-em-rowlabel"></td>
+                    <td class="stopwatch-em-rowvalue"></td>
+                </tr>
+            </div>
             <?php
         }
     }
@@ -119,6 +128,27 @@ class StopwatchExternalModule extends AbstractExternalModule {
      */
     private function validateParams($pid, $instrument, $field, $params) {
         // Add defaults.
+        if (!isset($params["hide_target"])) {
+            $params["hide_target"] = true; 
+        }
+        if (!isset($params["label_start"])) {
+            $params["label_start"] = "Start"; 
+        }
+        if (!isset($params["label_resume"])) {
+            $params["label_resume"] = "Resume";
+        }
+        if (!isset($params["label_stop"])) {
+            $params["label_stop"] = "Stop";
+        }
+        if (!isset($params["label_reset"])) {
+            $params["label_reset"] = "Reset";
+        }
+        if (!isset($params["label_lap"])) {
+            $params["label_lap"] = "Lap";
+        }
+        if (!isset($params["label_capture"])) {
+            $params["label_capture"] = "Capture";
+        }
         $parmas["is_mm_ss"] = false;
         if (!isset($params["mode"])) {
             $params["mode"] = "basic";

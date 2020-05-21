@@ -23,12 +23,14 @@ A REDCap External Module that provides a stopwatch widget that can be integrated
 - The following parameters are supported. _All are optional._
   - `mode`: Mode can be one of the following:
     - `basic`: A simple stopwatch with start/stop and reset button. The elapsed time is recorded. This is the default.
-    - `capture-json`, `capture-notes`, `capture-repeating`: A stopwatch that can record multiple captures of the (until then) elapsed time. Data is stored either as JSON data structure (requires `target` to be a _Text Box_ or _Notes Box_ field without validation), plain text (`target` must be a _Notes Box_ field), or as multiple entries in a separate repeating form (see below for details).
-    - `lap-json`, `lap-notes`, `lap-repeating`: A stopwatch that can record multiple laps. Data is stored either as JSON data structure (requires `target` to be a _Text Box_ or _Notes Box_ field without validation), plain text (`target` must be a _Notes Box_ field), or as multiple entries in a separate repeating form (see below for details).
+    - `capture`: A stopwatch that can record multiple captures of the (until then) elapsed time (see below for details).
+    - `lap`: A stopwatch that can record multiple laps (see below for details).
   - `target`: The field to store the elapsed time in.
+  - `hide_target`: Boolean (`true`|`false`) that determines whether the target input should be hidden (default to `true`).
+  - `data`: Sets the storage format for `capture` and `lap`
   - `stops`: Boolean (`true`|`false`) that determines whether stopping (and resuming) the timer is allowed (defaults to `false`).
   - `digits`: The precisison to show (0, 1, 2, or 3).
-  - `h_digits`, `m_digits`, `s_digits`: (minimal) padding for hours, minutes, seconds.
+  - `h_digits`, `m_digits`, `s_digits`: The (minimal) number of digits to use for hours, minutes, seconds (when shorter, values will be padded with 0).
   - `no_hours`: Boolean (`true`|`false`). If set to `true`, minutes will be the largest unit counted.
   - `no_minutes`: Boolean (`true`|`false`). If set to `true`, seconds will be the largest unit counted. This will imply `no_hours` = `true`.
   - `decimal_separator`: The decimal separator which is inserted between seconds and fractional seconds. This will be overriden by certain target field types.
@@ -37,56 +39,46 @@ A REDCap External Module that provides a stopwatch widget that can be integrated
   - `display_format`: The format for display in the stopwatch widget.
 - In case the `target` parameter is missing, the field the `@STOPWATCH` is on will be used, if compatible (see below).
 
-### Basic stopwatch configuration
+### Additional configuration for capture and lap modes
 
-The basic stopwatch supports this additional parameter:
+- `store_format`: This can be one of the following:
+  - `json`: Data is stored as a JSON string. `target` must be a _Text Box_ (without validation) or a _Notes Box_. This is the default store format.
+  - `plain`: Data is stored in plain text. `target` must be a _Notes Box_. Additional configuration can be done in the `plain` object.
+  - `repeating`: Data is stored in the fields of a repeating form.
 
-- `store_format`: The format the elapsed time is stored in.
+  For storage in repeating forms, the mapping of data items to fields must be set in the `capture_mapping` and `lap_mapping` objects, respectively. All fields must be on the same instrument. The exact storage format depends on the field type (see below). Plain text storage can be customized using the `plain_text` object.
 
-### Capture stopwatch configuration
+- `capture_mapping`: A JSON object with the following keys:
+  - `elapsed`: Field name for elapsed time.
+  - `start`: Field name for the datetime the capture was (first) started.
+  - `stop`: Field name for the datetiem the capture was (last) stopped.
+  - `event`: The event name (or numerical id) of the event the repeating form is on. If not specified, the current event is assumed.
 
-This advanced stopwatch supports the following additional configuration options:
+- `lap_mapping`: A JSON object with the following keys:
+  - `elapsed`: Field name for elapsed time.
+  - `start`: Field name for the datatime the lap was (first) started.
+  - `stop`: Field name for the datetime the lap was (last) stopped.
+  - `num_stops`: Field name for the number of times the timer was stopped during recording of a lap (the target field must be of type integer).
+  - `event`: The event name (or numerical id) of the event the repeating form is on. If not specified, the current event is assumed.
 
-- `capture`: A JSON object with the following keys. The permissible values depend on the mode:
-
-  Setting           | _lap-json_      | _lap-notes_     | _lap-repeating_
-  ----------------- | --------------- | --------------- | ------------------
-  `capture_elapsed` | n/a             | n/a             | field name
-  `capture_start`   | n/a             | _true_\|_false_ | field name
-  `capture_stop`    | n/a             | _true_\|_false_ | field name
-  `event`           | n/a             | n/a             | event name (or numerical id)
-  `only_once`       | _true_\|_false_ | _true_\|_false_ | _true_\|_false_\|custom value
-
-In case of `capture-repeating`, all fields **must** be on the same instrument. The `only_once` custom value (or a value depending on the field validation) will be stored in `target` (which must be a _Text Box_ with either Integer, Number, Date, or Datetime validation).  
-When `only_once` is set, the stopwatch cannot be used again once a value has been saved (to `target`).
-
-### Lap stopwatch configuration
-
-This advanced stopwatch supports the following additional configuration options:
-
-- `lap`: A JSON object with the following keys. The permissible values depend on the mode:
-
-  Setting       | _lap-json_      | _lap-notes_     | _lap-repeating_
-  ------------- | --------------- | --------------- | ------------------
-  `lap_start`   | n/a             | _true_\|_false_ | field name
-  `lap_end`     | n/a             | _true_\|_false_ | field name
-  `lap_elapsed` | n/a             | _true_\|_false_ | field name
-  `lap_stops`   | n/a             | _true_\|_false_ | field name
-  `event`       | n/a             | n/a             | event name (or numerical id)
-  `only_once`   | _true_\|_false_ | _true_\|_false_ | _true_\|_false_\|custom value
-
-In case of `lap-repeating`, all fields **must** be on the same instrument. The `only_once` custom value (or a value depending on the field validation) will be stored in `target` (which must be a _Text Box_ with either Integer, Number, Date, or Datetime validation).  
-When `only_once` is set, the stopwatch cannot be used again once a value has been saved (to `target`).
+- `only_once`: Boolean (`true`|`false`), or a custom value in case of `repeating` (which then is stored in the field specified by `target`, which must be a _Text Box_ without or with matching validation). When used, the stopwatch is cannot be used again when a value is stored in `target` (after a form save). The default is `false`.
 
 ## Format of the stored values
 
 Stopwatch will honor the format (validation) of the target field(s). The target field has to be of type _Text Box_ or _Notes Box_.
-Elapsed time will be stored as follows:
 
+Elapsed time will be stored as follows:
 - _Integer_: elapsed time in milliseconds.
 - _Number_ (any type): elapsed time in seconds (with fractional seconds).
 - _Time (MM:SS)_: elapsed time in minutes and seconds (limited to max 59:59).
 - No validation: the elapsed time will be stored as h:m:s.f (colons and dot).
+
+For capture and lap data values other than elapsed time, the following automatic formats will be used, depending on the field type:
+- _Integer_: the (local) time represented by number of milliseconds elapsed since the start of the epoch, 01 January, 1970 00:00:00 Universal Time (UTC).
+- _Number_ (any type): as above, but in seconds (including fractional seconds).
+- _Date_ (any type): The date. Time information will be lost.
+- _Datetime_ (any type): The date and time. Some time information will be lost.
+- No validation: A datetime value in the format `Y-M-D H:m:s.f` where Y = 4-digit year, M = 2-digit month, D = 2-digit day, H = 2-digit hour (0-23), m = 2-digit minute, s = 2-digit second, f = fractional second (up to ms precision, depending on the `digits` setting).
 
 ## Format of the timer display
 
@@ -101,7 +93,7 @@ To set the display format, these placeholders can be used:
 - `/g` - group separator
 - `/d` - decimal separator
 
-The display format for e.g. `0:02:33.12` can be written as `/h/g/m/g/s/d/f`, and `digits` would have to be set to `2`. 
+The display format for e.g. `0:02:33.12` can be written as `/h/g/m/g/s/d/f`, and `digits` would have to be set to `2`.
 
 ## Acknowledgements
 

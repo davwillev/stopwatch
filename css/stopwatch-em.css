@@ -15,10 +15,16 @@
     font-size: 1rem;
 }
 
-.stopwatch-em-running,
-.stopwatch-em-running:focus,
-.stopwatch-em-running:hover {
+.stopwatch-em-startstop:not([disabled]).stopwatch-em-running,
+.stopwatch-em-startstop:not([disabled]).stopwatch-em-running:focus,
+.stopwatch-em-startstop:not([disabled]).stopwatch-em-running:hover {
     background-color: rgba(207, 126, 126, 0.877);
+}
+
+.stopwatch-em-startstop:not([disabled]),
+.stopwatch-em-startstop:not([disabled]):focus,
+.stopwatch-em-startstop:not([disabled]):hover {
+    background-color: rgba(104, 160, 99, 0.877);
 }
 
 .stopwatch-em-disabled,
