@@ -57,7 +57,16 @@ class StopwatchExternalModule extends AbstractExternalModule {
                             <button role="button" class="btn btn-secondary stopwatch-em-startstop">Start</button>
                         </div>
                     </div>
+                    <div class="stopwatch-em-captures">
+                        <table class="stopwatch-em-table"></table>
+                    </div>
                 </div>
+            </template>
+            <template data-stopwatch-em="capture-row">
+                <tr>
+                    <td class="stopwatch-em-rowlabel"></td>
+                    <td class="stopwatch-em-rowvalue"></td>
+                </tr>
             </template>
             <?php
         }
