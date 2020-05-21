@@ -119,6 +119,9 @@ class StopwatchExternalModule extends AbstractExternalModule {
      */
     private function validateParams($pid, $instrument, $field, $params) {
         // Add defaults.
+        if (!isset($params["hide_target"])) {
+            $params["hide_target"] = true; 
+        }
         if (!isset($params["label_start"])) {
             $params["label_start"] = "Start"; 
         }

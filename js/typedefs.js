@@ -28,6 +28,7 @@
  *  is_mm_ss : boolean
  *  stops: boolean
  *  target: string
+ *  hide_target: boolean
  *  decimal_separator: string
  *  group_separator: string
  *  unset_display_symbol : string

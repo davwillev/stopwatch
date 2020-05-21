@@ -26,6 +26,7 @@ A REDCap External Module that provides a stopwatch widget that can be integrated
     - `capture-json`, `capture-notes`, `capture-repeating`: A stopwatch that can record multiple captures of the (until then) elapsed time. Data is stored either as JSON data structure (requires `target` to be a _Text Box_ or _Notes Box_ field without validation), plain text (`target` must be a _Notes Box_ field), or as multiple entries in a separate repeating form (see below for details).
     - `lap-json`, `lap-notes`, `lap-repeating`: A stopwatch that can record multiple laps. Data is stored either as JSON data structure (requires `target` to be a _Text Box_ or _Notes Box_ field without validation), plain text (`target` must be a _Notes Box_ field), or as multiple entries in a separate repeating form (see below for details).
   - `target`: The field to store the elapsed time in.
+  - `hide_target`: Boolean (`true`|`false`) that determines whether the target input should be hidden (default to `true`).
   - `stops`: Boolean (`true`|`false`) that determines whether stopping (and resuming) the timer is allowed (defaults to `false`).
   - `digits`: The precisison to show (0, 1, 2, or 3).
   - `h_digits`, `m_digits`, `s_digits`: (minimal) padding for hours, minutes, seconds.

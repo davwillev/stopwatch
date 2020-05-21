@@ -190,6 +190,9 @@ function createBasic(id, params, $tr, $input) {
         $insertionPoint = $tr.find('td.labelrc').last()
     }
     $insertionPoint.prepend($sw)
+    if (params.hide_target) {
+        $input.hide()
+    }
     log('Added Stopwatch to \'' + id + '\'', $insertionPoint)
 }
 
