@@ -159,7 +159,7 @@ function createBasic(id, params, $tr, $input) {
             insertElapsed(SWD[id], $input)
         }
         else {
-            $reset.prop('disabeld', true)
+            $reset.prop('disabled', true)
             $startStop.text(params.label_stop)
             $startStop.addClass('stopwatch-em-running')
             start(id)
@@ -169,6 +169,7 @@ function createBasic(id, params, $tr, $input) {
         e.preventDefault()
         reset(id)
         $startStop.prop('disabled', false)
+        $reset.prop('disabled', true)
         $input.val('')
     })
     // Hookup change event.
