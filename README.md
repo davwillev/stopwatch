@@ -103,5 +103,6 @@ This module uses some code from Andy Martin (ActionTagHelper and other bits).
 
 Version | Description
 ------- | ---------------------
+beta.3  | Bug fixes, small improvements, IE11 fixes, new plan for advanced stuff.
 beta.2  | Bug fixes and behind-the-scenes updates.
 beta.1  | First beta release.
