@@ -16,6 +16,38 @@
  */
 
 /**
+ * @typedef CaptureMapping
+ * @type {{
+ *  elapsed: string
+ *  start: string
+ *  stop: string
+ * }}
+ */
+
+/**
+ * @typedef LapMapping
+ * @type {{
+ *  elapsed: string
+ *  start: string
+ *  stop: string
+ *  num_stops: string
+ * }}
+ */
+
+/**
+ * @typedef Plain
+ * @type {{
+ *  items: string[]
+ *  delimiter: string
+ *  header: boolean
+ *  start: string
+ *  stop: string
+ *  num_stops: string
+ *  elapsed: string
+ * }}
+ */
+
+/**
  * @typedef StopwatchParams
  * @type {{
  *  mode: string
@@ -29,6 +61,7 @@
  *  stops: boolean
  *  target: string
  *  hide_target: boolean
+ *  only_once?: boolean|string
  *  decimal_separator: string
  *  group_separator: string
  *  unset_display_symbol : string
@@ -40,6 +73,7 @@
  *  no_minutes: boolean
  *  display_format: string
  *  store_format: string
+ *  max_rows: number
  *  error: string
  * }}
  */
@@ -48,15 +82,24 @@
  * @typedef StopwatchData
  * @type {{
  *  id: string
+ *  initial: boolean
+ *  $srsBtn?: JQuery
+ *  $rclBtn?: JQuery
  *  $display: JQuery
  *  $hourglass: JQuery
+ *  $input: JQuery
+ *  $json: JQuery
+ *  $table: JQuery
+ *  currentLap: LapInfo
+ *  $currentLapValue: JQuery
+ *  $currentLapStops: JQuery
  *  params: StopwatchParams
  *  running: boolean
  *  elapsed: number
  *  laps: LapInfo[]
  *  captures: CaptureInfo[]
- *  startTime?: Date
- *  stopTime?: Date
+ *  startTime: Date
+ *  stopTime: Date
  *  lapStartTime?: Date
  *  lapStopTime?: Date
  * }}
@@ -65,18 +108,18 @@
 /**
  * @typedef LapInfo
  * @type {{
- *  lapStartTime: Date
- *  lapStopTime: Date
+ *  start: Date
+ *  stop: Date
  *  elapsed: number
- *  isStop: boolean
+ *  num_stops: number
  * }}
  */
 
 /**
  * @typedef CaptureInfo
  * @type {{
- *  captureStartTime: Date
- *  captureStopTime: Date
+ *  start: Date
+ *  stop: Date
  *  elapsed: number
  *  isStop: boolean
  * }}
