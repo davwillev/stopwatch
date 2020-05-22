@@ -304,7 +304,7 @@ function addCaptureRow(swd, capture) {
     $value.text(format(capture.elapsed, swd.params).display)
     $stop.html(getStopSymbol(capture.isStop))
     swd.$table.prepend($row)
-    if (swd.captures.length > swd.params.max_rows) {
+    if (swd.params.max_rows > 0 && swd.captures.length > swd.params.max_rows) {
         swd.$table.children().last().remove()
     }
 }
