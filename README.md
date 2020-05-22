@@ -67,18 +67,21 @@ A REDCap External Module that provides a stopwatch widget that can be integrated
   - `start`, `stop`, `num_stops`, `elapsed`: When a string value is provided, this will be used in the header.
 
 - `only_once`: Boolean (`true`|`false`), or a custom value in case of `repeating` (which then is stored in the field specified by `target`, which must be a _Text Box_ without or with matching validation). When used, the stopwatch cannot be used again when a value is stored in `target` (after a form save). The default is `false`.
+- `max_rows`: The maximum number of rows to show in the captures/laps table. Default = 0 (no limit).
 
 ## Format of the stored values
 
 Stopwatch will honor the format (validation) of the target field(s). The target field has to be of type _Text Box_ or _Notes Box_.
 
 Elapsed time will be stored as follows:
+
 - _Integer_: elapsed time in milliseconds.
 - _Number_ (any type): elapsed time in seconds (with fractional seconds).
 - _Time (MM:SS)_: elapsed time in minutes and seconds (limited to max 59:59).
 - No validation: the elapsed time will be stored as h:m:s.f (colons and dot).
 
 For capture and lap data values other than elapsed time, the following automatic formats will be used, depending on the field type:
+
 - _Integer_: the (local) time represented by number of milliseconds elapsed since the start of the epoch, 01 January, 1970 00:00:00 Universal Time (UTC).
 - _Number_ (any type): as above, but in seconds (including fractional seconds).
 - _Date_ (any type): The date. Time information will be lost.

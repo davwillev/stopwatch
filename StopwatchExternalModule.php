@@ -253,6 +253,9 @@ class StopwatchExternalModule extends AbstractExternalModule {
         // Lap and capture modes
         //
         while ($params["mode"] == "capture" || $params["mode"] == "lap") {
+            if ($this->requireInt($params["max_rows"], 0) === null) {
+                $params["max_rows"] = 0;
+            }
             if (!isset($params["store_format"])) {
                 $params["store_format"] = "json";
             }
@@ -309,6 +312,25 @@ class StopwatchExternalModule extends AbstractExternalModule {
     }
 
 
+    /**
+     * Ensures that a value is an integer inside the given bounds.
+     * @param mixed $val
+     * @param int $lower (Optional) lower bounds.
+     * @param int $upper (Optional) upper bounds.
+     * @return int|null
+     */
+    function requireInt($val, $lower = null, $upper = null) {
+        if (!is_numeric($val)) return null;
+        $int = $val * 1;
+        if (!is_integer($int)) return null;
+        if ($lower !== null) {
+            $int = max($lower, $int);
+        }
+        if ($upper !== null) {
+            $int = min($upper, $int);
+        }
+        return $int;
+    }
 
 
 
