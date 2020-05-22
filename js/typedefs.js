@@ -106,6 +106,17 @@
  */
 
 /**
+ * @typedef ParseResult
+ * @type {{
+ *  val: string
+ *  elapsed: Number
+ *  laps: LapInfo[]
+ *  captures: CaptureInfo[]
+ * }}
+ */
+
+
+/**
  * @typedef LapInfo
  * @type {{
  *  start: Date
