@@ -561,6 +561,7 @@ function reset(swd) {
     swd.stopTime = null
     swd.lapStartTime = null
     swd.lapStopTime = null
+    swd.currentLap = null
     swd.laps = []
     swd.captures = []
     swd.running = false
