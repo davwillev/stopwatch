@@ -73,6 +73,7 @@
  *  no_minutes: boolean
  *  display_format: string
  *  store_format: string
+ *  max_rows: number
  *  error: string
  * }}
  */
@@ -87,13 +88,18 @@
  *  $display: JQuery
  *  $hourglass: JQuery
  *  $input: JQuery
+ *  $json: JQuery
+ *  $table: JQuery
+ *  currentLap: LapInfo
+ *  $currentLapValue: JQuery
+ *  $currentLapStops: JQuery
  *  params: StopwatchParams
  *  running: boolean
  *  elapsed: number
  *  laps: LapInfo[]
  *  captures: CaptureInfo[]
- *  startTime?: Date
- *  stopTime?: Date
+ *  startTime: Date
+ *  stopTime: Date
  *  lapStartTime?: Date
  *  lapStopTime?: Date
  * }}
@@ -102,18 +108,18 @@
 /**
  * @typedef LapInfo
  * @type {{
- *  lapStartTime: Date
- *  lapStopTime: Date
+ *  start: Date
+ *  stop: Date
  *  elapsed: number
- *  isStop: boolean
+ *  num_stops: number
  * }}
  */
 
 /**
  * @typedef CaptureInfo
  * @type {{
- *  captureStartTime: Date
- *  captureStopTime: Date
+ *  start: Date
+ *  stop: Date
  *  elapsed: number
  *  isStop: boolean
  * }}
