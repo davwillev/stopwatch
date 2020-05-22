@@ -466,7 +466,7 @@ function capture(swd, now, stopped) {
         start:  swd.lapStartTime,
         stop: swd.stopTime,
         elapsed: swd.elapsed,
-        isStop: stopped
+        isStop: stopped && swd.params.stops
     }
     swd.captures.push(capture)
     swd.lapStartTime = now
@@ -506,9 +506,10 @@ function lap(swd, now, stopped) {
     }
     else {
         swd.currentLap.stop = now
+        swd.currentLap.num_stops += (swd.params.stops ? 1 : 0)
         swd.currentLap.elapsed += elapsed
         swd.$currentLapValue.html(format(elapsed, swd.params).display)
-        swd.$currentLapStops.html(getStopSymbol(true))
+        swd.$currentLapStops.html(getStopSymbol(swd.currentLap.num_stops > 0))
         insertLaps(swd)
     }
 }
