@@ -66,7 +66,7 @@ A REDCap External Module that provides a stopwatch widget that can be integrated
   - `header`: Boolean (`true`|`false`) determining whether a header row should be included in the output.
   - `start`, `stop`, `num_stops`, `elapsed`: When a string value is provided, this will be used in the header.
 
-- `only_once`: Boolean (`true`|`false`), or a custom value in case of `repeating` (which then is stored in the field specified by `target`, which must be a _Text Box_ without or with matching validation). When used, the stopwatch is cannot be used again when a value is stored in `target` (after a form save). The default is `false`.
+- `only_once`: Boolean (`true`|`false`), or a custom value in case of `repeating` (which then is stored in the field specified by `target`, which must be a _Text Box_ without or with matching validation). When used, the stopwatch cannot be used again when a value is stored in `target` (after a form save). The default is `false`.
 
 ## Format of the stored values
 

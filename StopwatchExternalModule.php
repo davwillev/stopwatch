@@ -41,7 +41,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
                 DTO.debug = <?=json_encode($debug)?>;
                 DTO.fields = <?=json_encode($fields)?>;
             </script>
-            <div style="display:none;" data-stopwatch-em="basic">
+            <div style="display:none;" data-stopwatch-em="stopwatch-basic">
                 <div class="stopwatch-em stopwatch-em-container" aria-label="Stopwatch EM">
                     <div class="input-group input-group-sm">
                         <div class="input-group-prepend">
@@ -154,7 +154,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
         if (!isset($params["mode"])) {
             $params["mode"] = "basic";
         }
-        if ($params["mode"] == "basic" && !isset($params["target"])) {
+        if (!isset($params["target"])) {
             $params["target"] = $field;
         }
         if (!isset($params["hide_target"])) {
@@ -257,19 +257,39 @@ class StopwatchExternalModule extends AbstractExternalModule {
                 $params["store_format"] = "json";
             }
             if (!in_array(@$params["store_format"], $this->VALID_STORE_FORMATS, true)) {
-                $params["error"] = "Invalid store_format.";
+                $params["error"] = "Invalid value for 'store_format'.";
+                break;
+            }
+            if (!isset($params["only_once"])) {
+                $params["only_once"] = false;
+            }
+            if ($params["only_once"] !== false && empty($params["only_once"])) {
+                $params["error"] = "Invalid value for 'only_once'.";
                 break;
             }
             // Validate field types.
+            $target_metadata = $pds["fields"][$params["target"]]["metadata"];
             if ($params["store_format"] == "json") {
-                
+                if (!$target_metadata["element_type"] == "textarea" || ($target_metadata["element_type"] == "text" && $target_metadata["element_validation_type"] == null)) {
+                    $params["error"] = "Invalid target field type.";
+                    break;
+                }
             } 
             else if ($params["store_format"] == "plain") {
+                if (!$target_metadata["element_type"] == "textarea") {
+                    $params["error"] = "Target field type must be of type 'Notes Box'.";
+                    break;
+                }
             }
             else {
+                if ($params["only_once"] && $target_metadata["element_type"] != "text") {
+                    $params["error"] = "Target field type must be of type 'Text Box'.";
+                    break;
+                }
+                // TODO - Validate field mappings and plain.
 
             }
-
+            
             break;
         }
         //

@@ -72,9 +72,7 @@ function setup() {
         else {
             var $input = $('input[name="' + params.target + '"]')
             if ($tr.length && $input.length) {
-                if (params.mode == 'basic') {
-                    createBasic(field, params, $tr, $input)
-                }
+                create(field, params, $tr, $input)
             }
         }
     })
@@ -98,84 +96,85 @@ function error(id, error, $tr) {
 }
 
 /**
- * Create HTML for a basic Stopwatch.
- * TODO: This will have to be adapted to work with various modes.
+ * Create Stopwatch widget.
  * @param {string} id 
  * @param {StopwatchParams} params 
  * @param {JQuery} $tr
  * @param {JQuery} $input
  */
-function createBasic(id, params, $tr, $input) {
+function create(id, params, $tr, $input) {
     // Is there a previously saved value?
     var val = $input.val().toString()
     // Template.
-    var $sw = getTemplate('basic')
+    var $sw = getTemplate('stopwatch-basic')
     $sw.attr('data-stopwatch-em-id', id)
     // Display components.
     var $display = $sw.find('.stopwatch-em-timerdisplay')
     var $hourglass = $sw.find('.stopwatch-em-hourglass')
     // Init data structure and update display.
     var elapsed = parseValue(params, val)
-    SWD[id] = {
+    var swd = {
         id: id,
         $display: $display,
         $hourglass: $hourglass,
+        $input: $input,
         params: params,
         elapsed: elapsed,
         running: false,
         laps: [],
         captures: []
     }
-    updateElapsed(id)
-    updateHourglass(id)
-    // Buttons
-    var $startStop = $sw.find('.stopwatch-em-startstop')
-    var $reset = $sw.find('.stopwatch-em-reset')
-    $reset.text(params.label_reset)
-    $reset.attr('data-stopwatch-em-id', id)
-    $reset.prop('disabled', elapsed < 0)
-    $reset.on('click', function(e) {
+    SWD[id] = swd
+    updateElapsed(swd)
+    updateHourglass(swd)
+    // Buttons.
+    swd.srsBtn = $sw.find('.stopwatch-em-startstop')
+    swd.rclBtn = $sw.find('.stopwatch-em-reset')
+    // swd.rclBtn.text(params.label_reset)
+    swd.rclBtn.attr('data-stopwatch-em-id', id)
+    // swd.rclBtn.prop('disabled', elapsed < 0)
+    swd.rclBtn.on('click', function(e) {
+        // Reset.
         e.preventDefault()
-        $startStop.text(params.label_start)
-        reset(id)
-        return false
+        reset(swd)
+        // swd.srsBtn.text(params.label_start)
     })
-    $startStop.text(params.label_start)
-    $startStop.attr('data-stopwatch-em-id', id)
-    $startStop.prop('disabled', elapsed > -1)
-    $startStop.on('click', function(e) {
+    // swd.srsBtn.text(params.label_start)
+    swd.srsBtn.attr('data-stopwatch-em-id', id)
+    // swd.srsBtn.prop('disabled', elapsed > -1)
+    swd.srsBtn.on('click', function(e) {
         e.preventDefault()
-        if (SWD[id].running) {
-            stop(id)
-            $reset.prop('disabled', false)
-            $startStop.text(params.stops ? params.label_resume : params.label_start)
-            $startStop.removeClass('stopwatch-em-running')
-            $startStop.prop('disabled', params.stops == false)
-            insertElapsed(SWD[id], $input)
+        if (swd.running) {
+            stop(swd)
+            // swd.rclBtn.prop('disabled', false)
+            // swd.srsBtn.text(params.stops ? params.label_resume : params.label_start)
+            // swd.srsBtn.removeClass('stopwatch-em-running')
+            // swd.srsBtn.prop('disabled', params.stops == false)
+            // insertElapsed(SWD[id], $input)
         }
         else {
-            $reset.prop('disabled', true)
-            $startStop.text(params.label_stop)
-            $startStop.addClass('stopwatch-em-running')
-            start(id)
+            // swd.rclBtn.prop('disabled', true)
+            // swd.srsBtn.text(params.label_stop)
+            // swd.srsBtn.addClass('stopwatch-em-running')
+            start(swd)
         }
     })
-    $reset.on('click', function(e) {
+    swd.rclBtn.on('click', function(e) {
         e.preventDefault()
-        reset(id)
-        $startStop.prop('disabled', false)
-        $reset.prop('disabled', true)
-        $input.val('')
+        reset(swd)
+        // swd.srsBtn.prop('disabled', false)
+        // swd.rclBtn.prop('disabled', true)
+        // $input.val('')
     })
     // Hookup change event.
     $input.on('change', function() {
         var val = $input.val().toString()
         var elapsed = parseValue(params, val)
         // Set stopwatch to value (forcing stop if necessary) and update display.
-        set(id, elapsed)
-        $startStop.removeClass('stopwatch-em-running')
-        $startStop.prop('disabled', elapsed > -1 && params.stops == false)
-        $reset.prop('disabled', elapsed < 0)
+        set(swd, elapsed)
+        // swd.srsBtn.removeClass('stopwatch-em-running')
+        // swd.srsBtn.prop('disabled', elapsed > -1 && params.stops == false)
+        // swd.rclBtn.prop('disabled', elapsed < 0)
     })
     // Determine insertion point.
     var $insertionPoint = $tr.find('td.data')
@@ -205,20 +204,20 @@ function getTemplate(name) {
 
 /**
  * Inserts a time value into the target field.
- * @param {StopwatchData} sw 
+ * @param {StopwatchData} swd 
  * @param {JQuery} $input 
  */
-function insertElapsed(sw, $input) {
+function insertElapsed(swd, $input) {
     // Hard time_mm_ss limit (59:59)?
-    if (sw.params.is_mm_ss && sw.elapsed > 3599499) {
+    if (swd.params.is_mm_ss && swd.elapsed > 3599499) {
         // TODO: tt-fy, nicer alert
         alert('Elapsed times > 59:59 cannot be inserted! Reseting to stored value (or blank).')
         var val = $input.val().toString()
-        var elapsed = parseValue(sw.params, val)
-        set(sw.id, elapsed)
+        var elapsed = parseValue(swd.params, val)
+        set(swd, elapsed)
     }
     else {
-        $input.val(format(sw.elapsed, sw.params).store)
+        $input.val(format(swd.elapsed, swd.params).store)
         // Trigger change so that REDCap will do branching etc.
         $input.trigger('change')
     }
@@ -227,24 +226,22 @@ function insertElapsed(sw, $input) {
 
 /**
  * Updates the stopwatch display.
- * @param {string} id 
+ * @param {StopwatchData} swd 
  */
-function updateElapsed(id) {
-    var sw = SWD[id]
-    var elapsed = getElapsed(id)
-    var text = format(elapsed, sw.params).display
-    sw.$display.text(text)
+function updateElapsed(swd) {
+    var elapsed = getElapsed(swd)
+    var text = format(elapsed, swd.params).display
+    swd.$display.text(text)
 }
 
 /**
  * Updates the hourglass display.
- * @param {string} id 
+ * @param {StopwatchData} swd 
  */
-function updateHourglass(id) {
-    var sw = SWD[id]
-    sw.$hourglass.removeClass(['fa-hourglass-start', 'fa-hourglass-half', 'fa-hourglass-end'])
-    var hourglass = 'fa-hourglass-' + (sw.running ? 'half' : (sw.elapsed > 0 ? 'end' : 'start'))
-    sw.$hourglass.addClass(hourglass)
+function updateHourglass(swd) {
+    swd.$hourglass.removeClass(['fa-hourglass-start', 'fa-hourglass-half', 'fa-hourglass-end'])
+    var hourglass = 'fa-hourglass-' + (swd.running ? 'half' : (swd.elapsed > 0 ? 'end' : 'start'))
+    swd.$hourglass.addClass(hourglass)
 }
 
 //#endregion
@@ -253,15 +250,14 @@ function updateHourglass(id) {
 
 /**
  * Calculates the time (in ms) elapsed since the last start of the stopwatch.
- * @param {string} id 
+ * @param {StopwatchData} swd 
  */
-function getElapsed(id) {
-    var sw = SWD[id]
-    if (sw.running) {
+function getElapsed(swd) {
+    if (swd.running) {
         var now = new Date()
-        return sw.elapsed + (now.getTime() - sw.lapStartTime.getTime())
+        return swd.elapsed + (now.getTime() - swd.lapStartTime.getTime())
     }
-    return sw.elapsed
+    return swd.elapsed
 }
 
 /**
@@ -287,55 +283,56 @@ function timerSet() {
  */
 function timerTick() {
     Object.keys(SWD).forEach(function(id) {
-        if (SWD[id].running) {
-            updateElapsed(id)
+        var swd = SWD[id]
+        if (swd.running) {
+            updateElapsed(swd)
         }
     })
 }
 
 /**
  * Start a stopwatch.
- * @param {string} id 
+ * @param {StopwatchData} swd 
  */
-function start(id) {
-    var sw = SWD[id]
+function start(swd) {
     var now = new Date()
-    if (sw.params.mode == 'basic') {
-        if (!sw.running) {
-            sw.lapStartTime = now
-            sw.startTime = now
-            sw.running = true
+    var params = swd.params
+    if (params.mode == 'basic') {
+        if (!swd.running) {
+            swd.lapStartTime = now
+            swd.startTime = now
+            swd.running = true
         }
     }
-    else if (sw.params.mode.startsWith('capture')) {
+    else if (params.mode.startsWith('capture')) {
         log('Stopwatch EM: Capture mode not implemented yet.')
     }
-    else if (sw.params.mode.startsWith('lap')) {
+    else if (params.mode.startsWith('lap')) {
         log('Stopwatch EM: Laps mode not implemented yet.')
     }
-    updateHourglass(id)
+    updateHourglass(swd)
     timerSet()
-    log('Stopwatch [' + id + '] has been started at ' + now.toLocaleTimeString() + '.')
+    log('Stopwatch [' + swd.id + '] has been started at ' + now.toLocaleTimeString() + '.')
 }
 
 /**
  * Stops the timer.
- * @param {string} id 
+ * @param {StopwatchData} swd 
  */
-function stop(id) {
-    var sw = SWD[id]
+function stop(swd) {
     var now = new Date()
-    if (sw.params.mode == 'basic') {
-        sw.running = false
-        sw.lapStopTime = now
-        sw.stopTime = now
-        var elapsed = now.getTime() - sw.lapStartTime.getTime()
-        sw.elapsed = sw.elapsed < 0 ? elapsed : sw.elapsed + elapsed
+    var params = swd.params
+    if (params.mode == 'basic') {
+        swd.running = false
+        swd.lapStopTime = now
+        swd.stopTime = now
+        var elapsed = now.getTime() - swd.lapStartTime.getTime()
+        swd.elapsed = swd.elapsed < 0 ? elapsed : swd.elapsed + elapsed
     }
-    else if (sw.params.mode.startsWith('capture')) {
+    else if (params.mode.startsWith('capture')) {
         log('Stopwatch EM: Capture mode not implemented yet.')
     }
-    else if (sw.params.mode.startsWith('capture')) {
+    else if (params.mode.startsWith('lap')) {
         log('Stopwatch EM: Lap mode not implemented yet.')
         // sw.laps.push({
         //     lapStartTime: sw.lapStartTime,
@@ -346,53 +343,49 @@ function stop(id) {
     }
     // Update displayed time so there is no discrepancy.
     timerSet()
-    updateElapsed(id)
-    updateHourglass(id)
-    log('Stopwatch [' + id + '] has been stopped at ' + now.toLocaleTimeString() + '. Elapsed: ' + format(elapsed, sw.params).display)
+    updateElapsed(swd)
+    updateHourglass(swd)
+    log('Stopwatch [' + swd.id + '] has been stopped at ' + now.toLocaleTimeString() + '. Elapsed: ' + format(elapsed, params).display)
 }
 
 /**
  * Sets the stopwatch to a value.
- * @param {string} id 
+ * @param {StopwatchData} swd 
  * @param {number} elapsed
  */
-function set(id, elapsed) {
-    var sw = SWD[id]
-    if (sw.running) {
-        sw.running = false
-    }
-    sw.elapsed = elapsed
-    sw.laps = []
-    sw.captures = []
+function set(swd, elapsed) {
+    swd.running = false
+    swd.elapsed = elapsed
+    swd.laps = []
+    swd.captures = []
     // Update displayed time so there is no discrepancy.
     timerSet()
-    updateElapsed(id)
-    updateHourglass(id)
-    log('Stopwatch [' + id + '] has been set to ' + format(elapsed, sw.params).display)
+    updateElapsed(swd)
+    updateHourglass(swd)
+    log('Stopwatch [' + swd.id + '] has been set to ' + format(elapsed, swd.params).display)
 }
 
 
 
 /**
  * Resets the timer.
- * @param {string} id 
+ * @param {StopwatchData} swd 
  */
-function reset(id) {
-    var sw = SWD[id]
-    if (sw.running) return
+function reset(swd) {
+    if (swd.running) return
     // Reset.
-    sw.elapsed = -1
-    sw.startTime = null
-    sw.stopTime = null
-    sw.lapStartTime = null
-    sw.lapStopTime = null
-    sw.laps = []
-    sw.captures = []
-    sw.running = false
+    swd.elapsed = -1
+    swd.startTime = null
+    swd.stopTime = null
+    swd.lapStartTime = null
+    swd.lapStopTime = null
+    swd.laps = []
+    swd.captures = []
+    swd.running = false
     timerSet()
-    updateElapsed(id)
-    updateHourglass(id)
-    log('Stopwatch [' + id + '] has been reset.')
+    updateElapsed(swd)
+    updateHourglass(swd)
+    log('Stopwatch [' + swd.id + '] has been reset.')
 }
 
 //#endregion

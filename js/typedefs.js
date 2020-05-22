@@ -16,6 +16,38 @@
  */
 
 /**
+ * @typedef CaptureMapping
+ * @type {{
+ *  elapsed: string
+ *  start: string
+ *  stop: string
+ * }}
+ */
+
+/**
+ * @typedef LapMapping
+ * @type {{
+ *  elapsed: string
+ *  start: string
+ *  stop: string
+ *  num_stops: string
+ * }}
+ */
+
+/**
+ * @typedef Plain
+ * @type {{
+ *  items: string[]
+ *  delimiter: string
+ *  header: boolean
+ *  start: string
+ *  stop: string
+ *  num_stops: string
+ *  elapsed: string
+ * }}
+ */
+
+/**
  * @typedef StopwatchParams
  * @type {{
  *  mode: string
@@ -29,6 +61,7 @@
  *  stops: boolean
  *  target: string
  *  hide_target: boolean
+ *  only_once?: boolean|string
  *  decimal_separator: string
  *  group_separator: string
  *  unset_display_symbol : string
@@ -48,8 +81,11 @@
  * @typedef StopwatchData
  * @type {{
  *  id: string
+ *  $srsBtn?: JQuery
+ *  $rclBtn?: JQuery
  *  $display: JQuery
  *  $hourglass: JQuery
+ *  $input: JQuery
  *  params: StopwatchParams
  *  running: boolean
  *  elapsed: number
