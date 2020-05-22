@@ -81,6 +81,7 @@
  * @typedef StopwatchData
  * @type {{
  *  id: string
+ *  initial: boolean
  *  $srsBtn?: JQuery
  *  $rclBtn?: JQuery
  *  $display: JQuery
