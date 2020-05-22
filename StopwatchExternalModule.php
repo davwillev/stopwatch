@@ -41,7 +41,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
                 DTO.debug = <?=json_encode($debug)?>;
                 DTO.fields = <?=json_encode($fields)?>;
             </script>
-            <div style="display:none;" data-stopwatch-em="stopwatch-basic">
+            <div style="display:none;" data-stopwatch-em-template="stopwatch-basic">
                 <div class="stopwatch-em stopwatch-em-container" aria-label="Stopwatch EM">
                     <div class="input-group input-group-sm">
                         <div class="input-group-prepend">
@@ -62,12 +62,13 @@ class StopwatchExternalModule extends AbstractExternalModule {
                     </div>
                 </div>
             </div>
-            <div style="display:none;" data-stopwatch-em="capture-row">
+            <table style="display:none;" data-stopwatch-em-template="stopwatch-row">
                 <tr>
                     <td class="stopwatch-em-rowlabel"></td>
+                    <td class="stopwatch-em-rowstop"></td>
                     <td class="stopwatch-em-rowvalue"></td>
                 </tr>
-            </div>
+            </table>
             <?php
         }
     }
@@ -79,11 +80,15 @@ class StopwatchExternalModule extends AbstractExternalModule {
      * @return array
      */
     private function getFieldParams($project_id, $instrument) {
+        $pds = $this->getProjectDataStructure($project_id);
         $field_params = array();
         if (!class_exists("\Stanford\Utility\ActionTagHelper")) include_once("classes/ActionTagHelper.php");
         $action_tag_results = ActionTagHelper::getActionTags($this->STOPWATCH);
         if (isset($action_tag_results[$this->STOPWATCH])) {
             foreach ($action_tag_results[$this->STOPWATCH] as $field => $param_array) {
+                // Skip if not on current instrument.
+                if ($pds["fields"][$field]["form"] !== $instrument) continue; 
+                // Validate parameters and add.
                 $params = $param_array['params'];
                 if (empty($params)) {
                     $params = array(
@@ -270,20 +275,26 @@ class StopwatchExternalModule extends AbstractExternalModule {
                 $params["error"] = "Invalid value for 'only_once'.";
                 break;
             }
+            if (!isset($params["display_format"])) {
+                $params["display_format"] = "/h/g/m/g/s" . ($params["digits"] > 0 ? "/d/f" : "");
+            }
             // Validate field types.
             $target_metadata = $pds["fields"][$params["target"]]["metadata"];
+            // JSON.
             if ($params["store_format"] == "json") {
-                if (!$target_metadata["element_type"] == "textarea" || ($target_metadata["element_type"] == "text" && $target_metadata["element_validation_type"] == null)) {
+                if (!($target_metadata["element_type"] == "textarea" || ($target_metadata["element_type"] == "text" && $target_metadata["element_validation_type"] == null))) {
                     $params["error"] = "Invalid target field type.";
                     break;
                 }
             } 
+            // Plain text.
             else if ($params["store_format"] == "plain") {
                 if (!$target_metadata["element_type"] == "textarea") {
                     $params["error"] = "Target field type must be of type 'Notes Box'.";
                     break;
                 }
             }
+            // Repeating form.
             else {
                 if ($params["only_once"] && $target_metadata["element_type"] != "text") {
                     $params["error"] = "Target field type must be of type 'Text Box'.";

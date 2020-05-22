@@ -71,6 +71,9 @@ function setup() {
         }
         else {
             var $input = $('input[name="' + params.target + '"]')
+            if (!$input.length) {
+                $input = $('textarea[name="' + params.target + '"]')
+            }
             if ($tr.length && $input.length) {
                 create(field, params, $tr, $input)
             }
@@ -117,13 +120,24 @@ function create(id, params, $tr, $input) {
         $display: $display,
         $hourglass: $hourglass,
         $input: $input,
+        $json: null,
+        $table: $sw.find('.stopwatch-em-table'),
+        currentLap: null,
+        $currentLapValue: null,
+        $currentLapStops: null,
         params: params,
         elapsed: 0,
+        startTime: null,
+        stopTime: null,
         running: false,
         laps: [],
         captures: []
     }
     SWD[id] = swd
+    // Hidden input field (for repeat storage only).
+    if (params.store_format == 'repeating') {
+        swd.$json = $('<input/>').attr('name', 'stopwatch-em-json-' + swd.id).appendTo($sw).hide()
+    }
     // Buttons.
     swd.$srsBtn = $sw.find('.stopwatch-em-startstop')
     swd.$rclBtn = $sw.find('.stopwatch-em-reset')
@@ -131,7 +145,20 @@ function create(id, params, $tr, $input) {
     swd.$rclBtn.attr('data-stopwatch-em-id', id)
     swd.$rclBtn.on('click', function(e) {
         e.preventDefault()
-        reset(swd)
+        if (swd.running) {
+            // Add capture or lap.
+            var now = new Date()
+            if (params.mode == 'capture') {
+                capture(swd, now, false)
+            } 
+            else if (params.mode == 'lap') {
+                lap(swd, now, false)
+            }
+        }
+        else {
+            // Reset.
+            reset(swd)
+        }
     })
     // Start / Resume / Stop.
     swd.$srsBtn.attr('data-stopwatch-em-id', id)
@@ -144,15 +171,11 @@ function create(id, params, $tr, $input) {
             start(swd)
         }
     })
-    swd.$rclBtn.on('click', function(e) {
-        e.preventDefault()
-        reset(swd)
-    })
     // Hookup change event.
     $input.on('change', function() {
         // Set stopwatch to value (forcing stop when running).
         var val = $input.val().toString()
-        var elapsed = parseValue(params, val)
+        var elapsed = parseValue(swd, val)
         set(swd, elapsed)
     })
     // Determine insertion point.
@@ -169,7 +192,7 @@ function create(id, params, $tr, $input) {
     }
     // Set initial value and update UI.
     var val = $input.val().toString()
-    var elapsed = parseValue(params, val)
+    var elapsed = parseValue(swd, val)
     set(swd, elapsed)
     log('Added Stopwatch to \'' + id + '\'', $insertionPoint)
 }
@@ -181,39 +204,22 @@ function create(id, params, $tr, $input) {
  */
 function getTemplate(name) {
     // @ts-ignore
-    return $('div[data-stopwatch-em=' + name + ']').first().children().first().clone()
+    return $('[data-stopwatch-em-template=' + name + ']').first().children().first().clone()
 }
-
-
-/**
- * Inserts a time value into the target field.
- * @param {StopwatchData} swd 
- */
-function insertElapsed(swd) {
-    // Hard time_mm_ss limit (59:59)?
-    if (swd.params.is_mm_ss && swd.elapsed > 3599499) {
-        // TODO: tt-fy, nicer alert
-        alert('Elapsed times > 59:59 cannot be inserted! Reseting to stored value (or blank).')
-        var val = swd.$input.val().toString()
-        var elapsed = parseValue(swd.params, val)
-        set(swd, elapsed)
-    }
-    else {
-        swd.$input.val(format(swd.elapsed, swd.params).store)
-        // Trigger change so that REDCap will do branching etc.
-        swd.$input.trigger('change')
-    }
-}
-
 
 /**
  * Updates the stopwatch display.
  * @param {StopwatchData} swd 
  */
-function updateElapsed(swd) {
-    var elapsed = getElapsed(swd)
-    var text = format(elapsed, swd.params).display
-    swd.$display.text(text)
+function updateDisplay(swd) {
+    var totalElapsed = getTotalElapsed(swd)
+    var totalText = format(totalElapsed, swd.params).display
+    swd.$display.text(totalText)
+    if (swd.params.mode == 'lap') {
+        var lapElapsed = getLapElapsed(swd)
+        var lapText = format(lapElapsed, swd.params).display
+        swd.$currentLapValue.text(lapText)
+    }
 }
 
 /**
@@ -226,20 +232,138 @@ function updateHourglass(swd) {
     swd.$hourglass.addClass(hourglass)
 }
 
+/**
+ * Inserts a time value into the target field.
+ * @param {StopwatchData} swd 
+ */
+function insertElapsed(swd) {
+    // Hard time_mm_ss limit (59:59)?
+    if (swd.params.is_mm_ss && swd.elapsed > 3599499) {
+        // TODO: tt-fy, nicer alert
+        alert('Elapsed times > 59:59 cannot be inserted! Reseting to stored value (or blank).')
+        var val = swd.$input.val().toString()
+        var elapsed = parseValue(swd, val)
+        set(swd, elapsed)
+    }
+    else {
+        swd.$input.val(format(swd.elapsed, swd.params).store)
+        // Trigger change so that REDCap will do branching etc.
+        swd.$input.trigger('change')
+    }
+}
+
+/**
+ * Inserts a capture data structure into the target field.
+ * @param {StopwatchData} swd 
+ */
+function insertCaptures(swd) {
+    var params = swd.params
+    if (params.store_format == 'json') {
+        var json = JSON.stringify(swd.captures, null, 2)
+        swd.$input.val(json)
+    }
+    else if (params.store_format == 'repeating') {
+        var json = JSON.stringify(swd.captures)
+        swd.$json.val(json)
+    }
+    else if (params.store_format == 'plain') {
+        log('Plain text caputres not implemented yet')
+    }
+}
+
+/**
+ * Inserts a lap data structure into the target field.
+ * @param {StopwatchData} swd 
+ */
+function insertLaps(swd) {
+    var params = swd.params
+    if (params.store_format == 'json') {
+        var json = JSON.stringify(swd.laps, null, 2)
+        swd.$input.val(json)
+    }
+    else if (params.store_format == 'repeating') {
+        var json = JSON.stringify(swd.laps)
+        swd.$json.val(json)
+    }
+    else if (params.store_format == 'plain') {
+        log('Plain text laps not implemented yet')
+    }
+}
+
+/**
+ * Inserts a row into the captures table.
+ * @param {StopwatchData} swd 
+ * @param {CaptureInfo} capture 
+ */
+function addCaptureRow(swd, capture) {
+    var $row = getTemplate('stopwatch-row')
+    var $label = $row.find('.stopwatch-em-rowlabel')
+    var $stop = $row.find('.stopwatch-em-rowstop')
+    var $value = $row.find('.stopwatch-em-rowvalue')
+    $label.text('Capture ' + swd.captures.length)
+    $value.text(format(capture.elapsed, swd.params).display)
+    $stop.html(getStopSymbol(capture.isStop))
+    swd.$table.prepend($row)
+    if (swd.captures.length > swd.params.max_rows) {
+        swd.$table.children().last().remove()
+    }
+}
+
+/**
+ * Inserts a row into the laps table.
+ * @param {StopwatchData} swd 
+ */
+function addLapRow(swd) {
+    var $row = getTemplate('stopwatch-row')
+    var $label = $row.find('.stopwatch-em-rowlabel')
+    var $stop = $row.find('.stopwatch-em-rowstop')
+    var $value = $row.find('.stopwatch-em-rowvalue')
+    $label.text('Lap ' + swd.laps.length)
+    $value.text(format(swd.currentLap.elapsed, swd.params).display)
+    $stop.html(getStopSymbol(swd.currentLap.num_stops > 0))
+    swd.$table.prepend($row)
+    if (swd.params.max_rows > 0 && swd.laps.length > swd.params.max_rows) {
+        swd.$table.children().last().remove()
+    }
+    swd.$currentLapValue = $value
+    swd.$currentLapStops = $stop
+}
+
+/**
+ * Gets the stopped symbol.
+ * @param {boolean} stopped 
+ */
+function getStopSymbol(stopped) {
+    return stopped ? '<i class="fas fa-stopwatch"></i>' : ''
+}
+
 //#endregion
 
 //#region Clock functionality --------------------------------------------------------------
 
 /**
- * Calculates the time (in ms) elapsed since the last start of the stopwatch.
+ * Calculates the total time (in ms) elapsed since the last start of the stopwatch.
  * @param {StopwatchData} swd 
  */
-function getElapsed(swd) {
+function getTotalElapsed(swd) {
     if (swd.running) {
         var now = new Date()
         return swd.elapsed + (now.getTime() - swd.lapStartTime.getTime())
     }
     return swd.elapsed
+}
+
+/**
+ * Calculates the lap time (in ms) elapsed since the last resume of the stopwatch.
+ * @param {StopwatchData} swd 
+ */
+function getLapElapsed(swd) {
+    var elapsed = swd.currentLap ? swd.currentLap.elapsed : 0
+    if (swd.running) {
+        var now = new Date()
+        return elapsed + (now.getTime() - swd.lapStartTime.getTime())
+    }
+    return elapsed
 }
 
 /**
@@ -267,7 +391,7 @@ function timerTick() {
     Object.keys(SWD).forEach(function(id) {
         var swd = SWD[id]
         if (swd.running) {
-            updateElapsed(swd)
+            updateDisplay(swd)
         }
     })
 }
@@ -278,6 +402,9 @@ function timerTick() {
  */
 function start(swd) {
     var now = new Date()
+    if (swd.startTime == null) {
+        swd.startTime = now
+    }
     var params = swd.params
     if (params.mode == 'basic') {
         if (!swd.running) {
@@ -290,11 +417,35 @@ function start(swd) {
         swd.$srsBtn.text(params.label_stop)
         swd.$srsBtn.addClass('stopwatch-em-running')
     }
-    else if (params.mode.startsWith('capture')) {
-        log('Stopwatch EM: Capture mode not implemented yet.')
+    else if (params.mode == 'capture') {
+        if (!swd.running) {
+            swd.lapStartTime = now
+            swd.startTime = now
+            swd.running = true
+        }
+        // Update UI.
+        swd.$rclBtn.prop('disabled', false)
+        swd.$rclBtn.text(params.label_capture)
+        swd.$srsBtn.text(params.label_stop)
+        swd.$srsBtn.addClass('stopwatch-em-running')
     }
-    else if (params.mode.startsWith('lap')) {
-        log('Stopwatch EM: Laps mode not implemented yet.')
+    else if (params.mode == 'lap') {
+        if (!swd.running) {
+            swd.lapStartTime = now
+            swd.running = true
+            if (swd.laps.length == 0) {
+                swd.currentLap = lap(swd, now, false)
+            } 
+            else {
+                // need to increment number of stops
+                swd.currentLap.num_stops++
+            }
+        }
+        // Update UI.
+        swd.$rclBtn.prop('disabled', false)
+        swd.$rclBtn.text(params.label_lap)
+        swd.$srsBtn.text(params.label_stop)
+        swd.$srsBtn.addClass('stopwatch-em-running')
     }
     // Update UI.
     updateHourglass(swd)
@@ -303,42 +454,131 @@ function start(swd) {
 }
 
 /**
+ * Adds a capture.
+ * @param {StopwatchData} swd
+ * @param {Date} now
+ * @param {boolean} stopped 
+ */
+function capture(swd, now, stopped) {
+    swd.lapStopTime = now
+    var elapsed = now.getTime() - swd.lapStartTime.getTime()
+    swd.elapsed = swd.elapsed < 0 ? elapsed : swd.elapsed + elapsed
+    /** @type {CaptureInfo} */
+    var capture = {
+        start:  swd.lapStartTime,
+        stop: swd.stopTime,
+        elapsed: swd.elapsed,
+        isStop: stopped
+    }
+    swd.captures.push(capture)
+    swd.lapStartTime = now
+    addCaptureRow(swd, capture)
+    if (stopped) {
+        insertCaptures(swd)
+    }
+}
+
+/**
+ * Adds a lap.
+ * @param {StopwatchData} swd 
+ * @param {Date} now
+ * @param {boolean} stopped 
+ * @returns {LapInfo}
+ */
+function lap(swd, now, stopped) {
+    var elapsed = now.getTime() - swd.lapStartTime.getTime() 
+    swd.elapsed = swd.elapsed < 0 ? elapsed : swd.elapsed + elapsed
+    var currentLap = swd.currentLap
+    if (!stopped) {
+        // Is there a previous lap? Update it.
+        if (currentLap) {
+            currentLap.stop = now
+            currentLap.elapsed += elapsed
+            swd.$currentLapValue.html(format(currentLap.elapsed, swd.params).display)
+        }
+        swd.lapStartTime = now
+        // Add a new lap.
+        /** @type {LapInfo} */
+        currentLap = {
+            start:  now,
+            stop: null,
+            elapsed: 0,
+            num_stops: 0
+        }
+        swd.laps.push(currentLap)
+        addLapRow(swd)
+    }
+    else {
+        currentLap.stop = now
+        currentLap.elapsed += elapsed
+        swd.$currentLapValue.html(format(elapsed, swd.params).display)
+        swd.$currentLapStops.html(getStopSymbol(true))
+        insertLaps(swd)
+    }
+    return currentLap
+}
+
+/**
  * Stops the timer.
  * @param {StopwatchData} swd 
  */
 function stop(swd) {
     var now = new Date()
+    swd.stopTime = now
     var params = swd.params
     if (params.mode == 'basic') {
         swd.running = false
         swd.lapStopTime = now
-        swd.stopTime = now
         var elapsed = now.getTime() - swd.lapStartTime.getTime()
         swd.elapsed = swd.elapsed < 0 ? elapsed : swd.elapsed + elapsed
         insertElapsed(swd)
     }
-    else if (params.mode.startsWith('capture')) {
-        log('Stopwatch EM: Capture mode not implemented yet.')
+    else if (params.mode == 'capture') {
+        swd.running = false
+        capture(swd, now, true)
     }
-    else if (params.mode.startsWith('lap')) {
-        log('Stopwatch EM: Lap mode not implemented yet.')
-        // sw.laps.push({
-        //     lapStartTime: sw.lapStartTime,
-        //     lapStopTime: now,
-        //     elapsed: elapsed,
-        //     isStop: true
-        // })
+    else if (params.mode == 'lap') {
+        swd.running = false
+        swd.lapStopTime = now
+        lap(swd, now, true)
     }
     // Update displayed time so there is no discrepancy.
     timerSet()
     // Update UI.
     swd.$rclBtn.prop('disabled', false)
+    swd.$rclBtn.text(params.label_reset)
     swd.$srsBtn.text(params.stops ? params.label_resume : params.label_start)
     swd.$srsBtn.removeClass('stopwatch-em-running')
     swd.$srsBtn.prop('disabled', params.stops == false)
-    updateElapsed(swd)
+    updateDisplay(swd)
     updateHourglass(swd)
     log('Stopwatch [' + swd.id + '] has been stopped at ' + now.toLocaleTimeString() + '. Elapsed: ' + format(elapsed, params).display)
+}
+
+/**
+ * Resets the timer.
+ * @param {StopwatchData} swd 
+ */
+function reset(swd) {
+    // Reset.
+    swd.elapsed = -1
+    swd.startTime = null
+    swd.stopTime = null
+    swd.lapStartTime = null
+    swd.lapStopTime = null
+    swd.laps = []
+    swd.captures = []
+    swd.running = false
+    // UI updates.
+    swd.$srsBtn.prop('disabled', false)
+    swd.$rclBtn.prop('disabled', true)
+    swd.$srsBtn.text(swd.params.label_start)
+    swd.$input.val('')
+    swd.$table.children().remove()
+    timerSet()
+    updateDisplay(swd)
+    updateHourglass(swd)
+    log('Stopwatch [' + swd.id + '] has been reset.')
 }
 
 /**
@@ -350,8 +590,6 @@ function set(swd, elapsed) {
     var params = swd.params
     swd.running = false
     swd.elapsed = elapsed
-    swd.laps = []
-    swd.captures = []
     // Update displayed time so there is no discrepancy.
     timerSet()
     // Update UI.
@@ -363,42 +601,15 @@ function set(swd, elapsed) {
     }
     swd.$srsBtn.prop('disabled', elapsed > -1 && (swd.params.stops == false || swd.initial))
     swd.$srsBtn.removeClass('stopwatch-em-running')
-    updateElapsed(swd)
+    updateDisplay(swd)
     updateHourglass(swd)
     swd.initial = false
     log('Stopwatch [' + swd.id + '] has been set to ' + format(elapsed, swd.params).display)
 }
 
-/**
- * Resets the timer.
- * @param {StopwatchData} swd 
- */
-function reset(swd) {
-    if (swd.running) return
-    // Reset.
-    swd.elapsed = -1
-    swd.startTime = null
-    swd.stopTime = null
-    swd.lapStartTime = null
-    swd.lapStopTime = null
-    swd.laps = []
-    swd.captures = []
-    swd.running = false
-    timerSet()
-    // UI updates.
-    swd.$srsBtn.prop('disabled', false)
-    swd.$rclBtn.prop('disabled', true)
-    swd.$srsBtn.text(swd.params.label_start)
-
-    swd.$input.val('')
-    updateElapsed(swd)
-    updateHourglass(swd)
-    log('Stopwatch [' + swd.id + '] has been reset.')
-}
-
 //#endregion
 
-//#region Formatting -----------------------------------------------------------------------
+//#region Formatting and Parsing ---------------------------------------------------------
 
 /**
  * Left-pads a number with zeros.
@@ -516,11 +727,12 @@ function formatValue(f, t) {
 
 /**
  * Reads a elapsed time based on a storage format.
- * @param {StopwatchParams} params
+ * @param {StopwatchData} swd
  * @param {string} val The value to parse
  * @return {number} Elapsed time
  */
-function parseValue(params, val) {
+function parseValue(swd, val) {
+    var params = swd.params
     // Empty.
     if (val == '') return -1
     var f = params.store_format
@@ -534,44 +746,87 @@ function parseValue(params, val) {
             var s = parseInt(m_s[1]) * 1000
             return m + s
         }
-        // Need to parse. This is quite limited in capability. It relies on non-digit-separators being present between any digit groups.
-        var data = {
-            h: '',
-            m: '',
-            s: '',
-            f: ''
-        }
-        var known = 'hmsf'
-        var digits = '0123456789'
-        var esc = '/'
-        var escaped = false
-        var pos = 0 // Position in val
-            for (var i = 0; i < f.length; i++) {
-            var c = f[i]
-            if (c == esc && !escaped) {
-                escaped = true
-            } 
-            else if (escaped) {
-                if (known.includes(c)) {
-                    var num = ''
-                    do {
-                        var val_c = val.substr(pos, 1)
-                        if (digits.includes(val_c)) {
-                            num = num + val_c
-                            pos++
-                        }
-                        else break
-                    } while (pos < val.length)
-                    data[c] = num
+        if (params.mode == 'basic') {
+            // Need to parse. This is quite limited in capability. It relies on non-digit-separators being present between any digit groups.
+            var data = {
+                h: '',
+                m: '',
+                s: '',
+                f: ''
+            }
+            var known = 'hmsf'
+            var digits = '0123456789'
+            var esc = '/'
+            var escaped = false
+            var pos = 0 // Position in val
+                for (var i = 0; i < f.length; i++) {
+                var c = f[i]
+                if (c == esc && !escaped) {
+                    escaped = true
+                } 
+                else if (escaped) {
+                    if (known.includes(c)) {
+                        var num = ''
+                        do {
+                            var val_c = val.substr(pos, 1)
+                            if (digits.includes(val_c)) {
+                                num = num + val_c
+                                pos++
+                            }
+                            else break
+                        } while (pos < val.length)
+                        data[c] = num
+                    }
+                    escaped = false
+                } else {
+                    pos++
                 }
-                escaped = false
-            } else {
-                pos++
+            }
+            data.f = rpad(data.f.substr(0, 3), 3, '0')
+            var elapsed = parseInt(data.h) * 3600000 + parseInt(data.m) * 60000 + parseInt(data.s) * 1000 + parseInt(data.f)
+            return elapsed
+        }
+        else if (params.mode == 'capture') {
+            if (f == "json") {
+                var json = JSON.parse(val)
+                if (Array.isArray(json)) {
+                    for (var i = 0; i < json.length; i++) {
+                        /** @type {CaptureInfo} */
+                        var capture = {
+                            start: new Date(json[i]['start']),
+                            stop: new Date(json[i]['stop']),
+                            elapsed: parseInt(json[i]['elapsed']),
+                            isStop: json[i]['isStop']
+                        }
+                        swd.captures.push(capture)
+                        addCaptureRow(swd, capture)
+                    }
+                }
+                return swd.captures[swd.captures.length - 1].elapsed
             }
         }
-        data.f = rpad(data.f.substr(0, 3), 3, '0')
-        var elapsed = parseInt(data.h) * 3600000 + parseInt(data.m) * 60000 + parseInt(data.s) * 1000 + parseInt(data.f)
-        return elapsed
+        else if (params.mode == 'lap') {
+            if (f == "json") {
+                var json = JSON.parse(val)
+                var sum = 0
+                if (Array.isArray(json)) {
+                    for (var i = 0; i < json.length; i++) {
+                        /** @type {LapInfo} */
+                        var lap = {
+                            start: new Date(json[i]['start']),
+                            stop: new Date(json[i]['stop']),
+                            elapsed: parseInt(json[i]['elapsed']),
+                            num_stops: parseInt(json[i]['num_stops'])
+                        }
+                        swd.laps.push(lap)
+                        swd.currentLap = lap
+                        addLapRow(swd)
+                        sum += lap.elapsed
+                    }
+                }
+                return sum
+            }
+        }
     }
     catch (ex) {
         log('Stopwatch - Failed to parse stored value: ' + val)
