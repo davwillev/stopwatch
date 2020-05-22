@@ -215,7 +215,7 @@ function updateDisplay(swd) {
     var totalElapsed = getTotalElapsed(swd)
     var totalText = format(totalElapsed, swd.params).display
     swd.$display.text(totalText)
-    if (swd.params.mode == 'lap') {
+    if (swd.params.mode == 'lap' && swd.currentLap) {
         var lapElapsed = getLapElapsed(swd)
         var lapText = format(lapElapsed, swd.params).display
         swd.$currentLapValue.text(lapText)
@@ -304,7 +304,7 @@ function addCaptureRow(swd, capture) {
     $value.text(format(capture.elapsed, swd.params).display)
     $stop.html(getStopSymbol(capture.isStop))
     swd.$table.prepend($row)
-    if (swd.captures.length > swd.params.max_rows) {
+    if (swd.params.max_rows > 0 && swd.captures.length > swd.params.max_rows) {
         swd.$table.children().last().remove()
     }
 }
@@ -430,16 +430,14 @@ function start(swd) {
         swd.$srsBtn.addClass('stopwatch-em-running')
     }
     else if (params.mode == 'lap') {
-        if (!swd.running) {
-            swd.lapStartTime = now
-            swd.running = true
-            if (swd.laps.length == 0) {
-                swd.currentLap = lap(swd, now, false)
-            } 
-            else {
-                // need to increment number of stops
-                swd.currentLap.num_stops++
-            }
+        swd.lapStartTime = now
+        swd.running = true
+        if (!swd.currentLap) {
+            lap(swd, now, false)
+        } 
+        else {
+            // need to increment number of stops
+            swd.currentLap.num_stops++
         }
         // Update UI.
         swd.$rclBtn.prop('disabled', false)
@@ -483,39 +481,36 @@ function capture(swd, now, stopped) {
  * @param {StopwatchData} swd 
  * @param {Date} now
  * @param {boolean} stopped 
- * @returns {LapInfo}
  */
 function lap(swd, now, stopped) {
     var elapsed = now.getTime() - swd.lapStartTime.getTime() 
     swd.elapsed = swd.elapsed < 0 ? elapsed : swd.elapsed + elapsed
-    var currentLap = swd.currentLap
     if (!stopped) {
         // Is there a previous lap? Update it.
-        if (currentLap) {
-            currentLap.stop = now
-            currentLap.elapsed += elapsed
-            swd.$currentLapValue.html(format(currentLap.elapsed, swd.params).display)
+        if (swd.currentLap) {
+            swd.currentLap.stop = now
+            swd.currentLap.elapsed += elapsed
+            swd.$currentLapValue.html(format(swd.currentLap.elapsed, swd.params).display)
         }
         swd.lapStartTime = now
         // Add a new lap.
         /** @type {LapInfo} */
-        currentLap = {
-            start:  now,
+        swd.currentLap = {
+            start: now,
             stop: null,
             elapsed: 0,
             num_stops: 0
         }
-        swd.laps.push(currentLap)
+        swd.laps.push(swd.currentLap)
         addLapRow(swd)
     }
     else {
-        currentLap.stop = now
-        currentLap.elapsed += elapsed
+        swd.currentLap.stop = now
+        swd.currentLap.elapsed += elapsed
         swd.$currentLapValue.html(format(elapsed, swd.params).display)
         swd.$currentLapStops.html(getStopSymbol(true))
         insertLaps(swd)
     }
-    return currentLap
 }
 
 /**
