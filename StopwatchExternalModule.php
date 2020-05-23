@@ -28,18 +28,36 @@ class StopwatchExternalModule extends AbstractExternalModule {
     }
 
     function redcap_save_record($project_id, $record, $instrument, $event_id, $group_id, $survey_hash, $response_id, $repeat_instance) {
-        $fields = $this->getFieldParams($project_id, $instrument);
+        $fields = $this->getFieldParams($project_id, $instrument, $event_id);
         foreach ($fields as $field => $params) {
             if (empty($params["error"]) && $params["store_format"] == "repeating") {
                 $data = json_decode($_POST["stopwatch-em-json-{$field}"], true);
+                if (is_array($data)) {
+                    if (!class_exists("\DE\RUB\Utility\Project")) include_once("classes/Project.php");
+                    if (!class_exists("\DE\RUB\Utility\Record")) include_once("classes/Record.php");
+                    $project = Project::load($this->framework, $project_id);
+                    $record = $project->getRecord($record);
+                    $mappings = $params["mode"] == "lap" ? $params["lap_mapping"] : $params["capture_mapping"];
+                    $instances_data = array();
+                    foreach ($data as $item) {
+                        $instance_data = array();
+                        foreach ($mappings as $key => $store_key) {
+                            $metadata = $project->getFieldMetadata($store_key);
+                            
+                            $instance_data[$store_key] = $value;
+                        }
 
+                    }
+                
+                
+                }
             }
         }
     }
 
 
     private function insertStopwatch($project_id, $instrument, $event_id, $isSurvey) {
-        $fields = $this->getFieldParams($project_id, $instrument);
+        $fields = $this->getFieldParams($project_id, $instrument, $event_id);
         if (count($fields)) {
             if (!class_exists("\RUB\Utility\InjectionHelper")) include_once("classes/InjectionHelper.php");
             $ih = InjectionHelper::init($this);
@@ -91,7 +109,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
      * TODO: This currently fails to alert the user about action tags with malformed JSON, as these are ignored by the ActionTagHelper.
      * @return array
      */
-    private function getFieldParams($project_id, $instrument) {
+    private function getFieldParams($project_id, $instrument, $event_id) {
         $field_params = array();
         if (!class_exists("\DE\RUB\Utility\Project")) include_once("classes/Project.php");
         $project = Project::load($this->framework, $project_id);
@@ -117,7 +135,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
                     );
                 }
                 else {
-                    $params = $this->validateParams($project, $instrument, $field, $params);
+                    $params = $this->validateParams($project, $instrument, $event_id, $field, $params);
                 }
                 $field_params[$field] = $params;
             }
@@ -142,11 +160,12 @@ class StopwatchExternalModule extends AbstractExternalModule {
      * 
      * @param Project $project
      * @param string $instrument
+     * @param string $event_id
      * @param string $field
      * @param array $param
      * @return array The supplemented parameters.
      */
-    private function validateParams($project, $instrument, $field, $params) {
+    private function validateParams($project, $instrument, $event_id, $field, $params) {
         // Add defaults.
         if (!isset($params["label_start"])) {
             $params["label_start"] = "Start"; 
@@ -224,18 +243,17 @@ class StopwatchExternalModule extends AbstractExternalModule {
                 $params["error"] = "Invalid target field or @STOPWATCH and target field are not on the same instrument.";
                 break;
             }
-            // Get field metadata.
-            $metadata = $project->getFieldMetadata($targetField);
+            // Validate field metadata.
             $isAllowed = function($validation) {
                 return 
                     $validation == null ||
                     $validation == "int" ||
                     $validation == "float" ||
-                    substr($validation, 0, 6) == "number" ||
+                    $validation == "number_comma_decimal" ||
                     $validation == "time_mm_ss";
             };
-            $validation = $metadata["element_validation_type"];
-            if (@$metadata["element_type"] == "text" && $isAllowed($validation)) {
+            $validation = $project->getFieldValidation($targetField);
+            if ($project->getFieldType($targetField) == "text" && $isAllowed($validation)) {
                 if ($validation == "int") {
                     // Text Box with Integer validation.
                     $params["display_format"] = "/h/g/m/g/s" . ($params["digits"] > 0 ? "/d/f" : "");
@@ -290,24 +308,23 @@ class StopwatchExternalModule extends AbstractExternalModule {
                 $params["display_format"] = "/h/g/m/g/s" . ($params["digits"] > 0 ? "/d/f" : "");
             }
             // Validate field types.
-            $target_metadata = $project->getFieldMetadata($params["target"]);
             // JSON.
             if ($params["store_format"] == "json") {
-                if (!($target_metadata["element_type"] == "textarea" || ($target_metadata["element_type"] == "text" && $target_metadata["element_validation_type"] == null))) {
+                if (!($project->getFieldType($params["target"]) == "textarea" || ($project->getFieldType($params["target"]) == "text" && $project->getFieldValidation($params["target"]) == null))) {
                     $params["error"] = "Invalid target field type.";
                     break;
                 }
             } 
             // Plain text.
             else if ($params["store_format"] == "plain") {
-                if (!$target_metadata["element_type"] == "textarea") {
+                if (!$project->getFieldType($params["target"]) == "textarea") {
                     $params["error"] = "Target field type must be of type 'Notes Box'.";
                     break;
                 }
             }
             // Repeating form.
             else {
-                if ($target_metadata["element_type"] != "text" || $target_metadata["element_validation_type"] !== null) {
+                if ($project->getFieldType($params["target"]) != "text" || $project->getFieldValidation($params["target"]) !== null) {
                     $params["error"] = "Target field type must be of type 'Text Box' without validation.";
                     break;
                 }
@@ -317,16 +334,49 @@ class StopwatchExternalModule extends AbstractExternalModule {
                 foreach ($repeating_field_names as $fieldname) {
                     $mapping = @$params[$params["mode"]."_mapping"][$fieldname];
                     if (!empty($mapping)) {
-                        $repeating_fields[] = $mapping;
+                        $repeating_fields[$fieldname] = $mapping;
                     }
                 }
                 if (!count($repeating_fields)) {
                     $params["error"] = "Storage field mappings must be provided.";
                     break;
                 }
-                if (!$project->areFieldsOnSameForm($repeating_fields) || !$project->isFieldOnRepeatingForm($repeating_fields[0])) {
-                    $params["error"] = "Invalid field mappings. All fields must exist and be on the same repeating form.";
+                if (!isset($params["event"])) $params["event"] = $event_id;
+                if ($project->getEventId($params["event"]) == null) {
+                    $params["error"] = "Invalid event.";
+                    break;
                 }
+                if (!$project->areFieldsOnSameForm(array_values($repeating_fields)) || !$project->isFieldOnRepeatingForm($repeating_fields[array_key_first($repeating_fields)], $params["event"])) {
+                    $params["error"] = "Invalid field mappings. All fields must exist and be on the same repeating form.";
+                    break;
+                }
+                $allowedType = array(
+                    "elapsed" => array(
+                        "int", "float", "number_comma_decimal", null
+                    ),
+                    "start" => array(
+                        "int", "float", "number_comma_decimal", null, "date_dmy", "date_ymd", "date_mdy", "datetime_dmy", "datetime_ymd", "datetime_mdy", "datetime_seconds_dmy", "datetime_seconds_ymd", "datetime_seconds_mdy"
+                    ),
+                    "num_stops" => array(
+                        "int"
+                    )
+                );
+                $allowedType["stop"] = $allowedType["start"];
+                foreach ($repeating_fields as $map_name => $target_name) {
+                    if ($project->getFieldType($target_name) != "text") {
+                        $params["error"] = "Mapping field '{$target_name}' must be of type 'Text Box'.";
+                    }
+                    $validation_type = $project->getFieldValidation($target_name);
+                    if (!in_array($validation_type, $allowedType[$map_name], true)) {
+                        $params["error"] = "Field '{$target_name}' has an invalid type.";
+                        break 2;
+                    }
+                }
+                $params["form"] = $project->getFormByField($repeating_fields[array_key_first($repeating_fields)]);
+                if (!$project->isFormOnEvent($params["form"], $params["event"])) {
+                    $params["error"] = "Form '{$params["form"]}' is not on event '{$params["event"]}'.";
+                }
+                
             }
             break;
         }
