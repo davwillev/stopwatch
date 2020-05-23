@@ -27,7 +27,8 @@ class StopwatchExternalModule extends AbstractExternalModule {
         $this->insertStopwatch($project_id, $instrument, $event_id, true);
     }
 
-    function redcap_save_record($project_id, $record, $instrument, $event_id, $group_id, $survey_hash, $response_id, $repeat_instance) {
+    function redcap_save_record($project_id, $record_id, $instrument, $event_id, $group_id, $survey_hash, $response_id, $repeat_instance) {
+        $debug = $this->getProjectSetting("debug-js") == true;
         $fields = $this->getFieldParams($project_id, $instrument, $event_id);
         foreach ($fields as $field => $params) {
             if (empty($params["error"]) && $params["store_format"] == "repeating") {
@@ -36,7 +37,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
                     if (!class_exists("\DE\RUB\Utility\Project")) include_once("classes/Project.php");
                     if (!class_exists("\DE\RUB\Utility\Record")) include_once("classes/Record.php");
                     $project = Project::load($this->framework, $project_id);
-                    $record = $project->getRecord($record);
+                    $record = $project->getRecord($record_id);
                     $mappings = $params["mode"] == "lap" ? $params["lap_mapping"] : $params["capture_mapping"];
                     $instances_data = array();
                     foreach ($data as $item) {
@@ -49,7 +50,32 @@ class StopwatchExternalModule extends AbstractExternalModule {
                         }
                         $instances_data[] = $instance_data;
                     }
-                    $record->addFormInstances($params["form"], $params["event"], $instances_data);
+                    try {
+                        // Save instances.
+                        $rv = $record->addFormInstances($params["form"], $params["event"], $instances_data);
+                        // Store return value into target field.
+                        $record->updateFields(array($params["target"] => $rv), $event_id);
+                    }
+                    catch (\Exception $e) {
+                        if ($debug) REDCap::logEvent(
+                            "@STOPWATCH ('{$field}')",
+                            "Exception was thrown: " . $e->getMessage(),
+                            null,
+                            $record_id,
+                            $event_id,
+                            $project_id
+                        );
+                    }
+                    catch (\Error $e) {
+                        if ($debug) REDCap::logEvent(
+                            "@STOPWATCH ('{$field}')",
+                            "Error occured: " . $e->getMessage() . "\n" . $e->getTraceAsString(),
+                            null,
+                            $record_id,
+                            $event_id,
+                            $project_id
+                        );
+                    }
                 }
             }
         }
