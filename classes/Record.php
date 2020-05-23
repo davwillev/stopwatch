@@ -49,7 +49,7 @@ class Record
                 throw new \Exception("Invalid instance data format.");
             }
             foreach ($instance as $field => $value) {
-                if (!is_string($value) || !is_numeric($value) || !is_bool($value)) {
+                if (!is_null($value) || !is_string($value) || !is_numeric($value) || !is_bool($value)) {
                     throw new \Exception("Invalid value data type for field '$field'.");
                 }
                 if ($this->project->getFormByField($field) !== $form) {
@@ -59,7 +59,7 @@ class Record
         }
         // Build data structure for REDCap::saveData().
         $last_instance = $this->getFormLastInstanceNumber($form, $event);
-        
+
 
 
 
