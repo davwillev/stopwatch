@@ -16,6 +16,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
 
     function redcap_every_page_top($project_id) {
         // Inject action tag info.
+        // TODO
     }
 
     function redcap_data_entry_form($project_id, $record, $instrument, $event_id, $group_id, $repeat_instance) {
@@ -24,6 +25,16 @@ class StopwatchExternalModule extends AbstractExternalModule {
 
     function redcap_survey_page($project_id, $record, $instrument, $event_id, $group_id, $survey_hash, $response_id, $repeat_instance) {
         $this->insertStopwatch($project_id, $instrument, $event_id, true);
+    }
+
+    function redcap_save_record($project_id, $record, $instrument, $event_id, $group_id, $survey_hash, $response_id, $repeat_instance) {
+        $fields = $this->getFieldParams($project_id, $instrument);
+        foreach ($fields as $field => $params) {
+            if (empty($params["error"]) && $params["store_format"] == "repeating") {
+                $data = json_decode($_POST["stopwatch-em-json-{$field}"], true);
+
+            }
+        }
     }
 
 
