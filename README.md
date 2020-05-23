@@ -86,7 +86,7 @@ For capture and lap data values other than elapsed time, the following automatic
 - _Number_: as above, but in seconds (including fractional seconds).
 - _Date_: The date. Time information will be lost.
 - _Datetime_: The date and time. Some time information will be lost.
-- No validation: A datetime value in the format `Y-M-D H:m:s.f` where Y = 4-digit year, M = 2-digit month, D = 2-digit day, H = 2-digit hour (0-23), m = 2-digit minute, s = 2-digit second, f = fractional second (up to ms precision, depending on the `digits` setting).
+- No validation: A datetime value in the ISO 8601 format `yyyy-mm-ddThh:mm:ss.fff`.
 
 ## Format of the timer display
 
