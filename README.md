@@ -43,7 +43,7 @@ A REDCap External Module that provides a stopwatch widget that can be integrated
 - `store_format`: This can be one of the following:
   - `json`: Data is stored as a JSON string. `target` must be a _Text Box_ (without validation) or a _Notes Box_. This is the default store format.
   - `plain`: Data is stored in plain text. `target` must be a _Notes Box_. Additional configuration can be done in the `plain` object.
-  - `repeating`: Data is stored in the fields of a repeating form.
+  - `repeating`: Data is stored in the fields of a repeating form. `target` must exist and be a _Text Box_ without validation.
 
   For storage in repeating forms, the mapping of data items to fields must be set in the `capture_mapping` and `lap_mapping` objects, respectively. All fields must be on the same instrument. The exact storage format depends on the field type (see below). Plain text storage can be customized using the `plain_text` object.
 
@@ -66,7 +66,7 @@ A REDCap External Module that provides a stopwatch widget that can be integrated
   - `header`: Boolean (`true`|`false`) determining whether a header row should be included in the output.
   - `start`, `stop`, `num_stops`, `elapsed`: When a string value is provided, this will be used in the header.
 
-- `only_once`: Boolean (`true`|`false`), or a custom value in case of `repeating` (which then is stored in the field specified by `target`, which must be a _Text Box_ without or with matching validation). When used, the stopwatch cannot be used again when a value is stored in `target` (after a form save). The default is `false`.
+- `only_once`: Boolean (`true`|`false`) determining whether the stopwatch can be used again once a value has been recorded. The default is `false`.
 - `max_rows`: The maximum number of rows to show in the captures/laps table. Default = 0 (no limit).
 
 ## Format of the stored values
