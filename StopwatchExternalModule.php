@@ -2,8 +2,9 @@
 
 use ExternalModules\AbstractExternalModule;
 use \REDCap;
-use \Stanford\Utility\ActionTagHelper as ActionTagHelper;
-use \DE\RUB\Utility\InjectionHelper as InjectionHelper;
+use \Stanford\Utility\ActionTagHelper;
+use \DE\RUB\Utility\InjectionHelper;
+use \DE\RUB\Utility\Project;
 
 /**
  * ExternalModule class for Configuration Design Study.
@@ -80,14 +81,15 @@ class StopwatchExternalModule extends AbstractExternalModule {
      * @return array
      */
     private function getFieldParams($project_id, $instrument) {
-        $pds = $this->getProjectDataStructure($project_id);
         $field_params = array();
+        if (!class_exists("\DE\RUB\Utility\Project")) include_once("classes/Project.php");
+        $project = Project::load($this->framework, $project_id);
         if (!class_exists("\Stanford\Utility\ActionTagHelper")) include_once("classes/ActionTagHelper.php");
         $action_tag_results = ActionTagHelper::getActionTags($this->STOPWATCH);
         if (isset($action_tag_results[$this->STOPWATCH])) {
             foreach ($action_tag_results[$this->STOPWATCH] as $field => $param_array) {
                 // Skip if not on current instrument.
-                if ($pds["fields"][$field]["form"] !== $instrument) continue; 
+                if ($project->getFormByField($field) !== $instrument) continue; 
                 // Validate parameters and add.
                 $params = $param_array['params'];
                 if (empty($params)) {
@@ -104,7 +106,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
                     );
                 }
                 else {
-                    $params = $this->validateParams($project_id, $instrument, $field, $params);
+                    $params = $this->validateParams($project, $instrument, $field, $params);
                 }
                 $field_params[$field] = $params;
             }
@@ -127,15 +129,13 @@ class StopwatchExternalModule extends AbstractExternalModule {
      *  - g = group seperator
      *  - d = decimal seperator
      * 
-     * @param int $pid The project id.
+     * @param Project $project
      * @param string $instrument
      * @param string $field
      * @param array $param
      * @return array The supplemented parameters.
      */
-    private function validateParams($pid, $instrument, $field, $params) {
-        // Get the data structure of the project to validate field settings.
-        $pds = $this->getProjectDataStructure($pid);
+    private function validateParams($project, $instrument, $field, $params) {
         // Add defaults.
         if (!isset($params["label_start"])) {
             $params["label_start"] = "Start"; 
@@ -209,12 +209,12 @@ class StopwatchExternalModule extends AbstractExternalModule {
             // Verify and setup basic requirements.
             $targetField = $params["target"];
             // Valid target?
-            if ($pds["fields"][$field]["form"] != $pds["fields"][$targetField]["form"]) {
+            if (!$project->areFieldsOnSameForm([$field, $targetField])) {
                 $params["error"] = "Invalid target field or @STOPWATCH and target field are not on the same instrument.";
                 break;
             }
             // Get field metadata.
-            $metadata = $pds["fields"][$targetField]["metadata"];
+            $metadata = $project->getFieldMetadata($targetField);
             $isAllowed = function($validation) {
                 return 
                     $validation == null ||
@@ -279,7 +279,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
                 $params["display_format"] = "/h/g/m/g/s" . ($params["digits"] > 0 ? "/d/f" : "");
             }
             // Validate field types.
-            $target_metadata = $pds["fields"][$params["target"]]["metadata"];
+            $target_metadata = $project->getFieldMetadata($params["target"]);
             // JSON.
             if ($params["store_format"] == "json") {
                 if (!($target_metadata["element_type"] == "textarea" || ($target_metadata["element_type"] == "text" && $target_metadata["element_validation_type"] == null))) {
@@ -296,14 +296,27 @@ class StopwatchExternalModule extends AbstractExternalModule {
             }
             // Repeating form.
             else {
-                if ($params["only_once"] && $target_metadata["element_type"] != "text") {
-                    $params["error"] = "Target field type must be of type 'Text Box'.";
+                if ($target_metadata["element_type"] != "text" || $target_metadata["element_validation_type"] !== null) {
+                    $params["error"] = "Target field type must be of type 'Text Box' without validation.";
                     break;
                 }
-                // TODO - Validate field mappings and plain.
-
+                $repeating_field_names = array("elapsed", "start", "stop");
+                if ($params["mode"] == "lap") $repeating_field_names[] = "num_stops";
+                $repeating_fields = array();
+                foreach ($repeating_field_names as $fieldname) {
+                    $mapping = @$params[$params["mode"]."_mapping"][$fieldname];
+                    if (!empty($mapping)) {
+                        $repeating_fields[] = $mapping;
+                    }
+                }
+                if (!count($repeating_fields)) {
+                    $params["error"] = "Storage field mappings must be provided.";
+                    break;
+                }
+                if (!$project->areFieldsOnSameForm($repeating_fields) || !$project->isFieldOnRepeatingForm($repeating_fields[0])) {
+                    $params["error"] = "Invalid field mappings. All fields must exist and be on the same repeating form.";
+                }
             }
-            
             break;
         }
         //
@@ -342,288 +355,4 @@ class StopwatchExternalModule extends AbstractExternalModule {
         }
         return $int;
     }
-
-
-
-    #region Project Data Structure Helper -----------------------------------------------------------------------------------
-
-    /**
-     * Gets the repeating forms and events in the current or specified project.
-     * 
-     * The returned array is structured like so:
-     * [
-     *   "forms" => [
-     *      event_id => [
-     *         "form name", "form name", ...
-     *      ],
-     *      ...
-     *   ],
-     *   "events" => [
-     *      event_id => [
-     *        "form name", "form name", ...
-     *      ],
-     *      ...
-     *   ] 
-     * ]
-     * 
-     * @param int|string|null $pid The project id (optional).
-     * @return array An associative array listing the repeating forms and events.
-     * @throws Exception From requireProjectId if no project id can be found.
-     */
-    function getRepeatingFormsEvents($pid = null) {
-        $pid = $this->requireProjectId($pid);
-        
-        $result = $this->query('
-            select event_id, form_name 
-            from redcap_events_repeat 
-            where event_id in (
-                select m.event_id 
-                from redcap_events_arms a
-                join redcap_events_metadata m
-                on a.arm_id = m.arm_id and a.project_id = ?
-            )', $pid);
-
-        $forms = array(
-            "forms" => array(),
-            "events" => array()
-        );
-        while ($row = $result->fetch_assoc()) {
-            $event_id = $row["event_id"];
-            $form_name = $row["form_name"];
-            if ($form_name === null) {
-                // Entire repeating event. Add all forms in it.
-                $forms["events"][$event_id] = $this->getEventForms($event_id);
-            }
-            else {
-                $forms["forms"][$event_id][] = $form_name;
-            }
-        }
-        return $forms;
-    }
-
-    /**
-     * Gets the names of the forms in the current or specified event.
-     * 
-     * @param int|null $event_id The event id (optional)
-     * @return array An array of form names.
-     * @throws Exception From requireProjectId or ExternalModules::getEventId if event_id, project_id cannot be deduced or multiple event ids are in a project.
-     */
-    function getEventForms($event_id = null) {
-        if($event_id === null){
-            $event_id = $this->getEventId();
-        }
-        $forms = array();
-        $result = $this->query('
-            select form_name
-            from redcap_events_forms
-            where event_id = ?
-        ', $event_id);
-        while ($row = $result->fetch_assoc()) {
-            $forms[] = $row["form_name"];
-        }
-        return $forms;
-    }
-
-
-    /**
-     * Gets the project structure (arms, events, forms, fields) of the current or specified project.
-     * 
-     * The returned array is structured like so:
-     * [
-     *   "forms" => [
-     *      "form name" => [
-     *          "name" => "form name",
-     *          "repeating" => true|false,
-     *          "repeating_event" => true|false,
-     *          "arms" => [
-     *              arm_id => [ 
-     *                  "id" => arm_id 
-     *              ], ...
-     *          ],
-     *          "events" => [
-     *              event_id => [
-     *                  "id" => event_id,
-     *                  "name" => "event name",
-     *                  "repeating" => true|false
-     *              ], ...
-     *          ],
-     *          "fields" => [
-     *              "field name", "field name", ...
-     *          ]
-     *      ], ...
-     *   ],
-     *   "events" => [
-     *      event_id => [
-     *          "id" => event_id,
-     *          "name" => "event name",
-     *          "repeating" => true|false,
-     *          "arm" => arm_id,
-     *          "forms" => [
-     *              "form_name" => [
-     *                  "name" => "form_name",
-     *                  "repeating" => true|false
-     *              ], ...
-     *          ]
-     *      ], ...
-     *   ],
-     *   "arms" => [
-     *      arm_id => [
-     *          "id" => arm_id
-     *          "events" => [
-     *              event_id => [
-     *                  "id" => event_id,
-     *                  "name" => "event name"
-     *              ], ...
-     *          ],
-     *          "forms" => [
-     *              "form name" => [
-     *                  "name" => "form name"
-     *              ], ...
-     *          ]
-     *      ], ...
-     *   ],
-     *   "fields" => [
-     *      "field name" => [
-     *          "name" => "field name",
-     *          "form" => "form name",
-     *          "repeating_form" => true|false,
-     *          "repeating_event" => true|false,
-     *          "events" => [
-     *              event_id => [ 
-     *                  (same as "events" => event_id -- see above)
-     *              ], ...
-     *          ],
-     *          "metadata" => [
-     *              (same as in $Proj)
-     *          ]
-     *      ], ...
-     *   ]
-     * ] 
-     * @param int|string|null $pid The project id (optional).
-     * @return array An array containing information about the project's data structure.
-     */
-    function getProjectDataStructure($pid = null) {
-        $pid = $this->requireProjectId($pid);
-
-        // Check cache.
-        if (array_key_exists($pid, self::$ProjectDataStructureCache)) return self::$ProjectDataStructureCache[$pid];
-
-        // Use REDCap's Project class to get some of the data. Specifically, unique event names are not in the backend database.
-        $proj = new \Project($pid);
-        $proj->getUniqueEventNames();
-
-        // Prepare return data structure.
-        $ps = array(
-            "pid" => $pid,
-            "forms" => array(),
-            "events" => array(),
-            "arms" => array(),
-            "fields" => array(),
-        );
-
-        // Gather data - arms, events, forms.
-        // Some of this might be extractable from $proj, but this is just easier.
-        $result = $this->query('
-            select a.arm_id, m.event_id, f.form_name
-            from redcap_events_arms a
-            join redcap_events_metadata m
-            on a.arm_id = m.arm_id and a.project_id = ?
-            join redcap_events_forms f
-            on f.event_id = m.event_id
-        ', $pid);
-        while ($row = $result->fetch_assoc()) {
-            $ps["arms"][$row["arm_id"]]["id"] = $row["arm_id"];
-            $ps["arms"][$row["arm_id"]]["events"][$row["event_id"]] = array(
-                "id" => $row["event_id"],
-                "name" => $proj->uniqueEventNames[$row["event_id"]]
-            );
-            $ps["arms"][$row["arm_id"]]["forms"][$row["form_name"]] = array(
-                "name" => $row["form_name"]
-            );
-            $ps["events"][$row["event_id"]]["id"] = $row["event_id"];
-            $ps["events"][$row["event_id"]]["name"] = $proj->uniqueEventNames[$row["event_id"]];
-            $ps["events"][$row["event_id"]]["repeating"] = false;
-            $ps["events"][$row["event_id"]]["arm"] = $row["arm_id"];
-            $ps["events"][$row["event_id"]]["forms"][$row["form_name"]] = array(
-                "name" => $row["form_name"],
-                "repeating" => false
-            );
-            $ps["forms"][$row["form_name"]]["name"] = $row["form_name"];
-            $ps["forms"][$row["form_name"]]["repeating"] = false;
-            $ps["forms"][$row["form_name"]]["repeating_event"] = false;
-            $ps["forms"][$row["form_name"]]["arms"][$row["arm_id"]] = array(
-                "id" => $row["arm_id"]
-            );
-            $ps["forms"][$row["form_name"]]["events"][$row["event_id"]] = array(
-                "id" => $row["event_id"],
-                "name" => $proj->uniqueEventNames[$row["event_id"]],
-                "repeating" => false
-            );
-        }
-        // Gather data - fields. Again, this could be got from $proj, but this is more straightforward to process.
-        $result = $this->query('
-            select field_name, form_name
-            from redcap_metadata
-            where project_id = ?
-            order by field_order asc
-        ', $pid);
-        while ($row = $result->fetch_assoc()) {
-            $ps["fields"][$row["field_name"]] = array(
-                "name" => $row["field_name"],
-                "form" => $row["form_name"],
-                "repeating_form" => false,
-                "repeating_event" => false,
-            );
-            $ps["forms"][$row["form_name"]]["fields"][] = $row["field_name"];
-        }
-        // Gather data - repeating forms, events.
-        $repeating = $this->getRepeatingFormsEvents($pid);
-        foreach ($repeating["forms"] as $eventId => $forms) {
-            foreach ($forms as $form) {
-                $ps["events"][$eventId]["forms"][$form]["repeating"]= true;
-                $ps["forms"][$form]["repeating"] = true;
-                // Augment fields.
-                foreach ($ps["fields"] as $field => &$field_info) {
-                    if ($field_info["form"] == $form) {
-                        $field_info["repeating_form"] = true;
-                    }
-                }
-            }
-        }
-        foreach ($repeating["events"] as $eventId => $forms) {
-            $ps["events"][$eventId]["repeating"] = true;
-            foreach ($forms as $form) {
-                $ps["forms"][$form]["repeating_event"] = true;
-                $ps["forms"][$form]["events"][$eventId]["repeating"] = true;
-                // Augment fields.
-                foreach ($ps["fields"] as $field => &$field_info) {
-                    if ($field_info["form"] == $form) {
-                        $field_info["repeating_event"] = true;
-                    }
-                }
-            }
-        }
-        // Augment fields with events.
-        foreach ($ps["forms"] as $formName => $formInfo) {
-            foreach ($formInfo["fields"] as $field) {
-                foreach ($formInfo["events"] as $eventId => $_) {
-                    $ps["fields"][$field]["events"][$eventId] = $ps["events"][$eventId];
-                }
-            }
-        }
-        // Augment fields with field metadata.
-        foreach ($ps["fields"] as $field => &$field_data) {
-            $field_data["metadata"] = $proj->metadata[$field];
-        }
-
-        // Add to cache.
-        self::$ProjectDataStructureCache[$pid] = $ps;
-
-        return $ps;
-    }
-
-    private static $ProjectDataStructureCache = array();
-
-    #endregion --------------------------------------------------------------------------------------------------------------
-
 }
