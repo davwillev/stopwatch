@@ -42,19 +42,71 @@ class StopwatchExternalModule extends AbstractExternalModule {
                     foreach ($data as $item) {
                         $instance_data = array();
                         foreach ($mappings as $key => $store_key) {
-                            $metadata = $project->getFieldMetadata($store_key);
-                            
+                            if ($project->getFieldType($store_key) !== "text") continue;
+                            $target_type = $project->getFieldValidation($store_key);
+                            $value = $this->convertForStorage($key, $target_type, $item[$key]);
                             $instance_data[$store_key] = $value;
                         }
-
+                        $instances_data[] = $instance_data;
                     }
-                
-                
+                    $record->addFormInstances($params["form"], $params["event"], $instances_data);
                 }
             }
         }
     }
 
+    private function convertForStorage($field, $target_type, $value) {
+        // num_stops
+        if ($field == "num_stops") return $value;
+        // elapsed
+        if ($field == "elapsed") {
+            if ($target_type == "int") return $value;
+            if ($target_type == "float") return $value / 1000;
+            if ($target_type == "number_comma_decimal") {
+                $value = $value / 1000;
+                $value = "{$value}";
+                return str_replace(".", ",", $value);
+            }
+        }
+        // start or stop
+        if ($target_type == null) return $value;
+        // Parse ISO 8601 (2020-05-23T13:19:45.407Z) into PHP-compatible datetime structure.
+        // https://regex101.com/r/VCo1Tt
+        $re = '/(?\'Y\'\d+)-(?\'m\'\d+)-(?\'d\'\d+)T(?\'H\'\d+):(?\'i\'\d+):(?\'s\'\d+)(\.(?\'f\'\d+))?/m';
+        preg_match_all($re, $value, $matches, PREG_SET_ORDER, 0);
+        if (count($matches) == 1) {
+            $match = $matches[0];
+            $ms = isset($match["f"]) ? $match["f"] : "0";
+            $ms_digits = strlen($ms);
+            $ms_frac = $ms / (1000 / pow(10, 3 - $ms_digits));
+            $datetime = new \DateTime();
+            $datetime->setDate($match["Y"], $match["m"], $match["d"]);
+            $datetime->setTime($match["H"], $match["i"], $match["s"], $ms);
+            $ts = $datetime->getTimestamp();
+            if ($target_type == "int") {
+                $value = $ts * 1000 + $ms;
+                return "$value";
+            } 
+            if ($target_type == "float") {
+                $value = $ts + $ms_frac;
+                return "$value";
+            } 
+            if ($target_type == "number_comma_decimal") {
+                $value = $ts + $ms_frac;
+                return str_replace(".", ",", "$value");
+            }
+            if ($target_type == "date_dmy") return date("d-m-Y", $ts);
+            if ($target_type == "date_mdy") return date("m-d-Y", $ts);
+            if ($target_type == "date_ymd") return date("Y-m-d", $ts);
+            if ($target_type == "datetime_dmy") return date("d-m-Y H:i", $ts);
+            if ($target_type == "datetime_dmy") return date("d-m-Y H:i", $ts);
+            if ($target_type == "datetime_mdy") return date("m-d-Y H:i", $ts);
+            if ($target_type == "datetime_seconds_mdy") return date("m-d-Y H:i:s", $ts);
+            if ($target_type == "datetime_seconds_ymd") return date("Y-m-d H:i:s", $ts);
+            if ($target_type == "datetime_seconds_ymd") return date("Y-m-d H:i:s", $ts);
+        }
+        return null;
+    }
 
     private function insertStopwatch($project_id, $instrument, $event_id, $isSurvey) {
         $fields = $this->getFieldParams($project_id, $instrument, $event_id);
