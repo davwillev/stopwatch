@@ -32,6 +32,17 @@ class Project
         return new Record($this->framework, $this, $record_id);
     }
 
+
+    /**
+     * Gets the name of the record id field.
+     * 
+     * @return string
+     */
+    function recordIdField() {
+        $pds = $this->getProjectDataStructure();
+        return $pds["record_id"];
+    }
+
     /**
      * Checks whether an event exists in the project.
      * @param string $event The event name or numerical event id.
@@ -53,8 +64,10 @@ class Project
 
     /**
      * Gets the event id.
-     * @param string $event The event name or numerical event id.
-     * @return string|null The event id or null if the event does not exist.
+     * If the event does not exist, null will be returned.
+     * 
+     * @param string $event The event name or (numerical) event id.
+     * @return string|null 
      */
     function getEventId($event) {
         $event = "{$event}";
@@ -66,6 +79,22 @@ class Project
             foreach ($pds["events"] as $_ => $data) {
                 if ($data["name"] == $event) return $data["id"];
             }
+        }
+        return null;
+    }
+
+    /**
+     * Checks whether the event is a repeating event.
+     * If the event does not exist, null will be returned.
+     * 
+     * @param string $event The event name or (numerical) event id.
+     * @return boolean|null 
+     */
+    function isEventRepeating($event) {
+        $event_id = $this->getEventId($event);
+        if ($event_id !== null) {
+            $pds = $this->getProjectDataStructure();
+            return $pds["events"][$event_id]["repeating"];
         }
         return null;
     }
@@ -118,30 +147,52 @@ class Project
 
     /**
      * Checks whether a field is on a repeating form.
+     * If the field or event does not exists, null is returned.
+     * 
      * @param string $field The field name.
      * @param strign $event The event name or (numerical) event id.
-     * @return boolean If the field does not exists, false is returned.
+     * @return boolean|null
      */
     function isFieldOnRepeatingForm($field, $event) {
-        $form = $this->getFormByField($field);
-        return empty($form) ? false : $this->isFormRepeating($form, $event);
+        if ($this->hasField($field)) {
+            $form = $this->getFormByField($field);
+            return $this->isFormRepeating($form, $event);
+        }
+        return null;
+    }
+
+    /**
+     * Checks whether a field is on a specific event.
+     * If the field does not exists, false is returned.
+     * 
+     * @param string $field The field name.
+     * @param strign $event The event name or (numerical) event id.
+     * @return boolean|null
+     */
+    function isFieldOnEvent($field, $event) {
+        $event_id = $this->getEventId($event);
+        if ($event_id !== null && $this->hasField($field)) {
+            $pds = $this->getProjectDataStructure();
+            return array_key_exists($event_id, $pds["fields"][$field]["events"]);
+        }
+        return null;
     }
 
     /**
      * Checks whether a form is repeating. 
-     * If the form or event does not exist, false is returned.
+     * If the form or event does not exist, null is returned.
+     * 
      * @param string $form The form name.
      * @param string $event The event name or (numerical) event id.
-     * @return boolean 
+     * @return boolean|null
      */
     function isFormRepeating($form, $event) {
-        $pds = $this->getProjectDataStructure();
-        if ($this->isFormOnEvent($form, $event)) {
-            $event_id = $this->getEventId($event);
-            $repeating = $pds["events"][$event_id]["forms"][$form]["repeating"];
-            return !empty($repeating);
+        $event_id = $this->getEventId($event);
+        if ($event_id !== null && $this->isFormOnEvent($form, $event)) {
+            $pds = $this->getProjectDataStructure();
+            return $pds["events"][$event_id]["forms"][$form]["repeating"];
         }
-        return false;
+        return null;
     }
 
     /**
@@ -289,6 +340,7 @@ class Project
      * 
      * The returned array is structured like so:
      * [
+     *   "record_id" => "record_id_field_name",
      *   "forms" => [
      *      "form name" => [
      *          "name" => "form name",
@@ -375,6 +427,7 @@ class Project
         // Prepare return data structure.
         $ps = array(
             "pid" => $pid,
+            "record_id" => $this->framework->getRecordIdField($pid),
             "forms" => array(),
             "events" => array(),
             "arms" => array(),
