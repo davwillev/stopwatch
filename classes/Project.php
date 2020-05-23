@@ -7,10 +7,6 @@ class Project
     /** @var int The project id */
     private $project_id;
 
-    /** @var array The project data structure */
-    private $pds;
-
-
     public static function load($framework, $project_id) {
         return new Project($framework, $project_id);
     }
@@ -20,8 +16,78 @@ class Project
         $this->project_id = $framework->requireInteger($project_id);
     }
 
+    /**
+     * Gets the project id.
+     * @return int The project id.
+     */
     function getProjectId() {
         return $this->project_id;
+    }
+
+    /**
+     * Gets an instance of the Record class.
+     * @return Record 
+     */
+    function getRecord($record_id) {
+        return new Record($this->framework, $this, $record_id);
+    }
+
+    /**
+     * Checks whether an event exists in the project.
+     * @param string $event The event name or numerical event id.
+     * @return boolean
+     */
+    function hasEvent($event) {
+        $event = "{$event}";
+        $pds = $this->getProjectDataStructure();
+        if (is_numeric($event) && is_int($event * 1)) {
+            return isset($pds["events"][$event]);
+        }
+        else {
+            foreach ($pds["events"] as $_ => $data) {
+                if ($data["name"] == $event) return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Gets the event id.
+     * @param string $event The event name or numerical event id.
+     * @return string|null The event id or null if the event does not exist.
+     */
+    function getEventId($event) {
+        $event = "{$event}";
+        $pds = $this->getProjectDataStructure();
+        if (is_numeric($event) && is_int($event * 1) && isset($pds["events"][$event])) {
+            return $event;
+        }
+        else {
+            foreach ($pds["events"] as $_ => $data) {
+                if ($data["name"] == $event) return $data["id"];
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Checks whether a form exists in the project.
+     * @param string $form The form name.
+     * @return boolean
+     */
+    function hasForm($form) {
+        $pds = $this->getProjectDataStructure();
+        return isset($pds["forms"][$form]);
+    }
+
+    /**
+     * Checks whether a field exists in the project.
+     * @param string $field The field name.
+     * @return boolean
+     */
+    function hasField($field) {
+        $pds = $this->getProjectDataStructure();
+        return isset($pds["fields"][$field]);
     }
 
     /**
@@ -53,32 +119,90 @@ class Project
     /**
      * Checks whether a field is on a repeating form.
      * @param string $field The field name.
+     * @param strign $event The event name or (numerical) event id.
      * @return boolean If the field does not exists, false is returned.
      */
-    function isFieldOnRepeatingForm($field) {
+    function isFieldOnRepeatingForm($field, $event) {
         $form = $this->getFormByField($field);
-        return empty($form) ? false : $this->isFormRepeating($form);
+        return empty($form) ? false : $this->isFormRepeating($form, $event);
     }
 
     /**
-     * Checks whether a form is repeating.
+     * Checks whether a form is repeating. 
+     * If the form or event does not exist, false is returned.
      * @param string $form The form name.
-     * @return boolean If the form does not exist, false is returned.
+     * @param string $event The event name or (numerical) event id.
+     * @return boolean 
      */
-    function isFormRepeating($form) {
+    function isFormRepeating($form, $event) {
         $pds = $this->getProjectDataStructure();
-        $repeating = @$pds["forms"][$form]["repeating"];
-        return !empty($repeating);
+        if ($this->isFormOnEvent($form, $event)) {
+            $event_id = $this->getEventId($event);
+            $repeating = $pds["events"][$event_id]["forms"][$form]["repeating"];
+            return !empty($repeating);
+        }
+        return false;
+    }
+
+    /**
+     * Checks whether a form is on a specific event. 
+     * If the form or event does not exist, false is returned.
+     * @param string $form The form name.
+     * @param string $event The event name or (numerical) event id.
+     * @return boolean 
+     */
+    function isFormOnEvent($form, $event) {
+        $pds = $this->getProjectDataStructure();
+        if ($this->hasForm($form) && $this->hasEvent($event)) {
+            $event_id = $this->getEventId($event);
+            return array_key_exists($event_id, $pds["forms"][$form]["events"]);
+        }
+        return false;
     }
 
     /**
      * Gets the field metadata.
+     * If the field does not exist, null is returned.
+     * 
      * @param string $field The field name.
      * @return array Field metadata (as in global $Proj).
      */
     function getFieldMetadata($field) {
         $pds = $this->getProjectDataStructure();
-        return @$pds["fields"][$field]["metadata"];
+        if ($this->hasField($field)) {
+            return $pds["fields"][$field]["metadata"];
+        }
+        return null;
+    }
+
+    /**
+     * Gets the field type.
+     * If the field does not exist, null is returned.
+     * 
+     * @param string $field The field name.
+     * @return string 
+     */
+    function getFieldType($field) {
+        $metadata = $this->getFieldMetadata($field);
+        if ($metadata) {
+            return $metadata["element_type"];
+        }
+        return null;
+    }
+
+    /**
+     * Gets the field validation.
+     * If the field does not exist, null is returned.
+     * 
+     * @param string $field The field name.
+     * @return string 
+     */
+    function getFieldValidation($field) {
+        $metadata = $this->getFieldMetadata($field);
+        if ($metadata) {
+            return $metadata["element_validation_type"];
+        }
+        return null;
     }
 
     /**
