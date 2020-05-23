@@ -51,14 +51,14 @@ A REDCap External Module that provides a stopwatch widget that can be integrated
   - `elapsed`: Field name for elapsed time.
   - `start`: Field name for the datetime the capture was (first) started.
   - `stop`: Field name for the datetiem the capture was (last) stopped.
-  - `event`: The event name (or numerical id) of the event the repeating form is on. If not specified, the current event is assumed.
 
 - `lap_mapping`: A JSON object with the following keys:
   - `elapsed`: Field name for elapsed time.
   - `start`: Field name for the datatime the lap was (first) started.
   - `stop`: Field name for the datetime the lap was (last) stopped.
   - `num_stops`: Field name for the number of times the timer was stopped during recording of a lap (the target field must be of type integer).
-  - `event`: The event name (or numerical id) of the event the repeating form is on. If not specified, the current event is assumed.
+
+- `event`: The event name (or numerical id) of the event of the repeating form with the capture or lap mapping fields. If not specified, the current event is assumed.
 
 - `plain`: A JSON object with the following keys:
   - `items`: An array of strings of (some or all of) the keys of the respective mapping, determining which and in which order these will be output. The default is `["start", "stop", "num_stops", "elapsed"]`.
@@ -76,16 +76,16 @@ Stopwatch will honor the format (validation) of the target field(s). The target 
 Elapsed time will be stored as follows:
 
 - _Integer_: elapsed time in milliseconds.
-- _Number_ (any type): elapsed time in seconds (with fractional seconds).
+- _Number_: elapsed time in seconds (with fractional seconds).
 - _Time (MM:SS)_: elapsed time in minutes and seconds (limited to max 59:59).
 - No validation: the elapsed time will be stored as h:m:s.f (colons and dot).
 
 For capture and lap data values other than elapsed time, the following automatic formats will be used, depending on the field type:
 
 - _Integer_: the (local) time represented by number of milliseconds elapsed since the start of the epoch, 01 January, 1970 00:00:00 Universal Time (UTC).
-- _Number_ (any type): as above, but in seconds (including fractional seconds).
-- _Date_ (any type): The date. Time information will be lost.
-- _Datetime_ (any type): The date and time. Some time information will be lost.
+- _Number_: as above, but in seconds (including fractional seconds).
+- _Date_: The date. Time information will be lost.
+- _Datetime_: The date and time. Some time information will be lost.
 - No validation: A datetime value in the format `Y-M-D H:m:s.f` where Y = 4-digit year, M = 2-digit month, D = 2-digit day, H = 2-digit hour (0-23), m = 2-digit minute, s = 2-digit second, f = fractional second (up to ms precision, depending on the `digits` setting).
 
 ## Format of the timer display
