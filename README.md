@@ -81,7 +81,7 @@ Elapsed time will be stored as follows:
 - _Integer_: elapsed time in milliseconds.
 - _Number_: elapsed time in seconds (with fractional seconds).
 - _Time (MM:SS)_: elapsed time in minutes and seconds (limited to max 59:59).
-- No validation: the elapsed time will be stored as h:m:s.f (colons and dot).
+- No validation: the elapsed time will be stored as `h:m:s.f` (colons and dot).
 
 For capture and lap data values other than elapsed time, the following automatic formats will be used, depending on the field type:
 
