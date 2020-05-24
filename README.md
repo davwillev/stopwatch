@@ -72,7 +72,7 @@ Configuration is done via an action tag parameter. The format of the parameter s
 
 - `cumulated` (`lap` mode only): Boolean (`true`|`false`). If set to `true`, an additional column with cumulated elapsed time will be shown.
 
-## Format of the stored values
+### Format of the stored values
 
 Stopwatch will honor the format (validation) of the target field(s). The target field has to be of type _Text Box_ or _Notes Box_.
 
@@ -91,7 +91,7 @@ For capture and lap data values other than elapsed time, the following automatic
 - _Datetime_: The date and time. Some time information will be lost.
 - No validation: A datetime value in the ISO 8601 format `yyyy-mm-ddThh:mm:ss.fff`.
 
-## Format of the timer display
+### Format of the timer display
 
 To set the display format, these placeholders can be used:
 
@@ -105,6 +105,19 @@ To set the display format, these placeholders can be used:
 - `/d` - decimal separator
 
 The display format for e.g. `0:02:33.12` can be written as `/h/g/m/g/s/d/f`, and `digits` would have to be set to `2`.
+
+### Button and other labels
+
+Labels of buttons and other display elements can be customized using the following parameters:
+
+- `label_start`: Start button label. Default is 'Start'.
+- `label_resume`: Resume button label. Default is 'Resume'.
+- `label_stop`: Stop button label. Default is 'Stop'.
+- `label_reset`: Reset button label. Default is 'Reset'.
+- `label_lap`: Lap button label (also used as row label). Default is 'Lap'.
+- `label_capture`: Capture button label (also used as row label). Default is 'Capture'.
+- `label_elapsed` (`lap` mode only): Header for the elapsed time column. Default is 'Lap time'.
+- `label_cumulated` (`lap` mode only): Header for the cumulated time column. Default is 'Cumulated'.
 
 ## Acknowledgements
 
