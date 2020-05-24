@@ -37,7 +37,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
                     if (!class_exists("\DE\RUB\Utility\Project")) include_once("classes/Project.php");
                     $project = Project::load($this->framework, $project_id);
                     $record = $project->getRecord($record_id);
-                    $mappings = $params["mode"] == "lap" ? $params["lap_mapping"] : $params["capture_mapping"];
+                    $mappings = $params["mapping"];
                     $instances_data = array();
                     foreach ($data as $item) {
                         $instance_data = array();
@@ -82,7 +82,13 @@ class StopwatchExternalModule extends AbstractExternalModule {
 
     private function convertToStorage($field, $target_type, $value) {
         // num_stops
-        if ($field == "num_stops") return $value;
+        if ($field == "num_stops") {
+            return $value;
+        }
+        // is_stop
+        if ($field == "is_stop") {
+            return $value ? "1" : "0";
+        } 
         // elapsed
         if ($field == "elapsed") {
             if ($target_type == "int") return $value;
@@ -165,15 +171,26 @@ class StopwatchExternalModule extends AbstractExternalModule {
                         </div>
                     </div>
                     <div class="stopwatch-em-captures">
-                        <table class="stopwatch-em-table"></table>
+                        <table class="stopwatch-em-table">
+                            <thead class="stopwatch-em-thead" style="display:none;">
+                                <tr>
+                                    <th class="stopwatch-em-row-header-label"></th>
+                                    <th class="stopwatch-em-row-header-stop"></th>
+                                    <th class="stopwatch-em-row-header-elapsed"></th>
+                                    <th class="stopwatch-em-row-header-cumulated"></th>
+                                </tr>
+                            </thead>
+                            <tbody class="stopwatch-em-tbody"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
             <table style="display:none;" data-stopwatch-em-template="stopwatch-row">
                 <tr>
-                    <td class="stopwatch-em-rowlabel"></td>
-                    <td class="stopwatch-em-rowstop"></td>
-                    <td class="stopwatch-em-rowvalue"></td>
+                    <td class="stopwatch-em-row-label"></td>
+                    <td class="stopwatch-em-row-stop"></td>
+                    <td class="stopwatch-em-row-elapsed"></td>
+                    <td class="stopwatch-em-row-cumulated" style="display:none;"></td>
                 </tr>
             </table>
             <?php
@@ -265,6 +282,16 @@ class StopwatchExternalModule extends AbstractExternalModule {
         if (!isset($params["label_capture"])) {
             $params["label_capture"] = "Capture";
         }
+        if (!isset($params["label_elapsed"])) {
+            $params["label_elapsed"] = "Lap time";
+        }
+        if (!isset($params["label_cumulated"])) {
+            $params["label_cumulated"] = "Cumulated";
+        }
+        if (!isset($params["cumulated"])) {
+            $params["cumulated"] = false;
+        }
+        $params["cumulated"] = $params["cumulated"] !== false;
         $parmas["is_mm_ss"] = false;
         if (!isset($params["mode"])) {
             $params["mode"] = "basic";
@@ -315,13 +342,13 @@ class StopwatchExternalModule extends AbstractExternalModule {
         //
         // Basic mode
         //
-        while ($params["mode"] == "basic") {
+        if ($params["mode"] == "basic") {
             // Verify and setup basic requirements.
             $targetField = $params["target"];
             // Valid target?
             if (!$project->areFieldsOnSameForm([$field, $targetField])) {
                 $params["error"] = "Invalid target field or @STOPWATCH and target field are not on the same instrument.";
-                break;
+                return $params;
             }
             // Validate field metadata.
             $isAllowed = function($validation) {
@@ -360,13 +387,13 @@ class StopwatchExternalModule extends AbstractExternalModule {
             }
             else {
                 $params["error"] = "Invalid or missing target field. Target field must be of type 'Text Box' and either Integer, Number, or Time (MM:SS) validation and be located on the same instrument as {$this->STOPWATCH}.";
+                return $params;
             }
-            break;
         }
         //
         // Lap and capture modes
         //
-        while ($params["mode"] == "capture" || $params["mode"] == "lap") {
+        if ($params["mode"] == "capture" || $params["mode"] == "lap") {
             if ($this->requireInt($params["max_rows"], 0) === null) {
                 $params["max_rows"] = 0;
             }
@@ -375,14 +402,14 @@ class StopwatchExternalModule extends AbstractExternalModule {
             }
             if (!in_array(@$params["store_format"], $this->VALID_STORE_FORMATS, true)) {
                 $params["error"] = "Invalid value for 'store_format'.";
-                break;
+                return $params;
             }
             if (!isset($params["only_once"])) {
                 $params["only_once"] = false;
             }
             if ($params["only_once"] !== false && empty($params["only_once"])) {
                 $params["error"] = "Invalid value for 'only_once'.";
-                break;
+                return $params;
             }
             if (!isset($params["display_format"])) {
                 $params["display_format"] = "/h/g/m/g/s" . ($params["digits"] > 0 ? "/d/f" : "");
@@ -392,75 +419,92 @@ class StopwatchExternalModule extends AbstractExternalModule {
             if ($params["store_format"] == "json") {
                 if (!($project->getFieldType($params["target"]) == "textarea" || ($project->getFieldType($params["target"]) == "text" && $project->getFieldValidation($params["target"]) == null))) {
                     $params["error"] = "Invalid target field type.";
-                    break;
+                    return $params;
                 }
             } 
             // Repeating form.
             else {
                 if ($project->getFieldType($params["target"]) != "text" || $project->getFieldValidation($params["target"]) !== null) {
                     $params["error"] = "Target field type must be of type 'Text Box' without validation.";
-                    break;
+                    return $params;
                 }
                 $repeating_field_names = array("elapsed", "start", "stop");
-                if ($params["mode"] == "lap") $repeating_field_names[] = "num_stops";
+                // Extra options.
+                if ($params["mode"] == "lap") {
+                    $repeating_field_names[] = "cumulated";
+                    $repeating_field_names[] = "num_stops";
+                }
+                else if ($params["mode"] == "capture") {
+                    $repeating_field_names[] = "is_stop";
+                }
                 $repeating_fields = array();
                 foreach ($repeating_field_names as $fieldname) {
-                    $mapping = @$params[$params["mode"]."_mapping"][$fieldname];
+                    $mapping = @$params["mapping"][$fieldname];
                     if (!empty($mapping)) {
                         $repeating_fields[$fieldname] = $mapping;
                     }
                 }
                 if (!count($repeating_fields) || !array_key_exists("elapsed", $repeating_fields)) {
                     $params["error"] = "Storage field mappings must be provided.";
-                    break;
+                    return $params;
                 }
                 if (!isset($params["event"])) $params["event"] = $event_id;
                 if ($project->getEventId($params["event"]) == null) {
                     $params["error"] = "Invalid event.";
-                    break;
+                    return $params;
                 }
                 if (!$project->areFieldsOnSameForm(array_values($repeating_fields)) || !$project->isFieldOnRepeatingForm($repeating_fields[array_key_first($repeating_fields)], $params["event"])) {
                     $params["error"] = "Invalid field mappings. All fields must exist and be on the same repeating form.";
-                    break;
+                    return $params;
                 }
                 $allowedType = array(
                     "elapsed" => array(
                         "int", "float", "number_comma_decimal", null
                     ),
+                    "cumulated" => array(
+                        "int", "float", "number_comma_decimal", null
+                    ),
                     "start" => array(
+                        "int", "float", "number_comma_decimal", null, "date_dmy", "date_ymd", "date_mdy", "datetime_dmy", "datetime_ymd", "datetime_mdy", "datetime_seconds_dmy", "datetime_seconds_ymd", "datetime_seconds_mdy"
+                    ),
+                    "stop" => array(
                         "int", "float", "number_comma_decimal", null, "date_dmy", "date_ymd", "date_mdy", "datetime_dmy", "datetime_ymd", "datetime_mdy", "datetime_seconds_dmy", "datetime_seconds_ymd", "datetime_seconds_mdy"
                     ),
                     "num_stops" => array(
                         "int"
+                    ),
+                    "is_stop" => array(
+                        "int"
                     )
                 );
-                $allowedType["stop"] = $allowedType["start"];
                 foreach ($repeating_fields as $map_name => $target_name) {
                     if ($project->getFieldType($target_name) != "text") {
                         $params["error"] = "Mapping field '{$target_name}' must be of type 'Text Box'.";
+                        return $params;
                     }
                     $validation_type = $project->getFieldValidation($target_name);
                     if (!in_array($validation_type, $allowedType[$map_name], true)) {
                         $params["error"] = "Field '{$target_name}' has an invalid type.";
-                        break 2;
+                        return $params;
                     }
                 }
                 $params["form"] = $project->getFormByField($repeating_fields[array_key_first($repeating_fields)]);
                 if (!$project->isFormOnEvent($params["form"], $params["event"])) {
                     $params["error"] = "Form '{$params["form"]}' is not on event '{$params["event"]}'.";
+                    return $params;
                 }
-                
             }
-            break;
         }
         // Get value from target field.
         $data = $record->getFieldValues([$params["target"]], $event_id, $instance);
         list($load_event, $load_from, $load_to, $load_n) = explode(":", $data[$params["target"]][$instance]);
         $load_instances = array();
-        for ($i = $load_from * 1; $i <= $load_to * 1; $i++) {
-            array_push($load_instances, $i);
+        if ($load_n * 1 > 0) {
+            for ($i = $load_from * 1; $i <= $load_to * 1; $i++) {
+                array_push($load_instances, $i);
+            }
+            $data = $record->getFieldValues(array_values($repeating_fields), $load_event, $load_instances);
         }
-        $data = $record->getFieldValues(array_values($repeating_fields), $load_event, $load_instances);
         //
         // Capture mode
         //
@@ -500,9 +544,15 @@ class StopwatchExternalModule extends AbstractExternalModule {
 
     private function convertFromStorage($field, $target_type, $value) {
         // num_stops
-        if ($field == "num_stops") return $value;
+        if ($field == "num_stops") {
+            return $value;
+        } 
+        // is_stop
+        if ($field == "is_stop") {
+            return $value != "0";
+        }
         // elapsed
-        if ($field == "elapsed") {
+        if (in_array($field, array("elapsed", "cumulated"), true)) {
             if ($target_type == "int") return $value;
             if ($target_type == "float") return $value * 1000;
             if ($target_type == "number_comma_decimal") {

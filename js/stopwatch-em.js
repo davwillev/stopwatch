@@ -124,14 +124,17 @@ function create(id, params, $tr, $input) {
     var swd = {
         id: id,
         initial: true,
+        $stopwatch: $sw,
         $display: $display,
         $hourglass: $hourglass,
         $input: $input,
         $json: null,
-        $table: $sw.find('.stopwatch-em-table'),
+        $thead: $sw.find('.stopwatch-em-thead'),
+        $tbody: $sw.find('.stopwatch-em-tbody'),
         currentLap: null,
         $currentLapValue: null,
         $currentLapStops: null,
+        $currentLapCumulated: null,
         params: params,
         elapsed: 0,
         startTime: null,
@@ -145,6 +148,9 @@ function create(id, params, $tr, $input) {
     if (params.store_format == 'repeating') {
         swd.$json = $('<input/>').attr('name', 'stopwatch-em-json-' + swd.id).appendTo($sw).hide()
     }
+    // Table.
+    swd.$thead.find('.stopwatch-em-row-header-elapsed').html(params.label_elapsed)
+    swd.$thead.find('.stopwatch-em-row-header-cumulated').html(params.label_cumulated)
     // Buttons.
     swd.$srsBtn = $sw.find('.stopwatch-em-startstop')
     swd.$rclBtn = $sw.find('.stopwatch-em-reset')
@@ -218,11 +224,12 @@ function hideTarget(swd) {
 /**
  * Gets a template by name.
  * @param {string} name The name of the template (i.e. value of the data-emc attribute).
+ * @param {string} elementType The type of the nested element to get.
  * @returns {JQuery} The jQuery representation of the template's content.
  */
-function getTemplate(name) {
+function getTemplate(name, elementType = 'div') {
     // @ts-ignore
-    return $('[data-stopwatch-em-template=' + name + ']').first().children().first().clone()
+    return $('[data-stopwatch-em-template=' + name + ']').find(elementType).first().clone()
 }
 
 /**
@@ -315,16 +322,16 @@ function insertLaps(swd) {
  * @param {Number} n
  */
 function addCaptureRow(swd, capture, n) {
-    var $row = getTemplate('stopwatch-row')
-    var $label = $row.find('.stopwatch-em-rowlabel')
-    var $stop = $row.find('.stopwatch-em-rowstop')
-    var $value = $row.find('.stopwatch-em-rowvalue')
-    $label.text('Capture ' + n)
-    $value.text(format(capture.elapsed, swd.params).display)
-    $stop.html(getStopSymbol(capture.isStop))
-    swd.$table.prepend($row)
+    var $row = getTemplate('stopwatch-row', 'tr')
+    var $label = $row.find('.stopwatch-em-row-label')
+    var $stop = $row.find('.stopwatch-em-row-stop')
+    var $elapsed = $row.find('.stopwatch-em-row-elapsed')
+    $label.html(swd.params.label_capture + ' ' + n)
+    $elapsed.text(format(capture.elapsed, swd.params).display)
+    $stop.html(getStopSymbol(capture.is_stop))
+    swd.$tbody.prepend($row)
     if (swd.params.max_rows > 0 && swd.captures.length > swd.params.max_rows) {
-        swd.$table.children().last().remove()
+        swd.$tbody.children().last().remove()
     }
 }
 
@@ -334,19 +341,26 @@ function addCaptureRow(swd, capture, n) {
  * @param {Number} n
  */
 function addLapRow(swd, n) {
-    var $row = getTemplate('stopwatch-row')
-    var $label = $row.find('.stopwatch-em-rowlabel')
-    var $stop = $row.find('.stopwatch-em-rowstop')
-    var $value = $row.find('.stopwatch-em-rowvalue')
-    $label.text('Lap ' + n)
-    $value.text(format(swd.currentLap.elapsed, swd.params).display)
-    $stop.html(getStopSymbol(swd.currentLap.num_stops > 0))
-    swd.$table.prepend($row)
-    if (swd.params.max_rows > 0 && swd.laps.length > swd.params.max_rows) {
-        swd.$table.children().last().remove()
+    var $row = getTemplate('stopwatch-row', 'tr')
+    var $label = $row.find('.stopwatch-em-row-label')
+    var $stop = $row.find('.stopwatch-em-row-stop')
+    var $elapsed = $row.find('.stopwatch-em-row-elapsed')
+    var $cumulated = $row.find('.stopwatch-em-row-cumulated')
+    if (swd.params.cumulated) {
+        $cumulated.show()
+        swd.$thead.show()
     }
-    swd.$currentLapValue = $value
+    $label.html(swd.params.label_lap + ' ' + n)
+    $elapsed.text(format(swd.currentLap.elapsed, swd.params).display)
+    // $cumulated.text(format(swd.currentLap.elapsed, swd.params).display)
+    $stop.html(getStopSymbol(swd.currentLap.num_stops > 0))
+    swd.$tbody.prepend($row)
+    if (swd.params.max_rows > 0 && swd.laps.length > swd.params.max_rows) {
+        swd.$tbody.children().last().remove()
+    }
+    swd.$currentLapValue = $elapsed
     swd.$currentLapStops = $stop
+    swd.$currentLapCumulated = $cumulated
 }
 
 /**
@@ -422,6 +436,7 @@ function timerTick() {
  */
 function start(swd) {
     var now = new Date()
+    swd.initial = false
     if (swd.startTime == null) {
         swd.startTime = now
     }
@@ -434,7 +449,7 @@ function start(swd) {
         }
         // Update UI.
         swd.$rclBtn.prop('disabled', true)
-        swd.$srsBtn.text(params.label_stop)
+        swd.$srsBtn.html(params.label_stop)
         swd.$srsBtn.addClass('stopwatch-em-running')
     }
     else if (params.mode == 'capture') {
@@ -445,8 +460,8 @@ function start(swd) {
         }
         // Update UI.
         swd.$rclBtn.prop('disabled', false)
-        swd.$rclBtn.text(params.label_capture)
-        swd.$srsBtn.text(params.label_stop)
+        swd.$rclBtn.html(params.label_capture)
+        swd.$srsBtn.html(params.label_stop)
         swd.$srsBtn.addClass('stopwatch-em-running')
     }
     else if (params.mode == 'lap') {
@@ -461,8 +476,8 @@ function start(swd) {
         }
         // Update UI.
         swd.$rclBtn.prop('disabled', false)
-        swd.$rclBtn.text(params.label_lap)
-        swd.$srsBtn.text(params.label_stop)
+        swd.$rclBtn.html(params.label_lap)
+        swd.$srsBtn.html(params.label_stop)
         swd.$srsBtn.addClass('stopwatch-em-running')
     }
     // Update UI.
@@ -486,7 +501,7 @@ function capture(swd, now, stopped) {
         start:  swd.lapStartTime,
         stop: swd.stopTime,
         elapsed: swd.elapsed,
-        isStop: stopped && swd.params.stops
+        is_stop: stopped && swd.params.stops
     }
     swd.captures.push(capture)
     swd.lapStartTime = now
@@ -510,7 +525,9 @@ function lap(swd, now, stopped) {
         if (swd.currentLap) {
             swd.currentLap.stop = now
             swd.currentLap.elapsed += elapsed
-            swd.$currentLapValue.html(format(swd.currentLap.elapsed, swd.params).display)
+            swd.currentLap.cumulated = swd.elapsed
+            swd.$currentLapValue.text(format(swd.currentLap.elapsed, swd.params).display)
+            swd.$currentLapCumulated.text(format(swd.currentLap.cumulated, swd.params).display)
         }
         swd.lapStartTime = now
         // Add a new lap.
@@ -519,6 +536,7 @@ function lap(swd, now, stopped) {
             start: now,
             stop: null,
             elapsed: 0,
+            cumulated: swd.elapsed,
             num_stops: 0
         }
         swd.laps.push(swd.currentLap)
@@ -528,7 +546,8 @@ function lap(swd, now, stopped) {
         swd.currentLap.stop = now
         swd.currentLap.num_stops += (swd.params.stops ? 1 : 0)
         swd.currentLap.elapsed += elapsed
-        swd.$currentLapValue.html(format(elapsed, swd.params).display)
+        swd.$currentLapValue.text(format(elapsed, swd.params).display)
+        swd.$currentLapCumulated.text(format(swd.elapsed, swd.params).display)
         swd.$currentLapStops.html(getStopSymbol(swd.currentLap.num_stops > 0))
         insertLaps(swd)
     }
@@ -562,8 +581,8 @@ function stop(swd) {
     timerSet()
     // Update UI.
     swd.$rclBtn.prop('disabled', false)
-    swd.$rclBtn.text(params.label_reset)
-    swd.$srsBtn.text(params.stops ? params.label_resume : params.label_start)
+    swd.$rclBtn.html(params.label_reset)
+    swd.$srsBtn.html(params.stops ? params.label_resume : params.label_start)
     swd.$srsBtn.removeClass('stopwatch-em-running')
     swd.$srsBtn.prop('disabled', params.stops == false)
     updateDisplay(swd)
@@ -590,11 +609,12 @@ function reset(swd) {
     // UI updates.
     swd.$srsBtn.prop('disabled', false)
     swd.$rclBtn.prop('disabled', true)
-    swd.$srsBtn.text(swd.params.label_start)
+    swd.$srsBtn.html(swd.params.label_start)
     if (!MDC.includes(swd.$input.val().toString())) {
         swd.$input.val('')
     }
-    swd.$table.children().remove()
+    swd.$tbody.children().remove()
+    swd.$thead.hide()
     timerSet()
     updateDisplay(swd)
     updateHourglass(swd)
@@ -617,7 +637,8 @@ function set(swd, result) {
         swd.captures = result.captures
         swd.laps = result.laps
         // Update rows.
-        swd.$table.children().remove()
+        swd.$tbody.children().remove()
+        swd.$stopwatch.find('.stopwatch-em-row-header').hide()
         if (swd.laps.length) {
             swd.laps.forEach(function(lap, idx) {
                 swd.currentLap = lap
@@ -632,17 +653,16 @@ function set(swd, result) {
         // Update displayed time so there is no discrepancy.
         timerSet()
         // Update UI.
-        swd.$rclBtn.text(params.label_reset)
-        swd.$rclBtn.prop('disabled', swd.elapsed < 0)
-        swd.$srsBtn.text(params.label_start)
+        swd.$rclBtn.html(params.label_reset)
+        swd.$rclBtn.prop('disabled', swd.elapsed < 0 || params.only_once)
+        swd.$srsBtn.html(params.label_start)
         if (swd.elapsed > -1 && params.stops && !swd.initial) {
-            swd.$srsBtn.text(params.label_resume)
+            swd.$srsBtn.html(params.label_resume)
         }
         swd.$srsBtn.prop('disabled', swd.elapsed > -1 && (swd.params.stops == false || swd.initial))
         swd.$srsBtn.removeClass('stopwatch-em-running')
         updateDisplay(swd)
         updateHourglass(swd)
-        swd.initial = false
         log('Stopwatch [' + swd.id + '] has been set to ' + format(swd.elapsed, swd.params).display)
     }
     if (MDC.includes(result.val)) {
@@ -856,9 +876,6 @@ function parseValue(swd, val) {
             else if (f == 'repeating') {
                 restore = params.repeating_captures
             }
-            else if (f == 'plain') {
-                // TODO - parse 
-            }
             if (Array.isArray(restore)) {
                 for (var i = 0; i < restore.length; i++) {
                     /** @type {CaptureInfo} */
@@ -866,7 +883,7 @@ function parseValue(swd, val) {
                         start: new Date(restore[i]['start']),
                         stop: new Date(restore[i]['stop']),
                         elapsed: parseInt(restore[i]['elapsed']),
-                        isStop: restore[i]['isStop']
+                        is_stop: restore[i]['is_stop']
                     }
                     rv.captures.push(capture)
                 }
@@ -882,21 +899,20 @@ function parseValue(swd, val) {
             else if (f == 'repeating') {
                 restore = params.repeating_laps
             }
-            else if (f == 'plain') {
-                // TODO - parse 
-            }
             if (Array.isArray(restore)) {
                 var sum = 0
                 for (var i = 0; i < restore.length; i++) {
+                    var elapsed = parseInt(restore[i]['elapsed'])
+                    sum += elapsed
                     /** @type {LapInfo} */
                     var lap = {
                         start: new Date(restore[i]['start']),
                         stop: new Date(restore[i]['stop']),
-                        elapsed: parseInt(restore[i]['elapsed']),
+                        elapsed: elapsed,
+                        cumulated: sum,
                         num_stops: parseInt(restore[i]['num_stops'])
                     }
                     rv.laps.push(lap)
-                    sum += lap.elapsed
                 }
                 rv.elapsed = sum
                 return rv
