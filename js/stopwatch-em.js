@@ -199,10 +199,6 @@ function create(id, params, $tr, $input) {
     mut.observe(swd.$srsBtn[0], { attributes: true })
     // Hide the target.
     hideTarget(swd)
-    // Set initial value and update UI.
-    var val = $input.val().toString()
-    var result = parseValue(swd, val)
-    set(swd, result)
     // Determine insertion point - this depends on whether the field with 
     // the action tag is itself the target field.
     if (swd.id == params.target) {
@@ -212,6 +208,10 @@ function create(id, params, $tr, $input) {
     else {
         $tr.find('td.labelrc').last().append($sw)
     }
+    // Set initial value and update UI.
+    var val = $input.val().toString()
+    var result = parseValue(swd, val)
+    set(swd, result)
     log('Stopwatch [' + swd.id + '] - added to \'' + id + '\'')
 }
 
@@ -347,13 +347,11 @@ function addLapRow(swd, n) {
     var $stop = $row.find('.stopwatch-em-row-stop')
     var $elapsed = $row.find('.stopwatch-em-row-elapsed')
     var $cumulated = $row.find('.stopwatch-em-row-cumulated')
-    if (swd.params.cumulated) {
-        $cumulated.show()
-        swd.$thead.show()
-    }
     $label.html(swd.params.label_lap + ' ' + n)
     $elapsed.text(format(swd.currentLap.elapsed, swd.params).display)
-    // $cumulated.text(format(swd.currentLap.elapsed, swd.params).display)
+    if (swd.currentLap.elapsed > 0) { 
+        $cumulated.text(format(swd.currentLap.elapsed, swd.params).display)
+    }
     $stop.html(getStopSymbol(swd.currentLap.num_stops > 0))
     swd.$tbody.prepend($row)
     if (swd.params.max_rows > 0 && swd.laps.length > swd.params.max_rows) {
@@ -362,6 +360,10 @@ function addLapRow(swd, n) {
     swd.$currentLapValue = $elapsed
     swd.$currentLapStops = $stop
     swd.$currentLapCumulated = $cumulated
+    if (swd.params.cumulated) {
+        $cumulated.show()
+        swd.$thead.show()
+    }
 }
 
 /**
@@ -547,6 +549,7 @@ function lap(swd, now, stopped) {
         swd.currentLap.stop = now
         swd.currentLap.num_stops += (swd.params.resume ? 1 : 0)
         swd.currentLap.elapsed += elapsed
+        swd.currentLap.cumulated = swd.elapsed
         swd.$currentLapValue.text(format(elapsed, swd.params).display)
         swd.$currentLapCumulated.text(format(swd.elapsed, swd.params).display)
         swd.$currentLapStops.html(getStopSymbol(swd.currentLap.num_stops > 0))
