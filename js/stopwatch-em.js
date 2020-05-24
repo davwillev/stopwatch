@@ -3,6 +3,9 @@
 // Stopwatch External Module
 //
 ;(function() {
+
+//#region Globals & Data Transfer ----------------------------------------------------------
+
 // Setup data transfer object.
 // @ts-ignore
 var EM = window.ExternalModules
@@ -15,8 +18,6 @@ if (typeof EM == 'undefined') {
 var DTO = EM.StopwatchEM_DTO || {}
 EM.StopwatchEM_DTO = DTO
 
-//#region Globals --------------------------------------------------------------------------
-
 /** @type {Object<string, StopwatchData>} Holds data for each stopwatch widget (there can be multiple) */
 var SWD = {}
 /** @type {number} The interval (in ms) at which the stopwatch display is refreshed */
@@ -27,7 +28,6 @@ var CLOCK
 var TICKING = false
 /** @type {string[]} Missing Data Codes */
 var MDC = []
-
 
 //#endregion
 
@@ -58,14 +58,14 @@ function log() {
 }
 
 //#endregion
-    
+
 //#region HTML and Update ------------------------------------------------------------------
 
 /**
  * Initial setup.
  */
 function setup() {
-    log('Stopwatch EM - Setup', DTO)
+    log('Stopwatch EM - Initializing:', DTO)
     // Get missing data codes.
     // @ts-ignore
     if (Array.isArray(missing_data_codes)) MDC = missing_data_codes
@@ -102,7 +102,7 @@ function error(id, error, $tr) {
         $insertionPoint = $tr.find('div.space')
     }
     $insertionPoint.prepend($error)
-    log('Failed to add Stopwatch to \'' + id + '\': ' + error)
+    log('Stopwatch [' + id + '] - failed to create: ' + error)
 }
 
 /**
@@ -212,7 +212,7 @@ function create(id, params, $tr, $input) {
     else {
         $tr.find('td.labelrc').last().append($sw)
     }
-    log('Added Stopwatch to \'' + id + '\'')
+    log('Stopwatch [' + swd.id + '] - added to \'' + id + '\'')
 }
 
 /**
@@ -298,9 +298,6 @@ function insertCaptures(swd) {
         var json = JSON.stringify(swd.captures)
         swd.$json.val(json)
     }
-    else if (params.store_format == 'plain') {
-        log('Plain text caputres not implemented yet')
-    }
 }
 
 /**
@@ -316,9 +313,6 @@ function insertLaps(swd) {
     else if (params.store_format == 'repeating') {
         var json = JSON.stringify(swd.laps)
         swd.$json.val(json)
-    }
-    else if (params.store_format == 'plain') {
-        log('Plain text laps not implemented yet')
     }
 }
 
@@ -927,16 +921,14 @@ function parseValue(swd, val) {
         }
     }
     catch (ex) {
-        log('Stopwatch - Failed to parse stored value: ' + val)
+        log('Stopwatch [' + swd.id + '] - Failed to parse stored value: ' + val)
     }
     return rv
 }
 
 //#endregion
 
-// Setup stopwatches when the page is ready.
-$(function() {
-    setup();
-})
+// Setup @STOPWATCH instances when the page is ready.
+$(function() { setup() })
 
 })();
