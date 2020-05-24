@@ -35,7 +35,6 @@ class StopwatchExternalModule extends AbstractExternalModule {
                 $data = json_decode($_POST["stopwatch-em-json-{$field}"], true);
                 if (is_array($data)) {
                     if (!class_exists("\DE\RUB\Utility\Project")) include_once("classes/Project.php");
-                    if (!class_exists("\DE\RUB\Utility\Record")) include_once("classes/Record.php");
                     $project = Project::load($this->framework, $project_id);
                     $record = $project->getRecord($record_id);
                     $mappings = $params["mode"] == "lap" ? $params["lap_mapping"] : $params["capture_mapping"];
