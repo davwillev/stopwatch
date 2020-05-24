@@ -452,20 +452,127 @@ class StopwatchExternalModule extends AbstractExternalModule {
             }
             break;
         }
+        // Get value from target field.
+        $data = $record->getFieldValues([$params["target"]], $event_id, $instance);
+        list($load_event, $load_from, $load_to, $load_n) = explode(":", $data[$params["target"]][$instance]);
+        $load_instances = array();
+        for ($i = $load_from * 1; $i <= $load_to * 1; $i++) {
+            array_push($load_instances, $i);
+        }
+        $data = $record->getFieldValues(array_values($repeating_fields), $load_event, $load_instances);
         //
         // Capture mode
         //
-        while ($params["mode"] == "capture") {
-            break;
+        if ($params["mode"] == "capture") {
+            $captures = array();
+            foreach ($load_instances as $instance) {
+                $capture = array();
+                foreach ($repeating_fields as $key => $target_name) {
+                    $validation_type = $project->getFieldValidation($target_name);
+                    $value = $data[$target_name][$instance];
+                    $value = $this->convertFromStorage($key, $validation_type, $value);
+                    $capture[$key] = $value;
+                }
+                array_push($captures, $capture);
+            }
+            $params["repeating_captures"] = $captures;
         }
         //
         // Lap mode
         //
-        while ($params["mode"] == "lap") {
-
-            break;
+        if ($params["mode"] == "lap") {
+            $laps = array();
+            foreach ($load_instances as $instance) {
+                $lap = array();
+                foreach ($repeating_fields as $key => $target_name) {
+                    $validation_type = $project->getFieldValidation($target_name);
+                    $value = $data[$target_name][$instance];
+                    $value = $this->convertFromStorage($key, $validation_type, $value);
+                    $lap[$key] = $value;
+                }
+                array_push($laps, $lap);
+            }
+            $params["repeating_laps"] = $laps;
         }
         return $params;
+    }
+
+    private function convertFromStorage($field, $target_type, $value) {
+        // num_stops
+        if ($field == "num_stops") return $value;
+        // elapsed
+        if ($field == "elapsed") {
+            if ($target_type == "int") return $value;
+            if ($target_type == "float") return $value * 1000;
+            if ($target_type == "number_comma_decimal") {
+                $value = str_replace(",", ".", $value);
+                $value = $value * 1000;
+                return $value;
+            }
+        }
+        // start or stop
+        if ($target_type == null) return $value;
+        $format = function($ts, $ms) {
+            return date("Y-m-d", $ts)."T".date("H:i:s", $ts).".{$ms}Z";
+        };
+        if ($target_type == "int") {
+            $ts = floor($value / 1000);
+            $ms = $value % 1000;
+            return $format($ts, $ms);
+        }
+        if ($target_type == "float") {
+            $value = $value * 1000;
+            $ts = floor($value / 1000);
+            $ms = $value % 1000;
+            return $format($ts, $ms);
+        }
+        if ($target_type == "number_comma_decimal") {
+            $value = str_replace(",", ".", $value);
+            $value = $value * 1000;
+            $ts = floor($value / 1000);
+            $ms = $value % 1000;
+            return $format($ts, $ms);
+        }
+        if (substr($target_type, 0, 4) == "date") {
+            $Y = 0;
+            $m = 0;
+            $d = 0;
+            $H = 0;
+            $i = 0;
+            $s = 0;
+            if (strpos($target_type, "dmy") !== false) {
+                // dd-mm-yyyy
+                $d = substr($value, 0, 2);
+                $m = substr($value, 3, 2);
+                $Y = substr($value, 6, 4);
+            } 
+            if (strpos($target_type, "mdy") !== false) {
+                // mm-dd-yyyy
+                $m = substr($value, 0, 2);
+                $d = substr($value, 3, 2);
+                $Y = substr($value, 6, 4);
+            }
+            if (strpos($target_type, "ymd") !== false) {
+                // yyyy-mm-dd
+                $Y = substr($value, 0, 4);
+                $m = substr($value, 5, 2);
+                $d = substr($value, 8, 2);
+            }
+            if (strpos($target_type, "time") !== false) {
+                // xx-xx-xxxx 00:00
+                $H = substr($value, 11, 2);
+                $i = substr($value, 14, 2);
+            }
+            if (strpos($target_type, "seconds") !== false) {
+                // xx-xx-xxxx xx:xx:00
+                $s = substr($value, 17, 2);
+            }
+            $datetime = new \DateTime();
+            $datetime->setDate($Y, $m, $d);
+            $datetime->setTime($H, $i, $s);
+            return $format($datetime->getTimestamp(), 0);
+        }
+        return null;
     }
 
 
