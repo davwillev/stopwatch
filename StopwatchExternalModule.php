@@ -190,6 +190,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
         $field_params = array();
         if (!class_exists("\DE\RUB\Utility\Project")) include_once("classes/Project.php");
         $project = Project::load($this->framework, $project_id);
+        $record = $project->getRecord($record_id);
         if (!class_exists("\Stanford\Utility\ActionTagHelper")) include_once("classes/ActionTagHelper.php");
         $action_tag_results = ActionTagHelper::getActionTags($this->STOPWATCH);
         if (isset($action_tag_results[$this->STOPWATCH])) {
@@ -409,7 +410,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
                         $repeating_fields[$fieldname] = $mapping;
                     }
                 }
-                if (!count($repeating_fields)) {
+                if (!count($repeating_fields) || !array_key_exists("elapsed", $repeating_fields)) {
                     $params["error"] = "Storage field mappings must be provided.";
                     break;
                 }
