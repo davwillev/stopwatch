@@ -20,16 +20,16 @@ class StopwatchExternalModule extends AbstractExternalModule {
     }
 
     function redcap_data_entry_form($project_id, $record, $instrument, $event_id, $group_id, $repeat_instance) {
-        $this->insertStopwatch($project_id, $instrument, $event_id, false);
+        $this->insertStopwatch($project_id, $record, $instrument, $event_id, $repeat_instance, false);
     }
 
     function redcap_survey_page($project_id, $record, $instrument, $event_id, $group_id, $survey_hash, $response_id, $repeat_instance) {
-        $this->insertStopwatch($project_id, $instrument, $event_id, true);
+        $this->insertStopwatch($project_id, $record, $instrument, $event_id, $repeat_instance, true);
     }
 
     function redcap_save_record($project_id, $record_id, $instrument, $event_id, $group_id, $survey_hash, $response_id, $repeat_instance) {
         $debug = $this->getProjectSetting("debug-js") == true;
-        $fields = $this->getFieldParams($project_id, $instrument, $event_id);
+        $fields = $this->getFieldParams($project_id, $record_id, $instrument, $event_id, $repeat_instance);
         foreach ($fields as $field => $params) {
             if (empty($params["error"]) && $params["store_format"] == "repeating") {
                 $data = json_decode($_POST["stopwatch-em-json-{$field}"], true);
@@ -44,7 +44,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
                         foreach ($mappings as $key => $store_key) {
                             if ($project->getFieldType($store_key) !== "text") continue;
                             $target_type = $project->getFieldValidation($store_key);
-                            $value = $this->convertForStorage($key, $target_type, $item[$key]);
+                            $value = $this->convertToStorage($key, $target_type, $item[$key]);
                             $instance_data[$store_key] = $value;
                         }
                         $instances_data[] = $instance_data;
@@ -133,8 +133,8 @@ class StopwatchExternalModule extends AbstractExternalModule {
         return null;
     }
 
-    private function insertStopwatch($project_id, $instrument, $event_id, $isSurvey) {
-        $fields = $this->getFieldParams($project_id, $instrument, $event_id);
+    private function insertStopwatch($project_id, $record, $instrument, $event_id, $instance, $isSurvey) {
+        $fields = $this->getFieldParams($project_id, $record, $instrument, $event_id, $instance);
         if (count($fields)) {
             if (!class_exists("\RUB\Utility\InjectionHelper")) include_once("classes/InjectionHelper.php");
             $ih = InjectionHelper::init($this);
@@ -186,7 +186,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
      * TODO: This currently fails to alert the user about action tags with malformed JSON, as these are ignored by the ActionTagHelper.
      * @return array
      */
-    private function getFieldParams($project_id, $instrument, $event_id) {
+    private function getFieldParams($project_id, $record_id, $instrument, $event_id, $instance) {
         $field_params = array();
         if (!class_exists("\DE\RUB\Utility\Project")) include_once("classes/Project.php");
         $project = Project::load($this->framework, $project_id);
@@ -212,7 +212,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
                     );
                 }
                 else {
-                    $params = $this->validateParams($project, $instrument, $event_id, $field, $params);
+                    $params = $this->validateParams($project, $record, $instrument, $event_id, $instance, $field, $params);
                 }
                 $field_params[$field] = $params;
             }
@@ -235,14 +235,16 @@ class StopwatchExternalModule extends AbstractExternalModule {
      *  - g = group seperator
      *  - d = decimal seperator
      * 
-     * @param Project $project
+     * @param \DE\RUB\Utility\Project $project
+     * @param \DE\RUB\Utility\Record $record
      * @param string $instrument
      * @param string $event_id
+     * @param int|null $instance
      * @param string $field
      * @param array $param
      * @return array The supplemented parameters.
      */
-    private function validateParams($project, $instrument, $event_id, $field, $params) {
+    private function validateParams($project, $record, $instrument, $event_id, $instance, $field, $params) {
         // Add defaults.
         if (!isset($params["label_start"])) {
             $params["label_start"] = "Start"; 
