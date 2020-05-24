@@ -519,6 +519,7 @@ function lap(swd, now, stopped) {
             start: now,
             stop: null,
             elapsed: 0,
+            cumulated: 0,
             num_stops: 0
         }
         swd.laps.push(swd.currentLap)
@@ -882,15 +883,17 @@ function parseValue(swd, val) {
             if (Array.isArray(restore)) {
                 var sum = 0
                 for (var i = 0; i < restore.length; i++) {
+                    var elapsed = parseInt(restore[i]['elapsed'])
+                    sum += elapsed
                     /** @type {LapInfo} */
                     var lap = {
                         start: new Date(restore[i]['start']),
                         stop: new Date(restore[i]['stop']),
-                        elapsed: parseInt(restore[i]['elapsed']),
+                        elapsed: elapsed,
+                        cumulated: sum,
                         num_stops: parseInt(restore[i]['num_stops'])
                     }
                     rv.laps.push(lap)
-                    sum += lap.elapsed
                 }
                 rv.elapsed = sum
                 return rv
