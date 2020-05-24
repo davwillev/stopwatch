@@ -276,8 +276,6 @@ class StopwatchExternalModule extends AbstractExternalModule {
         return $field_params;
     }
 
-    private $VALID_STORE_FORMATS = ["json", "repeating"];
-
     /**
      * Adds format parameters (based on field type).
      * 
@@ -432,15 +430,10 @@ class StopwatchExternalModule extends AbstractExternalModule {
         // Lap and capture modes
         //
         if ($params["mode"] == "capture" || $params["mode"] == "lap") {
+            // Imply store format from presence of a mapping parameter.
+            $params["store_format"] = isset($params["mapping"]) ? "repeating" : "json";
             if ($this->requireInt($params["max_rows"], 0) === null) {
                 $params["max_rows"] = 0;
-            }
-            if (!isset($params["store_format"])) {
-                $params["store_format"] = "json";
-            }
-            if (!in_array(@$params["store_format"], $this->VALID_STORE_FORMATS, true)) {
-                $params["error"] = "Invalid value for 'store_format'.";
-                return $params;
             }
             if (!isset($params["only_once"])) {
                 $params["only_once"] = false;

@@ -50,13 +50,9 @@ Configuration is done via an action tag parameter. The format of the parameter s
 
 ### Additional configuration for capture and lap modes
 
-- `store_format`: This can be one of the following:
-  - `json`: Data is stored as a JSON string. `target` must be a _Text Box_ (without validation) or a _Notes Box_. This is the default store format.
-  - `repeating`: Data is stored in the fields of a repeating form. `target` must exist and be a _Text Box_ without validation.
+Data from a stopwatch capturing multiple timepoints or laps, by default, is stored as a JSON data structure inside a _Notes Box_ or _Text Box_ (without validation), unless a `mapping` is specified, in which case the data is stored in the fields of a repeating form. In the latter case, `target` must still exist and be a _Text Box_ without validation, as some metadata needs to be stored there (this field should not normally be shown and made read only).
 
-  For storage in repeating forms, the mapping of data items to fields must be set in the `mapping` object. All fields must be on the same instrument. The exact storage format depends on the field type (see below).
-
-- `mapping`: A JSON object with the following keys. All except `elapsed` are optional.
+- `mapping`: A JSON object with the following keys. All except `elapsed` are optional. All fields must be on the same instrument. The exact storage format depends on the field type (see below).
   - `elapsed`: Field name for elapsed time. This mapping **must** be provided.
   - `start`: Field name for the datetime the capture was (first) started.
   - `stop`: Field name for the datetiem the capture was (last) stopped.
