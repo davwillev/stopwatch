@@ -191,21 +191,28 @@ function create(id, params, $tr, $input) {
         var result = parseValue(swd, val)
         set(swd, result)
     })
-    // Determine insertion point.
-    var $insertionPoint = $tr.find('td.data')
-    if ($insertionPoint.length == 0) {
-        $insertionPoint = $tr.find('div.space')
-    }
-    if ($insertionPoint.length == 0) {
-        $insertionPoint = $tr.find('td.labelrc').last()
-    }
-    $insertionPoint.prepend($sw)
+    // MDC resilience (it shamelessly hides any buttons, how dare it!).
+    var mut = new MutationObserver(function() {
+        swd.$rclBtn.show()
+        swd.$srsBtn.show()
+    })
+    mut.observe(swd.$srsBtn[0], { attributes: true })
+    // Hide the target.
     hideTarget(swd)
     // Set initial value and update UI.
     var val = $input.val().toString()
     var result = parseValue(swd, val)
     set(swd, result)
-    log('Added Stopwatch to \'' + id + '\'', $insertionPoint)
+    // Determine insertion point - this depends on whether the field with 
+    // the action tag is itself the target field.
+    if (swd.id == params.target) {
+        // Inset above input control.
+        swd.$input.before($sw)
+    }
+    else {
+        $tr.find('td.labelrc').last().append($sw)
+    }
+    log('Added Stopwatch to \'' + id + '\'')
 }
 
 /**
@@ -666,8 +673,8 @@ function set(swd, result) {
         log('Stopwatch [' + swd.id + '] has been set to ' + format(swd.elapsed, swd.params).display)
     }
     if (MDC.includes(result.val)) {
-        swd.$srsBtn.prop('disabled', true).show()
-        swd.$rclBtn.prop('disabled', true).show()
+        swd.$srsBtn.prop('disabled', true)
+        swd.$rclBtn.prop('disabled', true)
     }
     hideTarget(swd)
 }
