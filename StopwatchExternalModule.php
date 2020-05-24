@@ -171,15 +171,26 @@ class StopwatchExternalModule extends AbstractExternalModule {
                         </div>
                     </div>
                     <div class="stopwatch-em-captures">
-                        <table class="stopwatch-em-table"></table>
+                        <table class="stopwatch-em-table">
+                            <thead class="stopwatch-em-thead" style="display:none;">
+                                <tr>
+                                    <th class="stopwatch-em-row-header-label"></th>
+                                    <th class="stopwatch-em-row-header-stop"></th>
+                                    <th class="stopwatch-em-row-header-elapsed"></th>
+                                    <th class="stopwatch-em-row-header-cumulated"></th>
+                                </tr>
+                            </thead>
+                            <tbody class="stopwatch-em-tbody"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
             <table style="display:none;" data-stopwatch-em-template="stopwatch-row">
                 <tr>
-                    <td class="stopwatch-em-rowlabel"></td>
-                    <td class="stopwatch-em-rowstop"></td>
-                    <td class="stopwatch-em-rowvalue"></td>
+                    <td class="stopwatch-em-row-label"></td>
+                    <td class="stopwatch-em-row-stop"></td>
+                    <td class="stopwatch-em-row-elapsed"></td>
+                    <td class="stopwatch-em-row-cumulated" style="display:none;"></td>
                 </tr>
             </table>
             <?php
@@ -271,6 +282,16 @@ class StopwatchExternalModule extends AbstractExternalModule {
         if (!isset($params["label_capture"])) {
             $params["label_capture"] = "Capture";
         }
+        if (!isset($params["label_elapsed"])) {
+            $params["label_elapsed"] = "Lap time";
+        }
+        if (!isset($params["label_cumulated"])) {
+            $params["label_cumulated"] = "Cumulated";
+        }
+        if (!isset($params["cumulated"])) {
+            $params["cumulated"] = false;
+        }
+        $params["cumulated"] = $params["cumulated"] !== false;
         $parmas["is_mm_ss"] = false;
         if (!isset($params["mode"])) {
             $params["mode"] = "basic";

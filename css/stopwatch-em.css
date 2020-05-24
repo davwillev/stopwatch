@@ -44,21 +44,44 @@
 /* Table */
 .stopwatch-em-table {
     margin-top: 0.5em;
+}
+.stopwatch-em-tbody {
     font-family: monospace;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
 }
 .stopwatch-em-table tr {
     border-bottom: 1px solid lightgray;
     border-top: 1px solid lightgray;
 }
-.stopwatch-em-rowlabel {
+.stopwatch-em-row-label {
     padding: 2px 0.5em;
 }
-.stopwatch-em-rowvalue {
+.stopwatch-em-row-elapsed {
     padding: 2px 0.5em;
     padding-left: 1em;
     text-align: right;
 }
-.stopwatch-em-rowstop {
+.stopwatch-em-row-cumulated {
+    padding: 2px 0.5em;
+    padding-left: 1em;
+    text-align: right;
+}
+.stopwatch-em-row-stop {
+    font-size: 0.8em;
+}
+.stopwatch-em-row-header-label {
+    padding: 2px 0.5em;
+}
+.stopwatch-em-row-header-elapsed {
+    padding: 2px 0.5em;
+    padding-left: 1em;
+    text-align: right;
+}
+.stopwatch-em-row-header-cumulated {
+    padding: 2px 0.5em;
+    padding-left: 1em;
+    text-align: right;
+}
+.stopwatch-em-row-header-stop {
     font-size: 0.8em;
 }
