@@ -82,7 +82,13 @@ class StopwatchExternalModule extends AbstractExternalModule {
 
     private function convertToStorage($field, $target_type, $value) {
         // num_stops
-        if ($field == "num_stops") return $value;
+        if ($field == "num_stops") {
+            return $value;
+        }
+        // is_stop
+        if ($field == "is_stop") {
+            return $value ? "1" : "0";
+        } 
         // elapsed
         if ($field == "elapsed") {
             if ($target_type == "int") return $value;
@@ -402,10 +408,13 @@ class StopwatchExternalModule extends AbstractExternalModule {
                     return $params;
                 }
                 $repeating_field_names = array("elapsed", "start", "stop");
+                // Extra options.
                 if ($params["mode"] == "lap") {
-                    // Extra options.
                     $repeating_field_names[] = "cumulated";
                     $repeating_field_names[] = "num_stops";
+                }
+                else if ($params["mode"] == "capture") {
+                    $repeating_field_names[] = "is_stop";
                 }
                 $repeating_fields = array();
                 foreach ($repeating_field_names as $fieldname) {
@@ -431,15 +440,22 @@ class StopwatchExternalModule extends AbstractExternalModule {
                     "elapsed" => array(
                         "int", "float", "number_comma_decimal", null
                     ),
+                    "cumulated" => array(
+                        "int", "float", "number_comma_decimal", null
+                    ),
                     "start" => array(
+                        "int", "float", "number_comma_decimal", null, "date_dmy", "date_ymd", "date_mdy", "datetime_dmy", "datetime_ymd", "datetime_mdy", "datetime_seconds_dmy", "datetime_seconds_ymd", "datetime_seconds_mdy"
+                    ),
+                    "stop" => array(
                         "int", "float", "number_comma_decimal", null, "date_dmy", "date_ymd", "date_mdy", "datetime_dmy", "datetime_ymd", "datetime_mdy", "datetime_seconds_dmy", "datetime_seconds_ymd", "datetime_seconds_mdy"
                     ),
                     "num_stops" => array(
                         "int"
+                    ),
+                    "is_stop" => array(
+                        "int"
                     )
                 );
-                $allowedType["stop"] = $allowedType["start"];
-                $allowedType["cumulated"] = $allowedType["elapsed"];
                 foreach ($repeating_fields as $map_name => $target_name) {
                     if ($project->getFieldType($target_name) != "text") {
                         $params["error"] = "Mapping field '{$target_name}' must be of type 'Text Box'.";
@@ -507,7 +523,13 @@ class StopwatchExternalModule extends AbstractExternalModule {
 
     private function convertFromStorage($field, $target_type, $value) {
         // num_stops
-        if ($field == "num_stops") return $value;
+        if ($field == "num_stops") {
+            return $value;
+        } 
+        // is_stop
+        if ($field == "is_stop") {
+            return $value != "0";
+        }
         // elapsed
         if (in_array($field, array("elapsed", "cumulated"), true)) {
             if ($target_type == "int") return $value;

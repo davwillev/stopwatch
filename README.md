@@ -62,6 +62,7 @@ Configuration is done via an action tag parameter. The format of the parameter s
   - `stop`: Field name for the datetiem the capture was (last) stopped.
   - `cumulated` (`lap` mode only): Field name for cumulated elapsed time.
   - `num_stops` (`lap` mode only): Field name for the number of times the timer was stopped during recording of a lap (the target field must be of type integer).
+  - `is_stop` (`capture` mode only): Field name for the stop flag (the target field must be of type integer - it will hold 0 or 1).
 
 - `event`: The event name (or numerical id) of the event of the repeating form with the capture or lap mapping fields. If not specified, the current event is assumed.
 

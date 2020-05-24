@@ -487,7 +487,7 @@ function capture(swd, now, stopped) {
         start:  swd.lapStartTime,
         stop: swd.stopTime,
         elapsed: swd.elapsed,
-        isStop: stopped && swd.params.stops
+        is_stop: stopped && swd.params.stops
     }
     swd.captures.push(capture)
     swd.lapStartTime = now
@@ -864,7 +864,7 @@ function parseValue(swd, val) {
                         start: new Date(restore[i]['start']),
                         stop: new Date(restore[i]['stop']),
                         elapsed: parseInt(restore[i]['elapsed']),
-                        isStop: restore[i]['isStop']
+                        is_stop: restore[i]['is_stop']
                     }
                     rv.captures.push(capture)
                 }
