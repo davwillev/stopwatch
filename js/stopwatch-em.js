@@ -502,7 +502,7 @@ function capture(swd, now, stopped) {
         start:  swd.lapStartTime,
         stop: swd.stopTime,
         elapsed: swd.elapsed,
-        is_stop: stopped && swd.params.stops
+        is_stop: stopped && swd.params.resume
     }
     swd.captures.push(capture)
     swd.lapStartTime = now
@@ -545,7 +545,7 @@ function lap(swd, now, stopped) {
     }
     else {
         swd.currentLap.stop = now
-        swd.currentLap.num_stops += (swd.params.stops ? 1 : 0)
+        swd.currentLap.num_stops += (swd.params.resume ? 1 : 0)
         swd.currentLap.elapsed += elapsed
         swd.$currentLapValue.text(format(elapsed, swd.params).display)
         swd.$currentLapCumulated.text(format(swd.elapsed, swd.params).display)
@@ -583,9 +583,9 @@ function stop(swd) {
     // Update UI.
     swd.$rclBtn.prop('disabled', false)
     swd.$rclBtn.html(params.label_reset)
-    swd.$srsBtn.html(params.stops ? params.label_resume : params.label_start)
+    swd.$srsBtn.html(params.resume ? params.label_resume : params.label_start)
     swd.$srsBtn.removeClass('stopwatch-em-running')
-    swd.$srsBtn.prop('disabled', params.stops == false)
+    swd.$srsBtn.prop('disabled', params.resume == false)
     updateDisplay(swd)
     updateHourglass(swd)
     log('Stopwatch [' + swd.id + '] has been stopped at ' + swd.stopTime.toLocaleTimeString() + '. Elapsed: ' + format(swd.elapsed, params).display)
@@ -657,10 +657,10 @@ function set(swd, result) {
         swd.$rclBtn.html(params.label_reset)
         swd.$rclBtn.prop('disabled', swd.elapsed < 0 || params.only_once)
         swd.$srsBtn.html(params.label_start)
-        if (swd.elapsed > -1 && params.stops && !swd.initial) {
+        if (swd.elapsed > -1 && params.resume && !swd.initial) {
             swd.$srsBtn.html(params.label_resume)
         }
-        swd.$srsBtn.prop('disabled', swd.elapsed > -1 && (swd.params.stops == false || swd.initial))
+        swd.$srsBtn.prop('disabled', swd.elapsed > -1 && (swd.params.resume == false || swd.initial))
         swd.$srsBtn.removeClass('stopwatch-em-running')
         updateDisplay(swd)
         updateHourglass(swd)

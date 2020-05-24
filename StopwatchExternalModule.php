@@ -302,8 +302,8 @@ class StopwatchExternalModule extends AbstractExternalModule {
         if (!isset($params["hide_target"])) {
             $params["hide_target"] = true; 
         }
-        if (!isset($params["stops"])) {
-            $params["stops"] = false;
+        if (!isset($params["resume"])) {
+            $params["resume"] = false;
         }
         if (!isset($params["no_hours"])) {
             $params["no_hours"] = false;
