@@ -849,40 +849,54 @@ function parseValue(swd, val) {
             return rv
         }
         else if (params.mode == 'capture') {
+            var restore
             if (f == "json") {
-                var json = JSON.parse(val)
-                if (Array.isArray(json)) {
-                    for (var i = 0; i < json.length; i++) {
-                        /** @type {CaptureInfo} */
-                        var capture = {
-                            start: new Date(json[i]['start']),
-                            stop: new Date(json[i]['stop']),
-                            elapsed: parseInt(json[i]['elapsed']),
-                            isStop: json[i]['isStop']
-                        }
-                        rv.captures.push(capture)
+                restore = JSON.parse(val)
+            }
+            else if (f == 'repeating') {
+                restore = params.repeating_captures
+            }
+            else if (f == 'plain') {
+                // TODO - parse 
+            }
+            if (Array.isArray(restore)) {
+                for (var i = 0; i < restore.length; i++) {
+                    /** @type {CaptureInfo} */
+                    var capture = {
+                        start: new Date(restore[i]['start']),
+                        stop: new Date(restore[i]['stop']),
+                        elapsed: parseInt(restore[i]['elapsed']),
+                        isStop: restore[i]['isStop']
                     }
+                    rv.captures.push(capture)
                 }
                 rv.elapsed = rv.captures[rv.captures.length - 1].elapsed
                 return rv
             }
         }
         else if (params.mode == 'lap') {
+            var restore
             if (f == "json") {
-                var json = JSON.parse(val)
+                restore = JSON.parse(val)
+            }
+            else if (f == 'repeating') {
+                restore = params.repeating_laps
+            }
+            else if (f == 'plain') {
+                // TODO - parse 
+            }
+            if (Array.isArray(restore)) {
                 var sum = 0
-                if (Array.isArray(json)) {
-                    for (var i = 0; i < json.length; i++) {
-                        /** @type {LapInfo} */
-                        var lap = {
-                            start: new Date(json[i]['start']),
-                            stop: new Date(json[i]['stop']),
-                            elapsed: parseInt(json[i]['elapsed']),
-                            num_stops: parseInt(json[i]['num_stops'])
-                        }
-                        rv.laps.push(lap)
-                        sum += lap.elapsed
+                for (var i = 0; i < restore.length; i++) {
+                    /** @type {LapInfo} */
+                    var lap = {
+                        start: new Date(restore[i]['start']),
+                        stop: new Date(restore[i]['stop']),
+                        elapsed: parseInt(restore[i]['elapsed']),
+                        num_stops: parseInt(restore[i]['num_stops'])
                     }
+                    rv.laps.push(lap)
+                    sum += lap.elapsed
                 }
                 rv.elapsed = sum
                 return rv

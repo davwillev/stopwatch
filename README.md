@@ -42,31 +42,24 @@ A REDCap External Module that provides a stopwatch widget that can be integrated
 
 - `store_format`: This can be one of the following:
   - `json`: Data is stored as a JSON string. `target` must be a _Text Box_ (without validation) or a _Notes Box_. This is the default store format.
-  - `plain`: Data is stored in plain text. `target` must be a _Notes Box_. Additional configuration can be done in the `plain` object.
-  - `repeating`: Data is stored in the fields of a repeating form.
+  - `repeating`: Data is stored in the fields of a repeating form. `target` must exist and be a _Text Box_ without validation.
 
   For storage in repeating forms, the mapping of data items to fields must be set in the `capture_mapping` and `lap_mapping` objects, respectively. All fields must be on the same instrument. The exact storage format depends on the field type (see below). Plain text storage can be customized using the `plain_text` object.
 
 - `capture_mapping`: A JSON object with the following keys:
-  - `elapsed`: Field name for elapsed time.
+  - `elapsed`: Field name for elapsed time. This mapping **must** be provided.
   - `start`: Field name for the datetime the capture was (first) started.
   - `stop`: Field name for the datetiem the capture was (last) stopped.
-  - `event`: The event name (or numerical id) of the event the repeating form is on. If not specified, the current event is assumed.
 
 - `lap_mapping`: A JSON object with the following keys:
-  - `elapsed`: Field name for elapsed time.
+  - `elapsed`: Field name for elapsed time. This mapping **must** be provided.
   - `start`: Field name for the datatime the lap was (first) started.
   - `stop`: Field name for the datetime the lap was (last) stopped.
   - `num_stops`: Field name for the number of times the timer was stopped during recording of a lap (the target field must be of type integer).
-  - `event`: The event name (or numerical id) of the event the repeating form is on. If not specified, the current event is assumed.
 
-- `plain`: A JSON object with the following keys:
-  - `items`: An array of strings of (some or all of) the keys of the respective mapping, determining which and in which order these will be output. The default is `["start", "stop", "num_stops", "elapsed"]`.
-  - `delimiter`: The column delimiter. Default is tab.
-  - `header`: Boolean (`true`|`false`) determining whether a header row should be included in the output.
-  - `start`, `stop`, `num_stops`, `elapsed`: When a string value is provided, this will be used in the header.
+- `event`: The event name (or numerical id) of the event of the repeating form with the capture or lap mapping fields. If not specified, the current event is assumed.
 
-- `only_once`: Boolean (`true`|`false`), or a custom value in case of `repeating` (which then is stored in the field specified by `target`, which must be a _Text Box_ without or with matching validation). When used, the stopwatch cannot be used again when a value is stored in `target` (after a form save). The default is `false`.
+- `only_once`: Boolean (`true`|`false`) determining whether the stopwatch can be used again once a value has been recorded. The default is `false`.
 - `max_rows`: The maximum number of rows to show in the captures/laps table. Default = 0 (no limit).
 
 ## Format of the stored values
@@ -76,17 +69,17 @@ Stopwatch will honor the format (validation) of the target field(s). The target 
 Elapsed time will be stored as follows:
 
 - _Integer_: elapsed time in milliseconds.
-- _Number_ (any type): elapsed time in seconds (with fractional seconds).
+- _Number_: elapsed time in seconds (with fractional seconds).
 - _Time (MM:SS)_: elapsed time in minutes and seconds (limited to max 59:59).
 - No validation: the elapsed time will be stored as h:m:s.f (colons and dot).
 
 For capture and lap data values other than elapsed time, the following automatic formats will be used, depending on the field type:
 
 - _Integer_: the (local) time represented by number of milliseconds elapsed since the start of the epoch, 01 January, 1970 00:00:00 Universal Time (UTC).
-- _Number_ (any type): as above, but in seconds (including fractional seconds).
-- _Date_ (any type): The date. Time information will be lost.
-- _Datetime_ (any type): The date and time. Some time information will be lost.
-- No validation: A datetime value in the format `Y-M-D H:m:s.f` where Y = 4-digit year, M = 2-digit month, D = 2-digit day, H = 2-digit hour (0-23), m = 2-digit minute, s = 2-digit second, f = fractional second (up to ms precision, depending on the `digits` setting).
+- _Number_: as above, but in seconds (including fractional seconds).
+- _Date_: The date. Time information will be lost.
+- _Datetime_: The date and time. Some time information will be lost.
+- No validation: A datetime value in the ISO 8601 format `yyyy-mm-ddThh:mm:ss.fff`.
 
 ## Format of the timer display
 
@@ -111,6 +104,4 @@ This module uses some code from Andy Martin (ActionTagHelper and other bits).
 
 Version | Description
 ------- | ---------------------
-beta.3  | Bug fixes, small improvements, IE11 fixes, new plan for advanced stuff.
-beta.2  | Bug fixes and behind-the-scenes updates.
-beta.1  | First beta release.
+v1.0.0  | Initial release.

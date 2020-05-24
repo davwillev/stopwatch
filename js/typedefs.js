@@ -74,6 +74,8 @@
  *  display_format: string
  *  store_format: string
  *  max_rows: number
+ *  repeating_laps: LapInfo[]
+ *  repeating_captures: CaptureInfo[]
  *  error: string
  * }}
  */
