@@ -22,8 +22,8 @@ Configuration is done via an action tag parameter. The format of the parameter s
 
 - `mode`: Mode can be one of the following:
   - `basic`: A simple stopwatch with start/stop and reset button. The elapsed time is recorded. This is the default.
-  - `capture`: A stopwatch that can record multiple captures of the (until then) elapsed time (see below for details).
-  - `lap`: A stopwatch that can record multiple laps (see below for details).
+  - `capture`: A stopwatch that can record multiple captures of the (until then) elapsed time (see below for details). `@STOPWATCH-CAPTURE` can be used instead.
+  - `lap`: A stopwatch that can record multiple laps (see below for details). `@STOPWATCH-LAP` can be used instead.
 
 - `target`: The field to store the elapsed time in. By default, the field the **@STOPWATCH** is on will be used (in which case its type and validation must be compatible - see below).
 

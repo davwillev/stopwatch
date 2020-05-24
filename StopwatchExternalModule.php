@@ -11,8 +11,11 @@ use \DE\RUB\Utility\Project;
  */
 class StopwatchExternalModule extends AbstractExternalModule {
 
-    /** @var string $STOPWATCH The name of the action tag. */
-    private $STOPWATCH = "@STOPWATCH";
+    // Action Tags.
+    private const STOPWATCH = "@STOPWATCH";
+    private const STOPWATCH_CAPTURE = "@STOPWATCH-CAPTURE";
+    private const STOPWATCH_LAP = "@STOPWATCH-LAP";
+
 
     function redcap_every_page_top($project_id) {
         // Inject action tag info.
@@ -233,9 +236,14 @@ class StopwatchExternalModule extends AbstractExternalModule {
         $project = Project::load($this->framework, $project_id);
         $record = $project->getRecord($record_id);
         if (!class_exists("\Stanford\Utility\ActionTagHelper")) include_once("classes/ActionTagHelper.php");
-        $action_tag_results = ActionTagHelper::getActionTags($this->STOPWATCH);
-        if (isset($action_tag_results[$this->STOPWATCH])) {
-            foreach ($action_tag_results[$this->STOPWATCH] as $field => $param_array) {
+        $action_tags = array(
+            self::STOPWATCH, 
+            self::STOPWATCH_CAPTURE, 
+            self::STOPWATCH_LAP
+        );
+        $action_tag_results = ActionTagHelper::getActionTags($action_tags);
+        foreach ($action_tags as $action_tag) {
+            foreach ($action_tag_results[$action_tag] as $field => $param_array) {
                 // Skip if not on current instrument.
                 if ($project->getFormByField($field) !== $instrument) continue; 
                 // Validate parameters and add.
@@ -250,10 +258,16 @@ class StopwatchExternalModule extends AbstractExternalModule {
                 }
                 if ($params == null) {
                     $params = array(
-                        "error" => "Invalid JSON supplied for {$this->STOPWATCH} action tag of field '{$field}'."
+                        "error" => "Invalid JSON supplied for {$action_tag} action tag of field '{$field}'."
                     );
                 }
                 else {
+                    if ($action_tag == self::STOPWATCH_LAP) {
+                        $params["mode"] = "lap";
+                    }
+                    else if ($action_tag == self::STOPWATCH_CAPTURE) {
+                        $params["mode"] = "capture";
+                    }
                     $params = $this->validateParams($project, $record, $instrument, $event_id, $instance, $field, $params);
                 }
                 $field_params[$field] = $params;
