@@ -57,6 +57,8 @@
  *  label_reset: string
  *  label_lap: string
  *  label_capture: string
+ *  label_elapsed: string
+ *  label_cumulated: string
  *  is_mm_ss : boolean
  *  stops: boolean
  *  target: string
@@ -74,6 +76,7 @@
  *  display_format: string
  *  store_format: string
  *  max_rows: number
+ *  cumulated: boolean
  *  repeating_laps: LapInfo[]
  *  repeating_captures: CaptureInfo[]
  *  error: string
@@ -85,16 +88,19 @@
  * @type {{
  *  id: string
  *  initial: boolean
+ *  $stopwatch: JQuery
  *  $srsBtn?: JQuery
  *  $rclBtn?: JQuery
  *  $display: JQuery
  *  $hourglass: JQuery
  *  $input: JQuery
  *  $json: JQuery
- *  $table: JQuery
+ *  $thead: JQuery
+ *  $tbody: JQuery
  *  currentLap: LapInfo
  *  $currentLapValue: JQuery
  *  $currentLapStops: JQuery
+ *  $currentLapCumulated: JQuery
  *  params: StopwatchParams
  *  running: boolean
  *  elapsed: number
@@ -135,7 +141,7 @@
  *  start: Date
  *  stop: Date
  *  elapsed: number
- *  isStop: boolean
+ *  is_stop: boolean
  * }}
  */
 
