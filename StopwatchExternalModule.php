@@ -220,7 +220,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
         return $field_params;
     }
 
-    private $VALID_STORE_FORMATS = ["json", "plain", "repeating"];
+    private $VALID_STORE_FORMATS = ["json", "repeating"];
 
     /**
      * Adds format parameters (based on field type).
@@ -394,13 +394,6 @@ class StopwatchExternalModule extends AbstractExternalModule {
                     break;
                 }
             } 
-            // Plain text.
-            else if ($params["store_format"] == "plain") {
-                if (!$project->getFieldType($params["target"]) == "textarea") {
-                    $params["error"] = "Target field type must be of type 'Notes Box'.";
-                    break;
-                }
-            }
             // Repeating form.
             else {
                 if ($project->getFieldType($params["target"]) != "text" || $project->getFieldValidation($params["target"]) !== null) {
