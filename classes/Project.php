@@ -132,17 +132,18 @@ class Project
     /**
      * Checks whether fields exist and are all fields are on the same form.
      * In case of an empty field list, false is returned.
+     * 
      * @param array $fields List of field names.
-     * @return boolean 
+     * @return string|boolean Form name or false.
      */
     function areFieldsOnSameForm($fields) {
         $ok = count($fields) > 0;
-        $instrument = $this->getFormByField($fields[0]);
-        $ok = $ok && !empty($instrument);
+        $form = $this->getFormByField($fields[0]);
+        $ok = $ok && !empty($form);
         foreach ($fields as $field) {
-            $ok = $ok && $this->getFormByField($field) == $instrument;
+            $ok = $ok && $this->getFormByField($field) == $form;
         }
-        return $ok;
+        return $ok ? $form : false;
     }
 
     /**
