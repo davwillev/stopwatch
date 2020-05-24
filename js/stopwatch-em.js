@@ -3,6 +3,9 @@
 // Stopwatch External Module
 //
 ;(function() {
+
+//#region Globals & Data Transfer ----------------------------------------------------------
+
 // Setup data transfer object.
 // @ts-ignore
 var EM = window.ExternalModules
@@ -15,8 +18,6 @@ if (typeof EM == 'undefined') {
 var DTO = EM.StopwatchEM_DTO || {}
 EM.StopwatchEM_DTO = DTO
 
-//#region Globals --------------------------------------------------------------------------
-
 /** @type {Object<string, StopwatchData>} Holds data for each stopwatch widget (there can be multiple) */
 var SWD = {}
 /** @type {number} The interval (in ms) at which the stopwatch display is refreshed */
@@ -27,7 +28,6 @@ var CLOCK
 var TICKING = false
 /** @type {string[]} Missing Data Codes */
 var MDC = []
-
 
 //#endregion
 
@@ -58,14 +58,14 @@ function log() {
 }
 
 //#endregion
-    
+
 //#region HTML and Update ------------------------------------------------------------------
 
 /**
  * Initial setup.
  */
 function setup() {
-    log('Stopwatch EM - Setup', DTO)
+    log('Stopwatch EM - Initializing:', DTO)
     // Get missing data codes.
     // @ts-ignore
     if (Array.isArray(missing_data_codes)) MDC = missing_data_codes
@@ -102,7 +102,7 @@ function error(id, error, $tr) {
         $insertionPoint = $tr.find('div.space')
     }
     $insertionPoint.prepend($error)
-    log('Failed to add Stopwatch to \'' + id + '\': ' + error)
+    log('Stopwatch [' + id + '] - failed to create: ' + error)
 }
 
 /**
@@ -191,21 +191,28 @@ function create(id, params, $tr, $input) {
         var result = parseValue(swd, val)
         set(swd, result)
     })
-    // Determine insertion point.
-    var $insertionPoint = $tr.find('td.data')
-    if ($insertionPoint.length == 0) {
-        $insertionPoint = $tr.find('div.space')
-    }
-    if ($insertionPoint.length == 0) {
-        $insertionPoint = $tr.find('td.labelrc').last()
-    }
-    $insertionPoint.prepend($sw)
+    // MDC resilience (it shamelessly hides any buttons, how dare it!).
+    var mut = new MutationObserver(function() {
+        swd.$rclBtn.show()
+        swd.$srsBtn.show()
+    })
+    mut.observe(swd.$srsBtn[0], { attributes: true })
+    // Hide the target.
     hideTarget(swd)
+    // Determine insertion point - this depends on whether the field with 
+    // the action tag is itself the target field.
+    if (swd.id == params.target) {
+        // Inset above input control.
+        swd.$input.before($sw)
+    }
+    else {
+        $tr.find('td.labelrc').last().append($sw)
+    }
     // Set initial value and update UI.
     var val = $input.val().toString()
     var result = parseValue(swd, val)
     set(swd, result)
-    log('Added Stopwatch to \'' + id + '\'', $insertionPoint)
+    log('Stopwatch [' + swd.id + '] - added to \'' + id + '\'')
 }
 
 /**
@@ -291,9 +298,6 @@ function insertCaptures(swd) {
         var json = JSON.stringify(swd.captures)
         swd.$json.val(json)
     }
-    else if (params.store_format == 'plain') {
-        log('Plain text caputres not implemented yet')
-    }
 }
 
 /**
@@ -309,9 +313,6 @@ function insertLaps(swd) {
     else if (params.store_format == 'repeating') {
         var json = JSON.stringify(swd.laps)
         swd.$json.val(json)
-    }
-    else if (params.store_format == 'plain') {
-        log('Plain text laps not implemented yet')
     }
 }
 
@@ -346,13 +347,11 @@ function addLapRow(swd, n) {
     var $stop = $row.find('.stopwatch-em-row-stop')
     var $elapsed = $row.find('.stopwatch-em-row-elapsed')
     var $cumulated = $row.find('.stopwatch-em-row-cumulated')
-    if (swd.params.cumulated) {
-        $cumulated.show()
-        swd.$thead.show()
-    }
     $label.html(swd.params.label_lap + ' ' + n)
     $elapsed.text(format(swd.currentLap.elapsed, swd.params).display)
-    // $cumulated.text(format(swd.currentLap.elapsed, swd.params).display)
+    if (swd.currentLap.elapsed > 0) { 
+        $cumulated.text(format(swd.currentLap.elapsed, swd.params).display)
+    }
     $stop.html(getStopSymbol(swd.currentLap.num_stops > 0))
     swd.$tbody.prepend($row)
     if (swd.params.max_rows > 0 && swd.laps.length > swd.params.max_rows) {
@@ -361,6 +360,10 @@ function addLapRow(swd, n) {
     swd.$currentLapValue = $elapsed
     swd.$currentLapStops = $stop
     swd.$currentLapCumulated = $cumulated
+    if (swd.params.cumulated) {
+        $cumulated.show()
+        swd.$thead.show()
+    }
 }
 
 /**
@@ -501,7 +504,7 @@ function capture(swd, now, stopped) {
         start:  swd.lapStartTime,
         stop: swd.stopTime,
         elapsed: swd.elapsed,
-        is_stop: stopped && swd.params.stops
+        is_stop: stopped && swd.params.resume
     }
     swd.captures.push(capture)
     swd.lapStartTime = now
@@ -544,8 +547,9 @@ function lap(swd, now, stopped) {
     }
     else {
         swd.currentLap.stop = now
-        swd.currentLap.num_stops += (swd.params.stops ? 1 : 0)
+        swd.currentLap.num_stops += (swd.params.resume ? 1 : 0)
         swd.currentLap.elapsed += elapsed
+        swd.currentLap.cumulated = swd.elapsed
         swd.$currentLapValue.text(format(elapsed, swd.params).display)
         swd.$currentLapCumulated.text(format(swd.elapsed, swd.params).display)
         swd.$currentLapStops.html(getStopSymbol(swd.currentLap.num_stops > 0))
@@ -582,9 +586,9 @@ function stop(swd) {
     // Update UI.
     swd.$rclBtn.prop('disabled', false)
     swd.$rclBtn.html(params.label_reset)
-    swd.$srsBtn.html(params.stops ? params.label_resume : params.label_start)
+    swd.$srsBtn.html(params.resume ? params.label_resume : params.label_start)
     swd.$srsBtn.removeClass('stopwatch-em-running')
-    swd.$srsBtn.prop('disabled', params.stops == false)
+    swd.$srsBtn.prop('disabled', params.resume == false)
     updateDisplay(swd)
     updateHourglass(swd)
     log('Stopwatch [' + swd.id + '] has been stopped at ' + swd.stopTime.toLocaleTimeString() + '. Elapsed: ' + format(swd.elapsed, params).display)
@@ -656,18 +660,18 @@ function set(swd, result) {
         swd.$rclBtn.html(params.label_reset)
         swd.$rclBtn.prop('disabled', swd.elapsed < 0 || params.only_once)
         swd.$srsBtn.html(params.label_start)
-        if (swd.elapsed > -1 && params.stops && !swd.initial) {
+        if (swd.elapsed > -1 && params.resume && !swd.initial) {
             swd.$srsBtn.html(params.label_resume)
         }
-        swd.$srsBtn.prop('disabled', swd.elapsed > -1 && (swd.params.stops == false || swd.initial))
+        swd.$srsBtn.prop('disabled', swd.elapsed > -1 && (swd.params.resume == false || swd.initial))
         swd.$srsBtn.removeClass('stopwatch-em-running')
         updateDisplay(swd)
         updateHourglass(swd)
         log('Stopwatch [' + swd.id + '] has been set to ' + format(swd.elapsed, swd.params).display)
     }
     if (MDC.includes(result.val)) {
-        swd.$srsBtn.prop('disabled', true).show()
-        swd.$rclBtn.prop('disabled', true).show()
+        swd.$srsBtn.prop('disabled', true)
+        swd.$rclBtn.prop('disabled', true)
     }
     hideTarget(swd)
 }
@@ -920,16 +924,14 @@ function parseValue(swd, val) {
         }
     }
     catch (ex) {
-        log('Stopwatch - Failed to parse stored value: ' + val)
+        log('Stopwatch [' + swd.id + '] - Failed to parse stored value: ' + val)
     }
     return rv
 }
 
 //#endregion
 
-// Setup stopwatches when the page is ready.
-$(function() {
-    setup();
-})
+// Setup @STOPWATCH instances when the page is ready.
+$(function() { setup() })
 
 })();

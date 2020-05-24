@@ -60,7 +60,7 @@
  *  label_elapsed: string
  *  label_cumulated: string
  *  is_mm_ss : boolean
- *  stops: boolean
+ *  resume: boolean
  *  target: string
  *  hide_target: boolean
  *  only_once?: boolean|string

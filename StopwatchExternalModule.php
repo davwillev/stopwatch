@@ -11,8 +11,11 @@ use \DE\RUB\Utility\Project;
  */
 class StopwatchExternalModule extends AbstractExternalModule {
 
-    /** @var string $STOPWATCH The name of the action tag. */
-    private $STOPWATCH = "@STOPWATCH";
+    // Action Tags.
+    private const STOPWATCH = "@STOPWATCH";
+    private const STOPWATCH_CAPTURE = "@STOPWATCH-CAPTURE";
+    private const STOPWATCH_LAP = "@STOPWATCH-LAP";
+
 
     function redcap_every_page_top($project_id) {
         // Inject action tag info.
@@ -20,11 +23,35 @@ class StopwatchExternalModule extends AbstractExternalModule {
     }
 
     function redcap_data_entry_form($project_id, $record, $instrument, $event_id, $group_id, $repeat_instance) {
-        $this->insertStopwatch($project_id, $record, $instrument, $event_id, $repeat_instance, false);
+        try {
+            $this->insertStopwatch($project_id, $record, $instrument, $event_id, $repeat_instance, false);
+        }
+        catch (\Error $e) {
+            if ($this->getProjectSetting("debug-js")) REDCap::logEvent(
+                "@STOPWATCH (Data Entry)",
+                "Error occured: " . $e->getMessage() . "\n" . $e->getTraceAsString(),
+                null,
+                $record,
+                $event_id,
+                $project_id
+            );
+        }
     }
 
     function redcap_survey_page($project_id, $record, $instrument, $event_id, $group_id, $survey_hash, $response_id, $repeat_instance) {
-        $this->insertStopwatch($project_id, $record, $instrument, $event_id, $repeat_instance, true);
+        try {
+            $this->insertStopwatch($project_id, $record, $instrument, $event_id, $repeat_instance, true);
+        }
+        catch (\Error $e) {
+            if ($this->getProjectSetting("debug-js")) REDCap::logEvent(
+                "@STOPWATCH (Survey)",
+                "Error occured: " . $e->getMessage() . "\n" . $e->getTraceAsString(),
+                null,
+                $record,
+                $event_id,
+                $project_id
+            );
+        }
     }
 
     function redcap_save_record($project_id, $record_id, $instrument, $event_id, $group_id, $survey_hash, $response_id, $repeat_instance) {
@@ -40,6 +67,8 @@ class StopwatchExternalModule extends AbstractExternalModule {
                     $mappings = $params["mapping"];
                     $instances_data = array();
                     foreach ($data as $item) {
+                        // Supplement id.
+                        $item["id"] = $params["id"];
                         $instance_data = array();
                         foreach ($mappings as $key => $store_key) {
                             if ($project->getFieldType($store_key) !== "text") continue;
@@ -81,16 +110,16 @@ class StopwatchExternalModule extends AbstractExternalModule {
     }
 
     private function convertToStorage($field, $target_type, $value) {
-        // num_stops
-        if ($field == "num_stops") {
+        // id and num_stops
+        if (in_array($field, array("id", "num_stops"), true)) {
             return $value;
         }
         // is_stop
         if ($field == "is_stop") {
             return $value ? "1" : "0";
         } 
-        // elapsed
-        if ($field == "elapsed") {
+        // elapsed and cumulated
+        if (in_array($field, array("cumulated", "elapsed"), true)) {
             if ($target_type == "int") return $value;
             if ($target_type == "float") return $value / 1000;
             if ($target_type == "number_comma_decimal") {
@@ -209,9 +238,14 @@ class StopwatchExternalModule extends AbstractExternalModule {
         $project = Project::load($this->framework, $project_id);
         $record = $project->getRecord($record_id);
         if (!class_exists("\Stanford\Utility\ActionTagHelper")) include_once("classes/ActionTagHelper.php");
-        $action_tag_results = ActionTagHelper::getActionTags($this->STOPWATCH);
-        if (isset($action_tag_results[$this->STOPWATCH])) {
-            foreach ($action_tag_results[$this->STOPWATCH] as $field => $param_array) {
+        $action_tags = array(
+            self::STOPWATCH, 
+            self::STOPWATCH_CAPTURE, 
+            self::STOPWATCH_LAP
+        );
+        $action_tag_results = ActionTagHelper::getActionTags($action_tags);
+        foreach ($action_tags as $action_tag) {
+            foreach ($action_tag_results[$action_tag] as $field => $param_array) {
                 // Skip if not on current instrument.
                 if ($project->getFormByField($field) !== $instrument) continue; 
                 // Validate parameters and add.
@@ -226,10 +260,16 @@ class StopwatchExternalModule extends AbstractExternalModule {
                 }
                 if ($params == null) {
                     $params = array(
-                        "error" => "Invalid JSON supplied for {$this->STOPWATCH} action tag of field '{$field}'."
+                        "error" => "Invalid JSON supplied for {$action_tag} action tag of field '{$field}'."
                     );
                 }
                 else {
+                    if ($action_tag == self::STOPWATCH_LAP) {
+                        $params["mode"] = "lap";
+                    }
+                    else if ($action_tag == self::STOPWATCH_CAPTURE) {
+                        $params["mode"] = "capture";
+                    }
                     $params = $this->validateParams($project, $record, $instrument, $event_id, $instance, $field, $params);
                 }
                 $field_params[$field] = $params;
@@ -237,8 +277,6 @@ class StopwatchExternalModule extends AbstractExternalModule {
         }
         return $field_params;
     }
-
-    private $VALID_STORE_FORMATS = ["json", "repeating"];
 
     /**
      * Adds format parameters (based on field type).
@@ -302,8 +340,11 @@ class StopwatchExternalModule extends AbstractExternalModule {
         if (!isset($params["hide_target"])) {
             $params["hide_target"] = true; 
         }
-        if (!isset($params["stops"])) {
-            $params["stops"] = false;
+        if (!isset($params["id"])) {
+            $params["id"] = $params["target"];
+        }
+        if (!isset($params["resume"])) {
+            $params["resume"] = false;
         }
         if (!isset($params["no_hours"])) {
             $params["no_hours"] = false;
@@ -394,15 +435,10 @@ class StopwatchExternalModule extends AbstractExternalModule {
         // Lap and capture modes
         //
         if ($params["mode"] == "capture" || $params["mode"] == "lap") {
+            // Imply store format from presence of a mapping parameter.
+            $params["store_format"] = isset($params["mapping"]) ? "repeating" : "json";
             if ($this->requireInt($params["max_rows"], 0) === null) {
                 $params["max_rows"] = 0;
-            }
-            if (!isset($params["store_format"])) {
-                $params["store_format"] = "json";
-            }
-            if (!in_array(@$params["store_format"], $this->VALID_STORE_FORMATS, true)) {
-                $params["error"] = "Invalid value for 'store_format'.";
-                return $params;
             }
             if (!isset($params["only_once"])) {
                 $params["only_once"] = false;
@@ -458,6 +494,9 @@ class StopwatchExternalModule extends AbstractExternalModule {
                     return $params;
                 }
                 $allowedType = array(
+                    "id" => array(
+                        null
+                    ),
                     "elapsed" => array(
                         "int", "float", "number_comma_decimal", null
                     ),
@@ -543,8 +582,8 @@ class StopwatchExternalModule extends AbstractExternalModule {
     }
 
     private function convertFromStorage($field, $target_type, $value) {
-        // num_stops
-        if ($field == "num_stops") {
+        // id and num_stops
+        if (in_array($field, array("id", "num_stops"), true)) {
             return $value;
         } 
         // is_stop
