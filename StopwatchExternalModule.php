@@ -20,11 +20,35 @@ class StopwatchExternalModule extends AbstractExternalModule {
     }
 
     function redcap_data_entry_form($project_id, $record, $instrument, $event_id, $group_id, $repeat_instance) {
-        $this->insertStopwatch($project_id, $record, $instrument, $event_id, $repeat_instance, false);
+        try {
+            $this->insertStopwatch($project_id, $record, $instrument, $event_id, $repeat_instance, false);
+        }
+        catch (\Error $e) {
+            if ($this->getProjectSetting("debug-js")) REDCap::logEvent(
+                "@STOPWATCH (Data Entry)",
+                "Error occured: " . $e->getMessage() . "\n" . $e->getTraceAsString(),
+                null,
+                $record,
+                $event_id,
+                $project_id
+            );
+        }
     }
 
     function redcap_survey_page($project_id, $record, $instrument, $event_id, $group_id, $survey_hash, $response_id, $repeat_instance) {
-        $this->insertStopwatch($project_id, $record, $instrument, $event_id, $repeat_instance, true);
+        try {
+            $this->insertStopwatch($project_id, $record, $instrument, $event_id, $repeat_instance, true);
+        }
+        catch (\Error $e) {
+            if ($this->getProjectSetting("debug-js")) REDCap::logEvent(
+                "@STOPWATCH (Survey)",
+                "Error occured: " . $e->getMessage() . "\n" . $e->getTraceAsString(),
+                null,
+                $record,
+                $event_id,
+                $project_id
+            );
+        }
     }
 
     function redcap_save_record($project_id, $record_id, $instrument, $event_id, $group_id, $survey_hash, $response_id, $repeat_instance) {
