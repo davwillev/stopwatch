@@ -130,6 +130,8 @@ Labels of buttons and other display elements can be customized using the followi
 
 ## Examples
 
+A demo project is available [here](demo-project/StopwatchEMTest.xml).
+
 **Simple Stopwatches** - capture elapsed time only:
 
 ![Simple](images/examples01-06.png)
