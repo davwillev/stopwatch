@@ -422,6 +422,7 @@ function timerTick() {
  */
 function start(swd) {
     var now = new Date()
+    swd.initial = false
     if (swd.startTime == null) {
         swd.startTime = now
     }
@@ -643,7 +644,6 @@ function set(swd, result) {
         swd.$srsBtn.removeClass('stopwatch-em-running')
         updateDisplay(swd)
         updateHourglass(swd)
-        swd.initial = false
         log('Stopwatch [' + swd.id + '] has been set to ' + format(swd.elapsed, swd.params).display)
     }
     if (MDC.includes(result.val)) {
