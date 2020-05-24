@@ -25,6 +25,8 @@ Configuration is done via an action tag parameter. The format of the parameter s
   - `capture`: A stopwatch that can record multiple captures of the (until then) elapsed time (see below for details). `@STOPWATCH-CAPTURE` can be used instead.
   - `lap`: A stopwatch that can record multiple laps (see below for details). `@STOPWATCH-LAP` can be used instead.
 
+- `id`: An identifier for the stopwatch. If not specified, this will be equal to `target`. This is useful when storing the data of multiple stopwatches in the same repeating instrument.
+
 - `target`: The field to store the elapsed time in. By default, the field the **@STOPWATCH** is on will be used (in which case its type and validation must be compatible - see below).
 
 - `hide_target`: Boolean (`true`|`false`) that determines whether the target input should be idden (default to `true`).
@@ -53,12 +55,13 @@ Configuration is done via an action tag parameter. The format of the parameter s
 Data from a stopwatch capturing multiple timepoints or laps, by default, is stored as a JSON data structure inside a _Notes Box_ or _Text Box_ (without validation), unless a `mapping` is specified, in which case the data is stored in the fields of a repeating form. In the latter case, `target` must still exist and be a _Text Box_ without validation, as some metadata needs to be stored there (this field should not normally be shown and made read only).
 
 - `mapping`: A JSON object with the following keys. All except `elapsed` are optional. All fields must be on the same instrument. The exact storage format depends on the field type (see below).
-  - `elapsed`: Field name for elapsed time. This mapping **must** be provided.
-  - `start`: Field name for the datetime the capture was (first) started.
-  - `stop`: Field name for the datetiem the capture was (last) stopped.
-  - `cumulated` (`lap` mode only): Field name for cumulated elapsed time.
-  - `num_stops` (`lap` mode only): Field name for the number of times the timer was stopped during recording of a lap (the target field must be of type integer).
-  - `is_stop` (`capture` mode only): Field name for the stop flag (the target field must be of type integer - it will hold 0 or 1).
+  - `id`: Field for storing the id of the stopwatch. This must be a _Text Box_ without validation. This mapping is useful when capturing the data from multiple stopwatches in the same repeating instrument.
+  - `elapsed`: Field for storing the elapsed time. This mapping **must** be provided.
+  - `start`: Field for storing the date/time the capture was (first) started.
+  - `stop`: Field for storing the date/time the capture was (last) stopped.
+  - `cumulated` (`lap` mode only): Field for storing the cumulated elapsed time.
+  - `num_stops` (`lap` mode only): Field for storing the number of times the timer was stopped during recording of a lap (the target field must be of type integer).
+  - `is_stop` (`capture` mode only): Field for storing the stop flag (the target field must be of type integer - it will hold 0 or 1).
 
 - `event`: The event name (or numerical id) of the event of the repeating form with the capture or lap mapping fields. If not specified, the current event is assumed.
 

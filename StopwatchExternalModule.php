@@ -67,6 +67,8 @@ class StopwatchExternalModule extends AbstractExternalModule {
                     $mappings = $params["mapping"];
                     $instances_data = array();
                     foreach ($data as $item) {
+                        // Supplement id.
+                        $item["id"] = $params["id"];
                         $instance_data = array();
                         foreach ($mappings as $key => $store_key) {
                             if ($project->getFieldType($store_key) !== "text") continue;
@@ -108,16 +110,16 @@ class StopwatchExternalModule extends AbstractExternalModule {
     }
 
     private function convertToStorage($field, $target_type, $value) {
-        // num_stops
-        if ($field == "num_stops") {
+        // id and num_stops
+        if (in_array($field, array("id", "num_stops"), true)) {
             return $value;
         }
         // is_stop
         if ($field == "is_stop") {
             return $value ? "1" : "0";
         } 
-        // elapsed
-        if ($field == "elapsed") {
+        // elapsed and cumulated
+        if (in_array($field, array("cumulated", "elapsed"), true)) {
             if ($target_type == "int") return $value;
             if ($target_type == "float") return $value / 1000;
             if ($target_type == "number_comma_decimal") {
@@ -338,6 +340,9 @@ class StopwatchExternalModule extends AbstractExternalModule {
         if (!isset($params["hide_target"])) {
             $params["hide_target"] = true; 
         }
+        if (!isset($params["id"])) {
+            $params["id"] = $params["target"];
+        }
         if (!isset($params["resume"])) {
             $params["resume"] = false;
         }
@@ -489,6 +494,9 @@ class StopwatchExternalModule extends AbstractExternalModule {
                     return $params;
                 }
                 $allowedType = array(
+                    "id" => array(
+                        null
+                    ),
                     "elapsed" => array(
                         "int", "float", "number_comma_decimal", null
                     ),
@@ -574,8 +582,8 @@ class StopwatchExternalModule extends AbstractExternalModule {
     }
 
     private function convertFromStorage($field, $target_type, $value) {
-        // num_stops
-        if ($field == "num_stops") {
+        // id and num_stops
+        if (in_array($field, array("id", "num_stops"), true)) {
             return $value;
         } 
         // is_stop
