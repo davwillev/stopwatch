@@ -124,6 +124,7 @@
  *  start: Date
  *  stop: Date
  *  elapsed: number
+ *  cumulated: number
  *  num_stops: number
  * }}
  */
