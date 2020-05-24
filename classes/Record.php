@@ -11,6 +11,10 @@ class Record
     /** @var \ExternalModules\Framework The framework instance. */
     private $framework;
 
+    private const NON_REPEATING = 1;
+    private const REPEAT_FORM = 2;
+    private const REPEAT_EVENT = 3;
+
     function __construct($framework, $project, $record_id) {
         $this->project = $project;
         $this->record_id = $record_id;
@@ -95,16 +99,16 @@ class Record
      * 
      * @param array $field_values An associative array (field_name => value).
      * @param string $event The name of the event or the (numerical) event id.
-     * @param int|null $instance The repeat instance (optional).
+     * @param int $instances The repeat instance (optional).
      * @throws Exception for violations of the project data structure.
      */
-    function updateFields($field_values, $event, $instance = null) {
-        // Anything to do?
-        if (!count($field_values)) return;
-        // Validate and ensure instance exists.
+    function updateFields($field_values, $event, $instances = 1) {
+
+        // Validate input.
+        if (!is_array($instances)) $instances = array($instances);
         $fields = array_keys($field_values);
-        $this->validateFields($fields, $event, $instance, true);
-        
+        $mode = $this->validateFields($fields, $event, $instances);
+        if ($mode == null) return;
         // Verify record / instance exists.
         $event_id = $this->project->getEventId($event);
         $project_id = $this->project->getProjectId();
@@ -119,30 +123,53 @@ class Record
             $event_id, 
             $this->record_id
         );
-        $event_repeating = $this->project->isEventRepeating($event);
-        if ($event_repeating) {
+        if ($mode == self::REPEAT_EVENT) {
             // Repeating event.
-            $sql .= "`field_name` = ? AND `instance` ";
+            $sql .= "`field_name` = ? AND (";
             array_push($parameters, $this->project->recordIdField());
-            if ($instance == 1) {
-                $sql .= "is null";
+            if (in_array(1, $instances)) {
+                $sql .= "`instance` IS NULL";
+                if (count($instances) > 1) {
+                    $ps = join(", ", explode("", str_repeat("?", count($instances) - 1)));
+                    $sql .= " OR `instance` IN ($ps)";
+                    foreach ($instances as $instance) {
+                        if ($instance == 1) continue;
+                        array_push($parameters, $instance);
+                    }
+                }
             }
             else {
-                $sql .= "?";
-                array_push($parameters, $instance);
+                $ps = join(", ", explode("", str_repeat("?", count($instances) - 1)));
+                $sql .= "`instance` IN ($ps)";
+                foreach ($instances as $instance) {
+                    array_push($parameters, $instance);
+                }
             }
+            $sql .= ")";
         }
-        else if ($instance !== null) {
+        else if ($mode == self::REPEAT_FORM) {
             // Repeating form.
-            $sql .= "`field_name` = ? AND `instance` ";
+            $sql .= "`field_name` = ? AND (";
             array_push($parameters, "{$form}_complete");
-            if ($instance == 1) {
-                $sql .= "is null";
+            if (in_array(1, $instances)) {
+                $sql .= "`instance` IS NULL";
+                if (count($instances) > 1) {
+                    $ps = join(", ", explode("", str_repeat("?", count($instances) - 1)));
+                    $sql .= " OR `instance` IN ($ps)";
+                    foreach ($instances as $instance) {
+                        if ($instance == 1) continue;
+                        array_push($parameters, $instance);
+                    }
+                }
             }
             else {
-                $sql .= "?";
-                array_push($parameters, $instance);
+                $ps = join(", ", explode("", str_repeat("?", count($instances) - 1)));
+                $sql .= "`instance` IN ($ps)";
+                foreach ($instances as $instance) {
+                    array_push($parameters, $instance);
+                }
             }
+            $sql .= ")";
         }
         else {
             // Plain. It's enough that record exists.
@@ -152,12 +179,12 @@ class Record
         $result = $this->framework->query($sql, $parameters);
         $row = $result->fetch_assoc();
         if ($row == null || $row["count"] == 0) {
-            throw new \Exception("Cannot update as record, event, or instance has no data yet.");
+            throw new \Exception("Cannot update as record, event, or instance(s) have no data yet.");
         }
 
         // Build data structure for REDCap::saveData().
         $data = null;
-        if ($event_repeating) {
+        if ($mode == self::REPEAT_EVENT) {
             $data = array(
                 $this->record_id => array(
                     "repeat_instances" => array(
@@ -170,7 +197,7 @@ class Record
                 )
             );
         }
-        else if ($instance !== null) {
+        else if ($mode == self::REPEAT_FORM) {
             $data = array(
                 $this->record_id => array(
                     "repeat_instances" => array(
@@ -205,18 +232,19 @@ class Record
      * 
      * @param array $fields An array of field names.
      * @param string $event The name of the event or the (numerical) event id.
-     * @param int|null $instance The repeat instance (optional).
+     * @param int|array $instances The repeat instance(s) (optional).
      * @return array An associative array (field_name => value).
      * @throws Exception for violations of the project data structure.
      */
-    public function getFieldValues($fields, $event, $instance = null) {
-        // Anything to do?
-        if (!count($fields)) return array();
-        $this->validateFields($fields, $event, $instance);
+    public function getFieldValues($fields, $event, $instances = 1) {
+        // Validate input.
+        if (!is_array($instances)) $instances = array($instances);
+        $mode = $this->validateFields($fields, $event, $instances);
+        if ($mode == null) return array();
+
         $event_id = $this->project->getEventId($event);
         $project_id = $this->project->getProjectId();
-
-        $all = REDCap::getData($project_id, "array", $this->record_id);
+        $form = $this->project->getFormByField($fields[0]);
 
         $data = REDCap::getData(
             $project_id,       // project_id
@@ -225,14 +253,22 @@ class Record
             $fields,           // fields
             $event_id          // events
         );
-
-        if ($instance === null) {
-            // Plain, non repeating.
-
+        $rv = array();
+        foreach ($fields as $field) {
+            $rv[$field] = array();
+            foreach($instances as $instance) {
+                if ($mode == self::REPEAT_EVENT) {
+                    $rv[$field][$instance] = $data[$this->record_id]["repeat_instances"][$event_id][null][$instance][$field];
+                }
+                else if ($mode == self::REPEAT_FORM) {
+                    $rv[$field][$instance] = $data[$this->record_id]["repeat_instances"][$event_id][$form][$instance][$field];
+                }
+                else {
+                    $rv[$field][$instance] = $data[$this->record_id][$event_id][$field];
+                }
+            }
         }
-        $event_repeating = $this->project->isEventRepeating($event);
-        
-        
+        return $rv;
     }
 
 
@@ -241,54 +277,61 @@ class Record
      * 
      * @param array $fields A list of field names.
      * @param string $event The event name of (numerical) event id.
-     * @param int|null $instance The repeat instance (optional).
+     * @param [int] $instances The repeat instance (optional).
+     * @return int|null The mode - one of REPEAT_EVENT, REPEAT_FORM, NON_REPEATING, or null if there is nothing to do.
      * @throws Excetion in case of violations.
      */
-    private function validateFields($fields, $event, $instance, $instance_must_exist = false) {
+    private function validateFields($fields, $event, $instances) {
+        $mode = null;
         // Anything to do?
-        if (!count($fields)) return;
+        if (!count($fields)) return $mode;
+        // Check instance.
+        $max_instance = 0;
+        $min_instance = 99999999;
+        foreach ($instances as $instance) {
+            if (!is_int($instance) || $instance < 1) {
+                throw new \Exception("Instances must be integers > 0.");
+            }
+            $max_instance = max($max_instance, $instance);
+            $min_instance = min($min_instance, $instance);
+        }
+        if ($max_instance == 0) {
+            throw new \Exception("Invalid instances.");
+        }
         // Check event.
         $event_id = $this->project->getEventId($event);
         $project_id = $this->project->getProjectId();
         if ($event_id === null) {
             throw new \Exception("Event '{$event}' does not exist in project '{$project_id}'.");
         }
-        $event_repeating = $this->project->isEventRepeating($event);
-        if ($event_repeating) {
-            // Instance provided?
-            if($instance == null) {
-                throw new \Exception("Must provide a valid instance number when updating fields on repeating events.");
-            }
+        if($this->project->isEventRepeating($event)) {
             // All fields on this event?
             foreach ($fields as $field) {
                 if (!$this->project->isFieldOnEvent($field, $event)) {
                     throw new \Exception("Field '{$field}' is not on event '{$event}'.");
                 }
             }
-        }
-        else if ($instance !== null) {
-            // This implies a repeating form. Are all fields on the same form?
-            if (!$this->project->areFieldsOnSameForm($fields)) {
-                throw new \Exception("All fields must be on the same repeating form.");
-            }
-            // Check if the form is repeating.
-            $form = $this->project->getFormByField($fields[0]);
-            if (!$this->project->isFormRepeating($form, $event)) {
-                throw new \Exception("Form '{$form}' is not repeating on event '{$event}'.");
-            }
+            $mode = self::REPEAT_EVENT;
         }
         else {
-            // Plain fields. None of the fields must be on a repeating form.
-            foreach ($fields as $field) {
-                if ($this->project->isFieldOnRepeatingForm($field, $event)) {
-                    throw new \Exception("Field '{$field}' on event '{$event}' must not be on a repeating form.");
+            // Are all fields on the same form?
+            $form = $this->project->areFieldsOnSameForm($fields);
+            // And if so, is it repeating?
+            if ($form && $max_instance > 1 && !$this->project->isFormRepeating($form, $event)) {
+                throw new \Exception("Invalid instance(s). Fields are on form '{$form}' which is not repeating on event '{$event}.");
+            }
+            if (!$form) {
+                // Fields are on more than one form. None of the fields must be on a repeating form.
+                foreach ($fields as $field) {
+                    if ($this->project->isFieldOnRepeatingForm($field, $event)) {
+                        throw new \Exception("Must not mix fields that are on non-repeating and repeating forms.");
+                    }
                 }
             }
+            $mode = $form && $this->project->isFormRepeating($form, $event) ? self::REPEAT_FORM : self::NON_REPEATING;
         }
+        return $mode;
     }
-
-
-
 
     /**
      * Gets the number of the form instances saved. Returns null if the form does not exist or is not repeating.
