@@ -80,7 +80,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
         }
     }
 
-    private function convertForStorage($field, $target_type, $value) {
+    private function convertToStorage($field, $target_type, $value) {
         // num_stops
         if ($field == "num_stops") return $value;
         // elapsed
