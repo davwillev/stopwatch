@@ -29,7 +29,7 @@ Configuration is done via an action tag parameter. The format of the parameter s
 
 - `hide_target`: Boolean (`true`|`false`) that determines whether the target input should be idden (default to `true`).
 
-- `stops`: Boolean (`true`|`false`) that determines whether stopping (and resuming) the timer is llowed (defaults to `false`).
+- `resume`: Boolean (`true`|`false`) that determines whether stopping and resuming the timer is allowed (defaults to `false`).
 
 - `digits`: The precisison to show (0, 1, 2, or 3).
 
