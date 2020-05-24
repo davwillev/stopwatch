@@ -856,9 +856,6 @@ function parseValue(swd, val) {
             else if (f == 'repeating') {
                 restore = params.repeating_captures
             }
-            else if (f == 'plain') {
-                // TODO - parse 
-            }
             if (Array.isArray(restore)) {
                 for (var i = 0; i < restore.length; i++) {
                     /** @type {CaptureInfo} */
@@ -881,9 +878,6 @@ function parseValue(swd, val) {
             }
             else if (f == 'repeating') {
                 restore = params.repeating_laps
-            }
-            else if (f == 'plain') {
-                // TODO - parse 
             }
             if (Array.isArray(restore)) {
                 var sum = 0
