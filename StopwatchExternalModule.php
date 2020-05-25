@@ -171,7 +171,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
     private function insertStopwatch($project_id, $record, $instrument, $event_id, $instance, $isSurvey) {
         $fields = $this->getFieldParams($project_id, $record, $instrument, $event_id, $instance);
         if (count($fields)) {
-            if (!class_exists("\RUB\Utility\InjectionHelper")) include_once("classes/InjectionHelper.php");
+            if (!class_exists("\DE\RUB\Utility\InjectionHelper")) include_once("classes/InjectionHelper.php");
             $ih = InjectionHelper::init($this);
             $ih->js("js/stopwatch-em.js", $isSurvey);
             $ih->css("css/stopwatch-em.css", $isSurvey);
