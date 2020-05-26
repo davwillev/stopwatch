@@ -669,7 +669,7 @@ function set(swd, result) {
         updateHourglass(swd)
         log('Stopwatch [' + swd.id + '] has been set to ' + format(swd.elapsed, swd.params).display)
     }
-    if (MDC.includes(result.val)) {
+    if (result.val != '' && MDC.includes(result.val)) {
         swd.$srsBtn.prop('disabled', true)
         swd.$rclBtn.prop('disabled', true)
     }
