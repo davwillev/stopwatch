@@ -502,7 +502,7 @@ function capture(swd, now, stopped) {
     /** @type {CaptureInfo} */
     var capture = {
         start:  swd.lapStartTime,
-        stop: swd.stopTime,
+        stop: swd.lapStopTime,
         elapsed: swd.elapsed,
         is_stop: stopped && swd.params.resume
     }
