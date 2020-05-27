@@ -39,7 +39,9 @@ _Note:_ When supplying parameters, the equal sign `=` must touch the action tag 
 
 - `target`: The field to store the elapsed time in. By default, the field the **@STOPWATCH** is on will be used (in which case its type and validation must be compatible - see below).
 
-- `hide_target`: Boolean (`true`|`false`) that determines whether the target input should be idden (default to `true`).
+- `show_target`: Boolean (`true`|`false`) that determines whether the target input should be shown on data entry forms (default to `false`).
+
+- `show_target_survey`: Boolean (`true`|`false`) that determines whether the target input should be idden (default to `false`).
 
 - `resume`: Boolean (`true`|`false`) that determines whether stopping and resuming the timer is allowed (defaults to `false`).
 

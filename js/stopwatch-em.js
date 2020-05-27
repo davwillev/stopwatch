@@ -220,7 +220,13 @@ function create(id, params, $tr, $input) {
  * @param {StopwatchData} swd 
  */
 function hideTarget(swd) {
-    if (swd.params.hide_target) {
+    if (!DTO.survey && !swd.params.show_target) {
+        swd.$input.hide()
+        if (swd.$input.is('textarea')) {
+            swd.$input.siblings('.expandLinkParent').hide()
+        }
+    }
+    if (DTO.survey && !swd.params.show_target_survey) {
         swd.$input.hide()
         if (swd.$input.is('textarea')) {
             swd.$input.siblings('.expandLinkParent').hide()

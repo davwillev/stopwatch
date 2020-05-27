@@ -337,8 +337,11 @@ class StopwatchExternalModule extends AbstractExternalModule {
         if (!isset($params["target"])) {
             $params["target"] = $field;
         }
-        if (!isset($params["hide_target"])) {
-            $params["hide_target"] = true; 
+        if (!isset($params["show_target"])) {
+            $params["show_target"] = false; 
+        }
+        if (!isset($params["show_target_survey"])) {
+            $params["show_target_survey"] = false; 
         }
         if (!isset($params["id"])) {
             $params["id"] = $params["target"];
