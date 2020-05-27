@@ -86,6 +86,12 @@ function setup() {
             }
         }
     })
+    // Locked data entry form?
+    if($('#__SUBMITBUTTONS__-tr').css('display') == 'none' || 
+        $('#__SUBMITBUTTONS__-div').css('display') == 'none') {
+        $('.stopwatch-em-startstop').prop('disabled', true)
+        $('.stopwatch-em-reset').prop('disabled', true)
+    }
 }
 
 /**
