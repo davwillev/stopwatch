@@ -182,6 +182,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
                 var DTO = window.ExternalModules.StopwatchEM_DTO;
                 DTO.debug = <?=json_encode($debug)?>;
                 DTO.fields = <?=json_encode($fields)?>;
+                DTO.survey = <?=json_encode($isSurvey)?>;
             </script>
             <div style="display:none;" data-stopwatch-em-template="stopwatch-basic">
                 <div class="stopwatch-em stopwatch-em-container" aria-label="Stopwatch EM">
@@ -383,6 +384,9 @@ class StopwatchExternalModule extends AbstractExternalModule {
         if (!isset($params["unset_display_symbol"])) {
             $params["unset_display_symbol"] = "–";
         }
+        if (!isset($params["display_empty"])) {
+            $params["display_empty"] = null;
+        }
         //
         // Basic mode
         //
@@ -407,25 +411,33 @@ class StopwatchExternalModule extends AbstractExternalModule {
             if ($project->getFieldType($targetField) == "text" && $isAllowed($validation)) {
                 if ($validation == "int") {
                     // Text Box with Integer validation.
-                    $params["display_format"] = "/h/g/m/g/s" . ($params["digits"] > 0 ? "/d/f" : "");
+                    if (!isset($params["display_format"])) {
+                        $params["display_format"] = "/h/g/m/g/s" . ($params["digits"] > 0 ? "/d/f" : "");
+                    }
                     $params["store_format"] = "/F";
                 }
                 else if ($validation == "time_mm_ss") {
                     // Text Box with Time (MM:SS) validation.
-                    $params["display_format"] = "/m/g/s";
+                    if (!isset($params["display_format"])) {
+                        $params["display_format"] = "/m/g/s";
+                    }
                     $params["store_format"] = "/m/g/s";
                     $params["digits"] = 0;
                     $params["is_mm_ss"] = true;
                 }
                 else if ($validation == "float" || strpos($validation, "number") !== false) {
                     // Text Box with Number (any) validation.
+                    if (!isset($params["display_format"])) {
+                        $params["display_format"] = "/h/g/m/g/s" . ($params["digits"] > 0 ? "/d/f" : "");
+                    }
                     $params["decimal_separator"] = strpos($validation, "comma") === false ? "." : ",";
-                    $params["display_format"] = "/h/g/m/g/s" . ($params["digits"] > 0 ? "/d/f" : "");
                     $params["store_format"] = "/S";
                 }
                 else {
                     // Text Box without validation.
-                    $params["display_format"] = "/h/g/m/g/s" . ($params["digits"] > 0 ? "/d/f" : "");
+                    if (!isset($params["display_format"])) {
+                        $params["display_format"] = "/h/g/m/g/s" . ($params["digits"] > 0 ? "/d/f" : "");
+                    }
                     $params["store_format"] = "/h:/m:/s" . ($params["digits"] > 0 ? "./f" : "");
                 }
             }
@@ -536,6 +548,10 @@ class StopwatchExternalModule extends AbstractExternalModule {
                     return $params;
                 }
             }
+        }
+        // Set running display
+        if (!isset($params["display_running"])) {
+            $params["display_running"] = $params["display_format"];
         }
         // Get value from target field.
         $data = $record->getFieldValues([$params["target"]], $event_id, $instance);
