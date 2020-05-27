@@ -28,6 +28,7 @@ Configuration is done via an action tag parameter. The format of the parameter s
   "number": 5
 }
 ```
+
 _Note:_ When supplying parameters, the equal sign `=` must touch the action tag (i.e. no space in between)! There may be whitespace (even line breaks) between `=` and the opening curly brace.
 
 - `mode`: Mode can be one of the following:
@@ -39,7 +40,9 @@ _Note:_ When supplying parameters, the equal sign `=` must touch the action tag 
 
 - `target`: The field to store the elapsed time in. By default, the field the **@STOPWATCH** is on will be used (in which case its type and validation must be compatible - see below).
 
-- `hide_target`: Boolean (`true`|`false`) that determines whether the target input should be idden (default to `true`).
+- `show_target`: Boolean (`true`|`false`) that determines whether the target input should be shown on data entry forms (default to `false`).
+
+- `show_target_survey`: Boolean (`true`|`false`) that determines whether the target input should be idden (default to `false`).
 
 - `resume`: Boolean (`true`|`false`) that determines whether stopping and resuming the timer is allowed (defaults to `false`).
 
@@ -55,10 +58,13 @@ _Note:_ When supplying parameters, the equal sign `=` must touch the action tag 
 
 - `group_separator`: The character(s) inserted between hours, minutes, seconds.
 
-- `unset_display_symbol`: The symbol to be used as digit replacement when no value has been set et.
+- `unset_display_symbol`: The symbol to be used as digit replacement when no value has been set.
 
-- `display_format`: The format for display in the stopwatch widget. This will only be in effect hen then `target` has no validation.
+- `display_format`: The format for display in the stopwatch widget.
 
+- `display_running`: When set, this will be displayed when the stopwatch is currently running.
+
+- `display_empty`: When set, this will be displayed when the stopwatch has no value(s).
 
 ### Additional configuration for capture and lap modes
 
@@ -136,26 +142,36 @@ A demo project is available [here](demo-project/StopwatchEMTest.xml).
 
 ![Simple](images/examples01-06.png)
 
-1. No data captured yet. It can be started by clicking the green 'Start' button.  
+1. No data captured yet. It can be started by clicking the green 'Start' button.
+
    ```json
    @STOPWATCH
    ```
+
 2. Timer has run. Can be reset.  
+
    ```json
-   @STOPWATCH={ "digits": 2, "hide_target": false }
+   @STOPWATCH={ "digits": 2, "show_target": true }
    ```
+
 3. Resume is enabled for this stopwatch. It's currently stopped, but can be resumed (or reset).  
+
    ```json
    @STOPWATCH={ "digits": 1, "resume": true }
    ```
+
 4. This stopwatch is currently running, indicated by the red 'Stop' button.  
+
    ```json
    @STOPWATCH
    ```
+
 5. This shows storage in a _Text Box_ without validation.  
+
    ```json
-   @STOPWATCH={ "hide_target": false }
+   @STOPWATCH={ "show_target": true }
    ```
+
 6. This illustrates the case of something going wrong. A very visible error message is displayed in case of a configuration error.
 
 **Advanced Stopwatches** - capture multiple timepoints / laps:
@@ -163,23 +179,30 @@ A demo project is available [here](demo-project/StopwatchEMTest.xml).
 ![JSON](images/examples07-10.png)
 
 7. Multiple captures into a _Notes Box_ (as a JSON data structure, here shown explicitly).  
+
    ```json
    @STOPWATCH=
    {
      "mode": "capture",
      "resume": true,
-     "hide_target": false
+     "show_target": true
    }
    ```
+
 8. Shortcut for a basic capture setup. No further configuration is needed.  
+
    ```json
    @STOPWATCH-CAPTURE
    ```
+
 9. Stopwatch capturing laps. Resuming is not allowed. The display as shown is re-constituted after saving the form.  
+
    ```json
    @STOPWATCH-LAP
    ```
-10. A stopwatch for capturing laps, showing a _cumulated_ column. The display format has been set so that hours are not shown (minutes will go past 59) and fractional seconds are rounded to 2 digits.   
+
+10. A stopwatch for capturing laps, showing a _cumulated_ column. The display format has been set so that hours are not shown (minutes will go past 59) and fractional seconds are rounded to 2 digits.  
+
     ```json
     @STOPWATCH-LAP=
     {
@@ -202,10 +225,10 @@ A demo project is available [here](demo-project/StopwatchEMTest.xml).
       "cumulated": true,
       "mapping": {
         "id": "stopwatch_id",
-        "elapsed": "store_elapsed", 
-        "cumulated": "store_cumulated", 
-        "start": "store_start", 
-        "stop": "store_stop", 
+        "elapsed": "store_elapsed",
+        "cumulated": "store_cumulated",
+        "start": "store_start",
+        "stop": "store_stop",
         "num_stops": "store_num_stops"
       },
       "resume": true
@@ -214,7 +237,7 @@ A demo project is available [here](demo-project/StopwatchEMTest.xml).
 
 ![JSON](images/examples11-report.png)
 
-**Integration with Missing Data Codes**
+## Integration with Missing Data Codes
 
 Stopwatch support missing data codes. When set, the stopwatch is disabled and shows the placeholder value. When the missing data code is removed, the stopwatch becomes available again.
 
