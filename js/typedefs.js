@@ -12,6 +12,7 @@
  * @type {{
  *  fields: Object<string, StopwatchParams>
  *  debug: boolean
+ *  survey: boolean
  * }}
  */
 
@@ -62,7 +63,8 @@
  *  is_mm_ss : boolean
  *  resume: boolean
  *  target: string
- *  hide_target: boolean
+ *  show_target: boolean
+ *  show_target_survey: boolean
  *  only_once?: boolean|string
  *  decimal_separator: string
  *  group_separator: string
@@ -74,6 +76,8 @@
  *  no_hours: boolean
  *  no_minutes: boolean
  *  display_format: string
+ *  display_running: string
+ *  display_empty: string
  *  store_format: string
  *  max_rows: number
  *  cumulated: boolean
