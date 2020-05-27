@@ -239,7 +239,7 @@ A demo project is available [here](demo-project/StopwatchEMTest.xml).
 
 ## Integration with Missing Data Codes
 
-Stopwatch support missing data codes. When set, the stopwatch is disabled and shows the placeholder value. When the missing data code is removed, the stopwatch becomes available again.
+Stopwatch supports missing data codes. When set, the stopwatch is disabled and shows the placeholder value. When the missing data code is removed, the stopwatch becomes available again.
 
 ![JSON](images/examples-mdc.png)
 
