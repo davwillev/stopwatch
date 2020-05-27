@@ -18,7 +18,7 @@ A REDCap External Module that provides a stopwatch widget that can be integrated
 
 ## Action Tag Configuration
 
-Configuration is done via action tag parameters. The parameter string must be written as valid JSON (see [https://jsonlint.com/](https://jsonlint.com/)). The following parameters are supported. _All are optional._
+The stopwatch is configured using action tag parameters. The parameter string must be written as valid JSON (see [https://jsonlint.com/](https://jsonlint.com/)). The following parameters are supported. _All are optional._
 
 ```json
 @STOPWATCH=
@@ -29,20 +29,20 @@ Configuration is done via action tag parameters. The parameter string must be wr
 }
 ```
 
-_Note:_ When supplying parameters, the equal sign `=` must touch the action tag (i.e. there must be no space between)! There may be whitespace (even line breaks) between `=` and the opening curly brace.
+_Note:_ When providing parameters, the equal sign `=` must touch the action tag (i.e. there must be no space between)! There may be whitespace (even line breaks) between `=` and the opening curly brace.
 
 - `mode` - Mode can be one of the following:
-  - `basic` - A simple stopwatch with start/stop and reset button. The elapsed time is recorded. This is the default.
+  - `basic` - A simple stopwatch with start/stop and reset buttons. The elapsed time is recorded. This is the default.
   - `capture` - A stopwatch that can record multiple captures of the (until then) elapsed time (see below for details). `@STOPWATCH-CAPTURE` can be used as a shortcut.
   - `lap` - A stopwatch that can record multiple laps (see below for details). `@STOPWATCH-LAP` can be used as a shortcut.
 
 - `id` - An identifier for the stopwatch. If another field is not specified, this will be equal to `target`. This is useful when storing the data of multiple stopwatches within a single repeating instrument.
 
-- `target` - The field in which the elapsed time will be stored. By default, this will be the field in which the **@STOPWATCH** action tag is used (in which case its type and validation must be compatible - see below).
+- `target` - The field in which the elapsed time is to be stored. By default, this will be the field in which the **@STOPWATCH** action tag is used (in which case its type and validation must be compatible - see below).
 
 - `show_target` - Boolean (`true`|`false`) that determines whether the target input should be shown on data entry forms (default to `false`).
 
-- `show_target_survey` - Boolean (`true`|`false`) that determines whether the target input should be idden (default to `false`).
+- `show_target_survey` - Boolean (`true`|`false`) that determines whether the target input should be hidden (default to `false`).
 
 - `resume` - Boolean (`true`|`false`) that determines whether stopping and resuming the timer is allowed (defaults to `false`).
 
@@ -68,7 +68,7 @@ _Note:_ When supplying parameters, the equal sign `=` must touch the action tag 
 
 ### Additional configuration for capture and lap modes
 
-Data from a stopwatch capturing multiple timepoints or laps, by default, is stored as a JSON data structure inside a _Notes Box_ or _Text Box_ (without validation), unless `mapping` is specified, in which case the data is stored in the fields of another form. In the latter case, `target` must still exist and be a _Text Box_ without validation, as some metadata needs to be stored there (this field should typically not be shown and made read only).
+Data from a stopwatch capturing multiple timepoints ('splits') or laps, by default, is stored as a JSON data structure inside a _Notes Box_ or _Text Box_ (without validation), unless `mapping` is specified, in which case the data is stored in the fields of another form. In the latter case, `target` must still exist and be a _Text Box_ without validation, as some metadata needs to be stored there (this field should typically not be shown and made read only).
 
 - `mapping` - A JSON object with the following keys. All except `elapsed` are optional. All fields must be on the same repeating instrument, separate from the field in which the **@STOPWATCH** action tag is used. The exact storage format depends on the chosen field type (see below).
   - `id` - Field for storing the id of the stopwatch. This must be a _Text Box_ without validation. This mapping is useful when capturing the data from multiple stopwatches in the same repeating instrument.
@@ -95,10 +95,10 @@ Elapsed time will be stored as follows:
 
 - _Integer_: elapsed time in milliseconds.
 - _Number_: elapsed time in seconds (with fractional seconds).
-- _Time (MM:SS)_: elapsed time in minutes and seconds (limited to max 59:59).
+- _Time (MM:SS)_: elapsed time in minutes and seconds (limited to a maximum of 59:59).
 - No validation: the elapsed time will be stored as `h:m:s.f` (colons and dot).
 
-For capture and lap data values other than elapsed time, the following automatic formats will be used, depending on the field type:
+For capture and lap data values other than elapsed time, the following automatic formats will be used, depending on the selected field type:
 
 - _Integer_: the (local) time represented by number of milliseconds elapsed since the start of the epoch, 01 January, 1970 00:00:00 Universal Time (UTC).
 - _Number_: as above, but in seconds (including fractional seconds).
@@ -108,7 +108,7 @@ For capture and lap data values other than elapsed time, the following automatic
 
 ### Format of the timer display
 
-To set the display format, these placeholders can be used:
+To set the display format, the following placeholders can be used:
 
 - `/h` - hours (1 or more digits)
 - `/m` - minutes (2 digits)
@@ -136,7 +136,7 @@ Labels of buttons and other display elements can be customized using the followi
 
 ## Module Configuration
 
-Behavior of the module can be configured on the project level:
+Behavior of the module can be configured at the project level:
 
 - **Enable JavaScript debug logging**: When enabled, the module will output debug information to the browser console.
 
@@ -148,7 +148,7 @@ A demo project is available [here](demo-project/StopwatchEMTest.xml).
 
 ![Simple](images/examples01-06.png)
 
-1. No data captured yet. It can be started by clicking the green 'Start' button.
+1. No data captured yet. The stopwatch can be started by clicking the green 'Start' button.
 
    ```json
    @STOPWATCH
@@ -160,13 +160,13 @@ A demo project is available [here](demo-project/StopwatchEMTest.xml).
    @STOPWATCH={ "digits": 2, "show_target": true }
    ```
 
-3. Resume is enabled for this stopwatch. It's currently stopped, but can be resumed (or reset).  
+3. Resume is enabled for this stopwatch. The stopwatch is currently stopped, but can be resumed (or reset).  
 
    ```json
    @STOPWATCH={ "digits": 1, "resume": true }
    ```
 
-4. This stopwatch is currently running, indicated by the red 'Stop' button.  
+4. This stopwatch is currently running, as indicated by the red 'Stop' button.  
 
    ```json
    @STOPWATCH
@@ -178,7 +178,7 @@ A demo project is available [here](demo-project/StopwatchEMTest.xml).
    @STOPWATCH={ "show_target": true }
    ```
 
-6. This illustrates the case of something going wrong. A very visible error message is displayed in case of a configuration error.
+6. This illustrates a case in which something is going wrong. A very visible error message is displayed in case of a configuration error.
 
 **Advanced Stopwatches** - capture multiple timepoints / laps:
 
@@ -195,19 +195,19 @@ A demo project is available [here](demo-project/StopwatchEMTest.xml).
    }
    ```
 
-8. Shortcut for a basic capture setup. No further configuration is needed.  
+8. Shortcut for a stopwatch with a basic capture setup. No further configuration is needed. Resuming is not allowed by default.
 
    ```json
    @STOPWATCH-CAPTURE
    ```
 
-9. Stopwatch capturing laps. Resuming is not allowed. The display as shown is re-constituted after saving the form.  
+9. Shortcut for a stopwatch that captures laps. Resuming is not allowed by default. The display as shown is re-constituted after saving the form.  
 
    ```json
    @STOPWATCH-LAP
    ```
 
-10. A stopwatch for capturing laps, showing a _cumulated_ column. The display format has been set so that hours are not shown (minutes will go past 59) and fractional seconds are rounded to 2 digits.  
+10. A stopwatch for capturing laps, showing a _cumulated_ column. The display format has been set so that hours are not shown (the number of minutes will exceed 59) and fractional seconds are rounded to 2 digits.  
 
     ```json
     @STOPWATCH-LAP=
@@ -223,7 +223,7 @@ A demo project is available [here](demo-project/StopwatchEMTest.xml).
 
 ![JSON](images/examples11.png)
 
-11. Multiple captures can be stored in a repeating instrument when `mapping` data items to fields on a repeating instrument are provided. The stored data is shown in the report below. Note that different field types have been set for the various items, which determines the storage format.
+11. Multiple captures can be stored in a repeating instrument when `mapping` data items to fields provided on a repeating instrument. The stored data is shown in the report below. Note that different field types have been set for the various items, which will determine the storage format.
 
     ```json
     @STOPWATCH-LAP=
