@@ -36,7 +36,7 @@ _Note:_ When providing parameters, the equal sign `=` must touch the action tag 
   - `capture` - A stopwatch that can record multiple captures of the (until then) elapsed time (see below for details). `@STOPWATCH-CAPTURE` can be used as a shortcut.
   - `lap` - A stopwatch that can record multiple laps (see below for details). `@STOPWATCH-LAP` can be used as a shortcut.
 
-- `id` - An identifier for the stopwatch. If another field is not specified, this will be equal to `target`. This is useful when storing the data of multiple stopwatches within a single repeating instrument.
+- `id` - An identifier for the stopwatch. If this is not specified, the name of the `target` field will be used. This is useful when storing the data of multiple stopwatches within a single repeating instrument (see below).
 
 - `target` - The field in which the elapsed time is to be stored. By default, this will be the field in which the **@STOPWATCH** action tag is used (in which case its type and validation must be compatible - see below).
 
