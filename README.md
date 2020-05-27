@@ -16,7 +16,7 @@ A REDCap External Module that provides a stopwatch widget that can be integrated
 - Multiple stopwatches can be used on the same form.
 - But only one action tag can ever be used for each field.
 
-## Configuration
+## Action Tag Configuration
 
 Configuration is done via an action tag parameter. The format of the parameter string must be valid JSON (see [https://jsonlint.com/](https://jsonlint.com/)). The following parameters are supported. _All are optional._
 
@@ -31,61 +31,61 @@ Configuration is done via an action tag parameter. The format of the parameter s
 
 _Note:_ When supplying parameters, the equal sign `=` must touch the action tag (i.e. no space in between)! There may be whitespace (even line breaks) between `=` and the opening curly brace.
 
-- `mode`: Mode can be one of the following:
-  - `basic`: A simple stopwatch with start/stop and reset button. The elapsed time is recorded. This is the default.
-  - `capture`: A stopwatch that can record multiple captures of the (until then) elapsed time (see below for details). `@STOPWATCH-CAPTURE` can be used instead.
-  - `lap`: A stopwatch that can record multiple laps (see below for details). `@STOPWATCH-LAP` can be used instead.
+- `mode` - Mode can be one of the following:
+  - `basic` - A simple stopwatch with start/stop and reset button. The elapsed time is recorded. This is the default.
+  - `capture` - A stopwatch that can record multiple captures of the (until then) elapsed time (see below for details). `@STOPWATCH-CAPTURE` can be used instead.
+  - `lap` - A stopwatch that can record multiple laps (see below for details). `@STOPWATCH-LAP` can be used instead.
 
-- `id`: An identifier for the stopwatch. If not specified, this will be equal to `target`. This is useful when storing the data of multiple stopwatches in the same repeating instrument.
+- `id` - An identifier for the stopwatch. If not specified, this will be equal to `target`. This is useful when storing the data of multiple stopwatches in the same repeating instrument.
 
-- `target`: The field to store the elapsed time in. By default, the field the **@STOPWATCH** is on will be used (in which case its type and validation must be compatible - see below).
+- `target` - The field to store the elapsed time in. By default, the field the **@STOPWATCH** is on will be used (in which case its type and validation must be compatible - see below).
 
-- `show_target`: Boolean (`true`|`false`) that determines whether the target input should be shown on data entry forms (default to `false`).
+- `show_target` - Boolean (`true`|`false`) that determines whether the target input should be shown on data entry forms (default to `false`).
 
-- `show_target_survey`: Boolean (`true`|`false`) that determines whether the target input should be idden (default to `false`).
+- `show_target_survey` - Boolean (`true`|`false`) that determines whether the target input should be idden (default to `false`).
 
-- `resume`: Boolean (`true`|`false`) that determines whether stopping and resuming the timer is allowed (defaults to `false`).
+- `resume` - Boolean (`true`|`false`) that determines whether stopping and resuming the timer is allowed (defaults to `false`).
 
-- `digits`: The precisison to show (0, 1, 2, or 3).
+- `digits` - The precisison to show (0, 1, 2, or 3).
 
-- `h_digits`, `m_digits`, `s_digits`: The (minimal) number of digits to use for hours, minutes, econds (when shorter, values will be padded with 0).
+- `h_digits`, `m_digits`, `s_digits` - The (minimal) number of digits to use for hours, minutes, econds (when shorter, values will be padded with 0).
 
-- `no_hours`: Boolean (`true`|`false`). If set to `true`, minutes will be the largest unit counted.
+- `no_hours` - Boolean (`true`|`false`). If set to `true`, minutes will be the largest unit counted.
 
-- `no_minutes`: Boolean (`true`|`false`). If set to `true`, seconds will be the largest unit ounted. This will imply `no_hours` = `true`.
+- `no_minutes` - Boolean (`true`|`false`). If set to `true`, seconds will be the largest unit ounted. This will imply `no_hours` = `true`.
 
-- `decimal_separator`: The decimal separator which is inserted between seconds and fractional econds. This will be overriden by certain target field types.
+- `decimal_separator` - The decimal separator which is inserted between seconds and fractional econds. This will be overriden by certain target field types.
 
-- `group_separator`: The character(s) inserted between hours, minutes, seconds.
+- `group_separator` - The character(s) inserted between hours, minutes, seconds.
 
-- `unset_display_symbol`: The symbol to be used as digit replacement when no value has been set.
+- `unset_display_symbol` - The symbol to be used as digit replacement when no value has been set.
 
-- `display_format`: The format for display in the stopwatch widget.
+- `display_format` - The format for display in the stopwatch widget.
 
-- `display_running`: When set, this will be displayed when the stopwatch is currently running.
+- `display_running` - When set, this will be displayed when the stopwatch is currently running.
 
-- `display_empty`: When set, this will be displayed when the stopwatch has no value(s).
+- `display_empty` - When set, this will be displayed when the stopwatch has no value(s).
 
 ### Additional configuration for capture and lap modes
 
 Data from a stopwatch capturing multiple timepoints or laps, by default, is stored as a JSON data structure inside a _Notes Box_ or _Text Box_ (without validation), unless a `mapping` is specified, in which case the data is stored in the fields of a repeating form. In the latter case, `target` must still exist and be a _Text Box_ without validation, as some metadata needs to be stored there (this field should not normally be shown and made read only).
 
-- `mapping`: A JSON object with the following keys. All except `elapsed` are optional. All fields must be on the same instrument. The exact storage format depends on the field type (see below).
-  - `id`: Field for storing the id of the stopwatch. This must be a _Text Box_ without validation. This mapping is useful when capturing the data from multiple stopwatches in the same repeating instrument.
-  - `elapsed`: Field for storing the elapsed time. This mapping **must** be provided.
-  - `start`: Field for storing the date/time the capture was (first) started.
-  - `stop`: Field for storing the date/time the capture was (last) stopped.
-  - `cumulated` (`lap` mode only): Field for storing the cumulated elapsed time.
-  - `num_stops` (`lap` mode only): Field for storing the number of times the timer was stopped during recording of a lap (the target field must be of type integer).
-  - `is_stop` (`capture` mode only): Field for storing the stop flag (the target field must be of type integer - it will hold 0 or 1).
+- `mapping` - A JSON object with the following keys. All except `elapsed` are optional. All fields must be on the same instrument. The exact storage format depends on the field type (see below).
+  - `id` - Field for storing the id of the stopwatch. This must be a _Text Box_ without validation. This mapping is useful when capturing the data from multiple stopwatches in the same repeating instrument.
+  - `elapsed` - Field for storing the elapsed time. This mapping **must** be provided.
+  - `start` - Field for storing the date/time the capture was (first) started.
+  - `stop` - Field for storing the date/time the capture was (last) stopped.
+  - `cumulated` (`lap` mode only) - Field for storing the cumulated elapsed time.
+  - `num_stops` (`lap` mode only) - Field for storing the number of times the timer was stopped during recording of a lap (the target field must be of type integer).
+  - `is_stop` (`capture` mode only) - Field for storing the stop flag (the target field must be of type integer - it will hold 0 or 1).
 
-- `event`: The event name (or numerical id) of the event of the repeating form with the capture or lap mapping fields. If not specified, the current event is assumed.
+- `event` - The event name (or numerical id) of the event of the repeating form with the capture or lap mapping fields. If not specified, the current event is assumed.
 
-- `only_once`: Boolean (`true`|`false`) determining whether the stopwatch can be used again once a value has been recorded. The default is `false`.
+- `only_once` - Boolean (`true`|`false`) determining whether the stopwatch can be used again once a value has been recorded. The default is `false`.
 
-- `max_rows`: The maximum number of rows to show in the captures/laps table. Default = 0 (no limit).
+- `max_rows` - The maximum number of rows to show in the captures/laps table. Default = 0 (no limit).
 
-- `cumulated` (`lap` mode only): Boolean (`true`|`false`). If set to `true`, an additional column with cumulated elapsed time will be shown.
+- `cumulated` (`lap` mode only) - Boolean (`true`|`false`). If set to `true`, an additional column with cumulated elapsed time will be shown.
 
 ### Format of the stored values
 
@@ -125,14 +125,20 @@ The display format for e.g. `0:02:33.12` can be written as `/h/g/m/g/s/d/f`, and
 
 Labels of buttons and other display elements can be customized using the following parameters:
 
-- `label_start`: Start button label. Default is 'Start'.
-- `label_resume`: Resume button label. Default is 'Resume'.
-- `label_stop`: Stop button label. Default is 'Stop'.
-- `label_reset`: Reset button label. Default is 'Reset'.
-- `label_lap`: Lap button label (also used as row label). Default is 'Lap'.
-- `label_capture`: Capture button label (also used as row label). Default is 'Capture'.
-- `label_elapsed` (`lap` mode only): Header for the elapsed time column. Default is 'Lap time'.
-- `label_cumulated` (`lap` mode only): Header for the cumulated time column. Default is 'Cumulated'.
+- `label_start` - Start button label. Default is 'Start'.
+- `label_resume` - Resume button label. Default is 'Resume'.
+- `label_stop` - Stop button label. Default is 'Stop'.
+- `label_reset` - Reset button label. Default is 'Reset'.
+- `label_lap` - Lap button label (also used as row label). Default is 'Lap'.
+- `label_capture` - Capture button label (also used as row label). Default is 'Capture'.
+- `label_elapsed` (`lap` mode only) - Header for the elapsed time column. Default is 'Lap time'.
+- `label_cumulated` (`lap` mode only) - Header for the cumulated time column. Default is 'Cumulated'.
+
+## Module Configuration
+
+Behavior of the module can be configured on the project level:
+
+- **Enable JavaScript debug logging**: When enabled, the module will output debug information to the browser console.
 
 ## Examples
 
