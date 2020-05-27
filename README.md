@@ -11,9 +11,13 @@ A REDCap External Module that provides a stopwatch widget that can be integrated
 
 ## Use
 
-- To include a stopwatch on a form or survey, create a field of any type and add the **@STOPWATCH** action tag.
-- The stopwatch widget will be shown in the label or data area of the field in which the **@STOPWATCH** tag is added, depending on the set target.
+- To include a stopwatch on a form or survey,
+  - create a field of a type compatible with storing a stopwatch result (see below), and add the **@STOPWATCH** action tag,
+  - or add the **@STOPWATCH** action tag to _any_ field, and define a separate `target` field to hold the stopwatch result using the action tag parameters.
+- The field with the action tag will be referred to as "the @STOPWATCH field".
+- In the @STOPWATCH field, the stopwatch widget will be shown in the label or data area, depending on whether the `target` is a different field or the @STOPWATCH field.
 - Multiple stopwatches can be used on the same form.
+- Each stopwatch must have a unique `target`.
 - Only one **@STOPWATCH** action tag can be used within each field.
 
 ## Action Tag Configuration
@@ -38,7 +42,7 @@ _Note:_ When providing parameters, the equal sign `=` must touch the action tag 
 
 - `id` - An identifier for the stopwatch. If this is not specified, the name of the `target` field will be used. This is useful when storing the data of multiple stopwatches within a single repeating instrument (see below).
 
-- `target` - The field in which the elapsed time is to be stored. By default, this will be the field in which the **@STOPWATCH** action tag is used (in which case its type and validation must be compatible - see below).
+- `target` - The field in which the elapsed time is to be stored. By default, this will be the @STOPWATCH field (in which case its type and validation must be compatible - see below).
 
 - `show_target` - Boolean (`true`|`false`) that determines whether the target input should be shown on data entry forms (default to `false`).
 
@@ -70,7 +74,7 @@ _Note:_ When providing parameters, the equal sign `=` must touch the action tag 
 
 Data from a stopwatch capturing multiple timepoints ('splits') or laps, by default, is stored as a JSON data structure inside a _Notes Box_ or _Text Box_ (without validation), unless `mapping` is specified, in which case the data is stored in the fields of another form. In the latter case, `target` must still exist and be a _Text Box_ without validation, as some metadata needs to be stored there (this field should typically not be shown and made read only).
 
-- `mapping` - A JSON object with the following keys. All except `elapsed` are optional. All fields must be on the same repeating instrument, separate from the field in which the **@STOPWATCH** action tag is used. The exact storage format depends on the chosen field type (see below).
+- `mapping` - A JSON object with the following keys. All except `elapsed` are optional. All fields must be on the same repeating instrument, separate from the @STOPWATCH field. The exact storage format depends on the chosen field type (see below).
   - `id` - Field for storing the id of the stopwatch. This must be a _Text Box_ without validation. This mapping is useful when capturing the data from multiple stopwatches in the same repeating instrument.
   - `elapsed` - Field for storing the elapsed time. This mapping **must** be provided.
   - `start` - Field for storing the date/time the capture was (first) started.
@@ -79,7 +83,7 @@ Data from a stopwatch capturing multiple timepoints ('splits') or laps, by defau
   - `num_stops` (`lap` mode only) - Field for storing the number of times the timer was stopped during recording of a lap (the target field must be of type integer).
   - `is_stop` (`capture` mode only) - Field for storing the stop flag (the target field must be of type integer - it will hold 0 or 1).
 
-- `event` - The event name (or numerical id) of the event of the repeating form with the capture or lap mapping fields. If not specified, the current event is assumed.
+- `event` - The name (or numerical id) of the event of the repeating form with the capture or lap mapping fields. If not specified, the current event is assumed.
 
 - `only_once` - Boolean (`true`|`false`) determining whether the stopwatch can be used again once a value has been recorded. The default is `false`.
 
