@@ -11,14 +11,14 @@ A REDCap External Module that provides a stopwatch widget that can be integrated
 
 ## Use
 
-- To include a stopwatch on a form or survey, create a field of ny type and add the **@STOPWATCH** action tag.
+- To include a stopwatch on a form or survey, create a field of any type and add the **@STOPWATCH** action tag.
 - The stopwatch widget will be shown in the label or data area of the field in which the **@STOPWATCH** tag is added, depending on the set target.
 - Multiple stopwatches can be used on the same form.
 - Only one **@STOPWATCH** action tag can be used within each field.
 
 ## Action Tag Configuration
 
-Configuration is done via action tag parameters. The format in which the parameter string is written must be valid JSON (see [https://jsonlint.com/](https://jsonlint.com/)). The following parameters are supported. _All are optional._
+Configuration is done via action tag parameters. The parameter string must be written as valid JSON (see [https://jsonlint.com/](https://jsonlint.com/)). The following parameters are supported. _All are optional._
 
 ```json
 @STOPWATCH=
@@ -54,11 +54,11 @@ _Note:_ When supplying parameters, the equal sign `=` must touch the action tag 
 
 - `no_minutes` - Boolean (`true`|`false`). If set to `true`, seconds will be the largest unit ounted. This will imply `no_hours` = `true`.
 
-- `decimal_separator` - The decimal separator which is inserted between seconds and fractional econds. This will be overriden by certain target field types.
+- `decimal_separator` - The decimal separator that is inserted between seconds and fractional econds. This will be overriden by certain target field types.
 
 - `group_separator` - The character(s) inserted between hours, minutes, seconds.
 
-- `unset_display_symbol` - The symbol to be used as digit replacement when no value has been set.
+- `unset_display_symbol` - The symbol to be used as a digit replacement when no value has been set.
 
 - `display_format` - The format for display in the stopwatch widget.
 
