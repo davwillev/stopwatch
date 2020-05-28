@@ -1,4 +1,4 @@
-<?php namespace DE\RUB\Utility;
+<?php namespace DE\RUB\StopwatchExternalModule;
 
 class Project
 {
@@ -29,7 +29,7 @@ class Project
      * @return Record 
      */
     function getRecord($record_id) {
-        if (!class_exists("\DE\RUB\Utility\Record")) include_once ("Record.php");
+        if (!class_exists("\DE\RUB\StopwatchExternalModule\Record")) include_once ("Record.php");
         return new Record($this->framework, $this, $record_id);
     }
 

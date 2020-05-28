@@ -2,9 +2,6 @@
 
 use ExternalModules\AbstractExternalModule;
 use \REDCap;
-use \Stanford\Utility\ActionTagHelper;
-use \DE\RUB\Utility\InjectionHelper;
-use \DE\RUB\Utility\Project;
 
 /**
  * ExternalModule class for Configuration Design Study.
@@ -61,7 +58,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
             if (empty($params["error"]) && $params["store_format"] == "repeating") {
                 $data = json_decode($_POST["stopwatch-em-json-{$field}"], true);
                 if (is_array($data)) {
-                    if (!class_exists("\DE\RUB\Utility\Project")) include_once("classes/Project.php");
+                    if (!class_exists("\DE\RUB\StopwatchExternalModule\Project")) include_once("classes/Project.php");
                     $project = Project::load($this->framework, $project_id);
                     $record = $project->getRecord($record_id);
                     $mappings = $params["mapping"];
@@ -171,7 +168,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
     private function insertStopwatch($project_id, $record, $instrument, $event_id, $instance, $isSurvey) {
         $fields = $this->getFieldParams($project_id, $record, $instrument, $event_id, $instance);
         if (count($fields)) {
-            if (!class_exists("\DE\RUB\Utility\InjectionHelper")) include_once("classes/InjectionHelper.php");
+            if (!class_exists("\DE\RUB\StopwatchExternalModule\InjectionHelper")) include_once("classes/InjectionHelper.php");
             $ih = InjectionHelper::init($this);
             $ih->js("js/stopwatch-em.js", $isSurvey);
             $ih->css("css/stopwatch-em.css", $isSurvey);
@@ -235,10 +232,10 @@ class StopwatchExternalModule extends AbstractExternalModule {
      */
     private function getFieldParams($project_id, $record_id, $instrument, $event_id, $instance) {
         $field_params = array();
-        if (!class_exists("\DE\RUB\Utility\Project")) include_once("classes/Project.php");
+        if (!class_exists("\DE\RUB\StopwatchExternalModule\Project")) include_once("classes/Project.php");
         $project = Project::load($this->framework, $project_id);
         $record = $project->getRecord($record_id);
-        if (!class_exists("\Stanford\Utility\ActionTagHelper")) include_once("classes/ActionTagHelper.php");
+        if (!class_exists("\DE\RUB\StopwatchExternalModule\ActionTagHelper")) include_once("classes/ActionTagHelper.php");
         $action_tags = array(
             self::STOPWATCH, 
             self::STOPWATCH_CAPTURE, 
