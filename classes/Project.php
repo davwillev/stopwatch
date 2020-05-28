@@ -207,8 +207,12 @@ class Project
     function isFormOnEvent($form, $event) {
         $pds = $this->getProjectDataStructure();
         if ($this->hasForm($form) && $this->hasEvent($event)) {
-            $event_id = $this->getEventId($event);
-            return array_key_exists($event_id, $pds["forms"][$form]["events"]);
+            if ($pds["longitudinal"]) {
+                $event_id = $this->getEventId($event);
+                return array_key_exists($event_id, $pds["forms"][$form]["events"]);
+            }
+            // In case of non-longitudinal projects, return true at this point
+            return true;
         }
         return false;
     }
@@ -342,7 +346,9 @@ class Project
      * 
      * The returned array is structured like so:
      * [
+     *   "pid" => "project_id", 
      *   "record_id" => "record_id_field_name",
+     *   "longitudinal" => true|false,
      *   "forms" => [
      *      "form name" => [
      *          "name" => "form name",
@@ -429,6 +435,7 @@ class Project
         // Prepare return data structure.
         $ps = array(
             "pid" => $pid,
+            "longitudinal" => $proj->longitudinal,
             "record_id" => $this->framework->getRecordIdField($pid),
             "forms" => array(),
             "events" => array(),
