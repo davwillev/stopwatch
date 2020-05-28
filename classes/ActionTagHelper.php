@@ -1,6 +1,4 @@
-<?php
-
-namespace Stanford\Utility;
+<?php namespace DE\RUB\StopwatchExternalModule;
 
 use \REDCap as REDCap;
 

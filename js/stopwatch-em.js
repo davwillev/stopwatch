@@ -631,7 +631,8 @@ function reset(swd) {
     swd.$srsBtn.prop('disabled', false)
     swd.$rclBtn.prop('disabled', true)
     swd.$srsBtn.html(swd.params.label_start)
-    if (!MDC.includes(swd.$input.val().toString())) {
+    var val = swd.$input.val().toString()
+    if (val != '' && !MDC.includes(val)) {
         swd.$input.val('')
         swd.$input.trigger('change')
         swd.$input.trigger('blur')

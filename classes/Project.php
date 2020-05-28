@@ -1,4 +1,4 @@
-<?php namespace DE\RUB\Utility;
+<?php namespace DE\RUB\StopwatchExternalModule;
 
 class Project
 {
@@ -29,7 +29,7 @@ class Project
      * @return Record 
      */
     function getRecord($record_id) {
-        if (!class_exists("\DE\RUB\Utility\Record")) include_once ("Record.php");
+        if (!class_exists("\DE\RUB\StopwatchExternalModule\Record")) include_once ("Record.php");
         return new Record($this->framework, $this, $record_id);
     }
 
@@ -207,8 +207,12 @@ class Project
     function isFormOnEvent($form, $event) {
         $pds = $this->getProjectDataStructure();
         if ($this->hasForm($form) && $this->hasEvent($event)) {
-            $event_id = $this->getEventId($event);
-            return array_key_exists($event_id, $pds["forms"][$form]["events"]);
+            if ($pds["longitudinal"]) {
+                $event_id = $this->getEventId($event);
+                return array_key_exists($event_id, $pds["forms"][$form]["events"]);
+            }
+            // In case of non-longitudinal projects, return true at this point
+            return true;
         }
         return false;
     }
@@ -342,7 +346,9 @@ class Project
      * 
      * The returned array is structured like so:
      * [
+     *   "pid" => "project_id", 
      *   "record_id" => "record_id_field_name",
+     *   "longitudinal" => true|false,
      *   "forms" => [
      *      "form name" => [
      *          "name" => "form name",
@@ -429,6 +435,7 @@ class Project
         // Prepare return data structure.
         $ps = array(
             "pid" => $pid,
+            "longitudinal" => $proj->longitudinal,
             "record_id" => $this->framework->getRecordIdField($pid),
             "forms" => array(),
             "events" => array(),

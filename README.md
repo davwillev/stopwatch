@@ -150,7 +150,7 @@ A demo project is available [here](demo-project/StopwatchEMTest.xml).
 
 **Simple Stopwatches** - capture elapsed time only:
 
-![Simple](images/examples01-06.png)
+![Simple](images/examples1-7.png)
 
 1. No data captured yet. The stopwatch can be started by clicking the green 'Start' button.
 
@@ -182,13 +182,23 @@ A demo project is available [here](demo-project/StopwatchEMTest.xml).
    @STOPWATCH={ "show_target": true }
    ```
 
-6. This illustrates a case in which something is going wrong. A very visible error message is displayed in case of a configuration error.
+6. This stopwatch has been configured so the user is blinded regarding the elapsed time.
+
+   ```json
+   @STOPWATCH={
+      "display_format": "Blinded",
+      "display_running": "Running",
+      "display_empty": "--:--.--"
+   }
+   ```
+
+7. This illustrates a case in which something is going wrong. A very visible error message is displayed in case of a configuration error.
 
 **Advanced Stopwatches** - capture multiple timepoints / laps:
 
-![JSON](images/examples07-10.png)
+![JSON](images/examples8-11.png)
 
-7. Multiple captures into a _Notes Box_ (as a JSON data structure, here shown explicitly).  
+8. Multiple captures into a _Notes Box_ (as a JSON data structure, here shown explicitly).  
 
    ```json
    @STOPWATCH=
@@ -199,19 +209,19 @@ A demo project is available [here](demo-project/StopwatchEMTest.xml).
    }
    ```
 
-8. Shortcut for a stopwatch with a basic capture setup. No further configuration is needed. Resuming is not allowed by default.
+9. Shortcut for a stopwatch with a basic capture setup. No further configuration is needed. Resuming is not allowed by default.
 
    ```json
    @STOPWATCH-CAPTURE
    ```
 
-9. Shortcut for a stopwatch that captures laps. Resuming is not allowed by default. The display as shown is re-constituted after saving the form.  
+10. Shortcut for a stopwatch that captures laps. Resuming is not allowed by default. The display as shown is re-constituted after saving the form.  
 
    ```json
    @STOPWATCH-LAP
    ```
 
-10. A stopwatch for capturing laps, showing a _cumulated_ column. The display format has been set so that hours are not shown (the number of minutes will exceed 59) and fractional seconds are rounded to 2 digits.  
+11. A stopwatch for capturing laps, showing a _cumulated_ column. The display format has been set so that hours are not shown (the number of minutes will exceed 59) and fractional seconds are rounded to 2 digits.  
 
     ```json
     @STOPWATCH-LAP=
@@ -225,9 +235,9 @@ A demo project is available [here](demo-project/StopwatchEMTest.xml).
 
 **Advanced Stopwatches** - capture multiple timepoints / laps into a repeating instrument:
 
-![JSON](images/examples11.png)
+![JSON](images/example12.png)
 
-11. Multiple captures can be stored in a repeating instrument when `mapping` data items to fields provided on a repeating instrument. The stored data is shown in the report below. Note that different field types have been set for the various items, which will determine the storage format.
+12. Multiple captures can be stored in a repeating instrument when `mapping` data items to fields provided on a repeating instrument. The stored data is shown in the report below. Note that different field types have been set for the various items, which will determine the storage format: _Elapsed_ (integer) shows milliseconds, _Cumulated_ (number) shows cumulated time in seconds, _Start_ and _Stop_ (no validation) show JS times (local from the browser) when a lap was started and stopped, respectively, and _Time stopped?_ indicates how often the 'Stop' button was clicked during the recording of a lap.
 
     ```json
     @STOPWATCH-LAP=
@@ -245,7 +255,7 @@ A demo project is available [here](demo-project/StopwatchEMTest.xml).
     }
     ```
 
-![JSON](images/examples11-report.png)
+![JSON](images/example12-report.png)
 
 ## Integration with Missing Data Codes
 
