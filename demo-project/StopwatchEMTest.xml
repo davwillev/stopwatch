@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:redcap="https://projectredcap.org" xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 schema/odm/ODM1-3-1.xsd" ODMVersion="1.3.1" FileOID="000-00-0000" FileType="Snapshot" Description="Stopwatch EM Test" AsOfDateTime="2020-05-24T23:21:58" CreationDateTime="2020-05-24T23:21:58" SourceSystem="REDCap" SourceSystemVersion="9.10.0">
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:redcap="https://projectredcap.org" xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 schema/odm/ODM1-3-1.xsd" ODMVersion="1.3.1" FileOID="000-00-0000" FileType="Snapshot" Description="Stopwatch EM Test" AsOfDateTime="2020-05-28T22:47:17" CreationDateTime="2020-05-28T22:47:17" SourceSystem="REDCap" SourceSystemVersion="9.7.8">
 <Study OID="Project.StopwatchEMTest">
 <GlobalVariables>
 	<StudyName>Stopwatch EM Test</StudyName>
@@ -17,36 +17,26 @@
 	<redcap:MissingDataCodes>NA, Not applicable
 NAVU, Not available</redcap:MissingDataCodes>
 	<redcap:RepeatingInstrumentsAndEvents>
-		<redcap:RepeatingEvent redcap:UniqueEventName="event_2_arm_1"/>
 		<redcap:RepeatingInstruments>
-			<redcap:RepeatingInstrument redcap:UniqueEventName="event_1_arm_1" redcap:RepeatInstrument="repeating_store" redcap:CustomLabel=""/>
+			<redcap:RepeatingInstrument redcap:UniqueEventName="event_1_arm_1" redcap:RepeatInstrument="repeating_store" redcap:CustomLabel="[store_elapsed]"/>
+			<redcap:RepeatingInstrument redcap:UniqueEventName="event_1_arm_1" redcap:RepeatInstrument="survey_timings" redcap:CustomLabel="[survey_elapsed]"/>
 		</redcap:RepeatingInstruments>
 	</redcap:RepeatingInstrumentsAndEvents>
 	<redcap:SurveysGroup>
-		<redcap:Surveys form_name="basic" title="Basic" instructions="&lt;p&gt;&lt;strong&gt;Please complete the survey below.&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;Thank you!&lt;/p&gt;" acknowledgement="&lt;p&gt;&lt;strong&gt;Thank you for taking the survey.&lt;/strong&gt;&lt;/p&gt;
+		<redcap:Surveys form_name="survey" title="Stopwatch Demo" instructions="&lt;p&gt;&lt;strong&gt;Please have fun with the Stopwatch&lt;/strong&gt;&lt;/p&gt;" acknowledgement="&lt;p&gt;&lt;strong&gt;Thank you for trying out the Stopwatch.&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;Have a nice day!&lt;/p&gt;" question_by_section="0" display_page_number="0" question_auto_numbering="1" survey_enabled="1" save_and_return="0" save_and_return_code_bypass="0" logo="" hide_title="0" view_results="0" min_responses_view_results="10" check_diversity_view_results="0" end_survey_redirect_url="" survey_expiration="" promis_skip_question="0" survey_auth_enabled_single="0" edit_completed_response="0" hide_back_button="0" show_required_field_text="1" confirmation_email_subject="" confirmation_email_content="" confirmation_email_from="" confirmation_email_from_display="" confirmation_email_attach_pdf="0" confirmation_email_attachment="" text_to_speech="0" text_to_speech_language="en" end_survey_redirect_next_survey="0" theme="" text_size="1" font_family="16" theme_text_buttons="" theme_bg_page="" theme_text_title="" theme_bg_title="" theme_text_sectionheader="" theme_bg_sectionheader="" theme_text_question="" theme_bg_question="" enhanced_choices="0" repeat_survey_enabled="0" repeat_survey_btn_text="" repeat_survey_btn_location="AFTER_SUBMIT" response_limit="" response_limit_include_partials="1" response_limit_custom_text="Thank you for your interest; however, the survey is closed because the maximum number of responses has been reached." survey_time_limit_days="" survey_time_limit_hours="" survey_time_limit_minutes="" email_participant_field="" end_of_survey_pdf_download="0" pdf_auto_archive="0" pdf_econsent_version="" pdf_econsent_type="" pdf_econsent_firstname_field="" pdf_econsent_firstname_event_id="" pdf_econsent_lastname_field="" pdf_econsent_lastname_event_id="" pdf_econsent_dob_field="" pdf_econsent_dob_event_id="" pdf_econsent_allow_edit="0" pdf_econsent_signature_field1="" pdf_econsent_signature_field2="" pdf_econsent_signature_field3="" pdf_econsent_signature_field4="" pdf_econsent_signature_field5=""/>
 	</redcap:SurveysGroup>
 	<redcap:ReportsGroup>
-		<redcap:Reports title="Repeating Store" report_order="1" user_access="ALL" user_edit_access="ALL" description="" combine_checkbox_values="0" output_dags="0" output_survey_fields="0" output_missing_data_codes="0" remove_line_breaks_in_values="1" orderby_field1="record_id" orderby_sort1="ASC" orderby_field2="" orderby_sort2="" orderby_field3="" orderby_sort3="" advanced_logic="" filter_type="RECORD" dynamic_filter1="record_id" dynamic_filter2="" dynamic_filter3="" fields="" limiter_fields="" limiter_dags="" limiter_events="" limiter_logic="" user_access_users="" user_access_roles="" user_access_dags="" user_edit_access_users="" user_edit_access_roles="" user_edit_access_dags="" redcap_reports_fields="record_id,stopwatch_id,store_elapsed,store_cumulated,store_start,store_stop,store_num_stops,repeating_store_complete" redcap_reports_filter_dags="" redcap_reports_filter_events="event_1_arm_1" ID="da4b9237bacccdf19c0760cab7aec4a8359010b0"/>
+		<redcap:Reports title="Repeating Store" report_order="1" user_access="ALL" user_edit_access="ALL" description="" combine_checkbox_values="0" output_dags="0" output_survey_fields="0" output_missing_data_codes="0" remove_line_breaks_in_values="1" orderby_field1="record_id" orderby_sort1="ASC" orderby_field2="" orderby_sort2="" orderby_field3="" orderby_sort3="" advanced_logic="" filter_type="RECORD" dynamic_filter1="record_id" dynamic_filter2="" dynamic_filter3="" fields="" limiter_fields="" limiter_dags="" limiter_events="" limiter_logic="" user_access_users="" user_access_roles="" user_access_dags="" user_edit_access_users="" user_edit_access_roles="" user_edit_access_dags="" redcap_reports_fields="record_id,stopwatch_id,store_elapsed,store_cumulated,store_start,store_stop,store_num_stops,repeating_store_complete" redcap_reports_filter_dags="" redcap_reports_filter_events="event_1_arm_1" ID="af3e133428b9e25c55bc59fe534248e6a0c0f17b"/>
+		<redcap:Reports title="Survey Times" report_order="2" user_access="ALL" user_edit_access="ALL" description="" combine_checkbox_values="0" output_dags="0" output_survey_fields="0" output_missing_data_codes="0" remove_line_breaks_in_values="1" orderby_field1="record_id" orderby_sort1="ASC" orderby_field2="" orderby_sort2="" orderby_field3="" orderby_sort3="" advanced_logic="" filter_type="RECORD" dynamic_filter1="" dynamic_filter2="" dynamic_filter3="" fields="" limiter_fields="" limiter_dags="" limiter_events="" limiter_logic="" user_access_users="" user_access_roles="" user_access_dags="" user_edit_access_users="" user_edit_access_roles="" user_edit_access_dags="" redcap_reports_fields="record_id,survey_elapsed,survey_stopwatch" redcap_reports_filter_dags="" redcap_reports_filter_events="" ID="761f22b2c1593d0bb87e0b606f990ba4974706de"/>
 	</redcap:ReportsGroup>
 </GlobalVariables>
-<MetaDataVersion OID="Metadata.StopwatchEMTest_2020-05-24_2321" Name="Stopwatch EM Test" redcap:RecordIdField="record_id">
-	<Protocol>
-		<StudyEventRef StudyEventOID="Event.event_1_arm_1" OrderNumber="1" Mandatory="No"/>
-		<StudyEventRef StudyEventOID="Event.event_2_arm_1" OrderNumber="2" Mandatory="No"/>
-	</Protocol>
-	<StudyEventDef OID="Event.event_1_arm_1" Name="Event 1" Type="Common" Repeating="No" redcap:EventName="Event 1" redcap:CustomEventLabel="" redcap:UniqueEventName="event_1_arm_1" redcap:ArmNum="1" redcap:ArmName="Arm 1" redcap:DayOffset="1" redcap:OffsetMin="0" redcap:OffsetMax="0">
-		<FormRef FormOID="Form.basic" OrderNumber="1" Mandatory="No" redcap:FormName="basic"/>
-		<FormRef FormOID="Form.json" OrderNumber="2" Mandatory="No" redcap:FormName="json"/>
-		<FormRef FormOID="Form.repeating" OrderNumber="3" Mandatory="No" redcap:FormName="repeating"/>
-		<FormRef FormOID="Form.repeating_store" OrderNumber="4" Mandatory="No" redcap:FormName="repeating_store"/>
-	</StudyEventDef>
-	<StudyEventDef OID="Event.event_2_arm_1" Name="Event 2" Type="Common" Repeating="No" redcap:EventName="Event 2" redcap:CustomEventLabel="" redcap:UniqueEventName="event_2_arm_1" redcap:ArmNum="1" redcap:ArmName="Arm 1" redcap:DayOffset="2" redcap:OffsetMin="0" redcap:OffsetMax="0">
-		<FormRef FormOID="Form.repeating_store" OrderNumber="1" Mandatory="No" redcap:FormName="repeating_store"/>
-	</StudyEventDef>
+<MetaDataVersion OID="Metadata.StopwatchEMTest_2020-05-28_2247" Name="Stopwatch EM Test" redcap:RecordIdField="record_id">
+	<FormDef OID="Form.survey" Name="Survey" Repeating="No" redcap:FormName="survey">
+		<ItemGroupRef ItemGroupOID="survey.record_id" Mandatory="No"/>
+		<ItemGroupRef ItemGroupOID="survey.survey_complete" Mandatory="No"/>
+	</FormDef>
 	<FormDef OID="Form.basic" Name="Basic" Repeating="No" redcap:FormName="basic">
-		<ItemGroupRef ItemGroupOID="basic.record_id" Mandatory="No"/>
 		<ItemGroupRef ItemGroupOID="basic.sw_int" Mandatory="No"/>
 		<ItemGroupRef ItemGroupOID="basic.sw_number" Mandatory="No"/>
 		<ItemGroupRef ItemGroupOID="basic.basic_complete" Mandatory="No"/>
@@ -66,8 +56,17 @@ NAVU, Not available</redcap:MissingDataCodes>
 		<ItemGroupRef ItemGroupOID="repeating_store.stopwatch_id" Mandatory="No"/>
 		<ItemGroupRef ItemGroupOID="repeating_store.repeating_store_complete" Mandatory="No"/>
 	</FormDef>
-	<ItemGroupDef OID="basic.record_id" Name="Basic" Repeating="No">
+	<FormDef OID="Form.survey_timings" Name="Survey Timings" Repeating="No" redcap:FormName="survey_timings">
+		<ItemGroupRef ItemGroupOID="survey_timings.survey_elapsed" Mandatory="No"/>
+		<ItemGroupRef ItemGroupOID="survey_timings.survey_timings_complete" Mandatory="No"/>
+	</FormDef>
+	<ItemGroupDef OID="survey.record_id" Name="Survey" Repeating="No">
 		<ItemRef ItemOID="record_id" Mandatory="No" redcap:Variable="record_id"/>
+		<ItemRef ItemOID="survey_stopwatch" Mandatory="Yes" redcap:Variable="survey_stopwatch"/>
+		<ItemRef ItemOID="survey_laps" Mandatory="No" redcap:Variable="survey_laps"/>
+	</ItemGroupDef>
+	<ItemGroupDef OID="survey.survey_complete" Name="Form Status" Repeating="No">
+		<ItemRef ItemOID="survey_complete" Mandatory="No" redcap:Variable="survey_complete"/>
 	</ItemGroupDef>
 	<ItemGroupDef OID="basic.sw_int" Name="Basic Stopwatch Uses" Repeating="No">
 		<ItemRef ItemOID="sw_int" Mandatory="No" redcap:Variable="sw_int"/>
@@ -77,6 +76,7 @@ NAVU, Not available</redcap:MissingDataCodes>
 		<ItemRef ItemOID="sw_number_comma" Mandatory="No" redcap:Variable="sw_number_comma"/>
 		<ItemRef ItemOID="sw_mm_ss" Mandatory="No" redcap:Variable="sw_mm_ss"/>
 		<ItemRef ItemOID="sw_text" Mandatory="No" redcap:Variable="sw_text"/>
+		<ItemRef ItemOID="sw_blinded" Mandatory="No" redcap:Variable="sw_blinded"/>
 		<ItemRef ItemOID="sw_invalidtarget" Mandatory="No" redcap:Variable="sw_invalidtarget"/>
 	</ItemGroupDef>
 	<ItemGroupDef OID="basic.basic_complete" Name="Form Status" Repeating="No">
@@ -114,8 +114,31 @@ NAVU, Not available</redcap:MissingDataCodes>
 	<ItemGroupDef OID="repeating_store.repeating_store_complete" Name="Form Status" Repeating="No">
 		<ItemRef ItemOID="repeating_store_complete" Mandatory="No" redcap:Variable="repeating_store_complete"/>
 	</ItemGroupDef>
+	<ItemGroupDef OID="survey_timings.survey_elapsed" Name="Survey Timings" Repeating="No">
+		<ItemRef ItemOID="survey_elapsed" Mandatory="No" redcap:Variable="survey_elapsed"/>
+	</ItemGroupDef>
+	<ItemGroupDef OID="survey_timings.survey_timings_complete" Name="Form Status" Repeating="No">
+		<ItemRef ItemOID="survey_timings_complete" Mandatory="No" redcap:Variable="survey_timings_complete"/>
+	</ItemGroupDef>
 	<ItemDef OID="record_id" Name="record_id" DataType="text" Length="999" redcap:Variable="record_id" redcap:FieldType="text">
 		<Question><TranslatedText>Record ID</TranslatedText></Question>
+	</ItemDef>
+	<ItemDef OID="survey_stopwatch" Name="survey_stopwatch" DataType="integer" Length="999" redcap:Variable="survey_stopwatch" redcap:FieldType="text" redcap:TextValidationType="int" redcap:RequiredField="y" redcap:FieldAnnotation="@STOPWATCH={
+&quot;resume&quot;:false, 
+&quot;display_format&quot;: &quot;Blinded&quot;, 
+&quot;display_running&quot;: &quot;Running&quot;, 
+&quot;display_empty&quot;: &quot;--:--.---&quot;
+}">
+		<Question><TranslatedText>Please take your time ...
+
+Start it ... complete the laps challenge, then stop it.</TranslatedText><redcap:FormattedTranslatedText>&lt;div class=&quot;rich-text-field-label&quot;&gt;&lt;p&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;Please take your time ...&lt;/span&gt;&lt;br /&gt;&lt;br /&gt;Start it &lt;span style=&quot;font-weight: normal;&quot;&gt;... complete the &lt;em&gt;laps&lt;/em&gt; challenge, then&lt;/span&gt; stop it&lt;span style=&quot;font-weight: normal;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;</redcap:FormattedTranslatedText></Question>
+	</ItemDef>
+	<ItemDef OID="survey_laps" Name="survey_laps" DataType="text" Length="999" redcap:Variable="survey_laps" redcap:FieldType="text" redcap:FieldAnnotation="@STOPWATCH-LAP={&quot;resume&quot;: true, &quot;mapping&quot;: { &quot;elapsed&quot;: &quot;survey_elapsed&quot; }}">
+		<Question><TranslatedText>Time your laps ... of judgement?</TranslatedText></Question>
+	</ItemDef>
+	<ItemDef OID="survey_complete" Name="survey_complete" DataType="text" Length="1" redcap:Variable="survey_complete" redcap:FieldType="select" redcap:SectionHeader="Form Status">
+		<Question><TranslatedText>Complete?</TranslatedText></Question>
+		<CodeListRef CodeListOID="survey_complete.choices"/>
 	</ItemDef>
 	<ItemDef OID="sw_int" Name="sw_int" DataType="integer" Length="999" redcap:Variable="sw_int" redcap:FieldType="text" redcap:TextValidationType="int" redcap:SectionHeader="Basic Stopwatch Uses" redcap:FieldAnnotation="@STOPWATCH">
 		<Question><TranslatedText>1 Text Box, Integer (elapsed time in ms) Action Tag:
@@ -123,11 +146,11 @@ NAVU, Not available</redcap:MissingDataCodes>
 	</ItemDef>
 	<ItemDef OID="sw_number" Name="sw_number" DataType="float" Length="999" SignificantDigits="1" redcap:Variable="sw_number" redcap:FieldType="text" redcap:TextValidationType="float" redcap:FieldAnnotation="@STOPWATCH={
   &quot;digits&quot;: 2,
-  &quot;hide_target&quot;: false
+  &quot;show_target&quot;: true
 }">
 		<Question><TranslatedText>2 Text Box, Number (elapsed time in seconds) Action Tag:
-@STOPWATCH={ &quot;digits&quot;: 2, &quot;hide_target&quot;: false }
-  Limited to 2 decimal digit Input field explicitly shown </TranslatedText><redcap:FormattedTranslatedText>&lt;div class=&quot;rich-text-field-label&quot;&gt;&lt;p&gt;2&lt;span style=&quot;font-weight: normal;&quot;&gt; Text Box, &lt;/span&gt;Number &lt;span style=&quot;font-weight: normal;&quot;&gt;(elapsed time in seconds)&lt;/span&gt;&lt;/p&gt; &lt;p&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;&lt;em&gt;Action Tag:&lt;br /&gt;&lt;/em&gt;&lt;/span&gt;@STOPWATCH&lt;span style=&quot;font-weight: normal;&quot;&gt;={ &quot;digits&quot;: 2, &quot;hide_target&quot;: false }&lt;br /&gt;&lt;/span&gt;&lt;/p&gt; &lt;ul&gt; &lt;li&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;Limited to 2 decimal digit&lt;/span&gt;&lt;/li&gt; &lt;li&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;Input field explicitly shown&lt;/span&gt;&lt;/li&gt; &lt;/ul&gt;&lt;/div&gt;</redcap:FormattedTranslatedText></Question>
+@STOPWATCH={ &quot;digits&quot;: 2, &quot;show_target&quot;: true }
+  Limited to 2 decimal digit Input field explicitly shown </TranslatedText><redcap:FormattedTranslatedText>&lt;div class=&quot;rich-text-field-label&quot;&gt;&lt;p&gt;2&lt;span style=&quot;font-weight: normal;&quot;&gt; Text Box, &lt;/span&gt;Number &lt;span style=&quot;font-weight: normal;&quot;&gt;(elapsed time in seconds)&lt;/span&gt;&lt;/p&gt; &lt;p&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;&lt;em&gt;Action Tag:&lt;br /&gt;&lt;/em&gt;&lt;/span&gt;@STOPWATCH&lt;span style=&quot;font-weight: normal;&quot;&gt;={ &quot;digits&quot;: 2, &quot;show_target&quot;: true }&lt;br /&gt;&lt;/span&gt;&lt;/p&gt; &lt;ul&gt; &lt;li&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;Limited to 2 decimal digit&lt;/span&gt;&lt;/li&gt; &lt;li&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;Input field explicitly shown&lt;/span&gt;&lt;/li&gt; &lt;/ul&gt;&lt;/div&gt;</redcap:FormattedTranslatedText></Question>
 	</ItemDef>
 	<ItemDef OID="sw_number_comma" Name="sw_number_comma" DataType="text" Length="999" redcap:Variable="sw_number_comma" redcap:FieldType="text" redcap:TextValidationType="number_comma_decimal" redcap:FieldAnnotation="@STOPWATCH={
   &quot;digits&quot;:1,
@@ -142,13 +165,25 @@ NAVU, Not available</redcap:MissingDataCodes>
 Note: no hours or milliseconds, capped at 59:59 Action Tag:
 @STOPWATCH</TranslatedText><redcap:FormattedTranslatedText>&lt;div class=&quot;rich-text-field-label&quot;&gt;&lt;p&gt;4&lt;span style=&quot;font-weight: normal;&quot;&gt; Text Box, &lt;/span&gt;Time (MM:SS)&lt;span style=&quot;font-weight: normal;&quot;&gt; &lt;br /&gt;&lt;em&gt;Note: &lt;/em&gt;no hours or milliseconds, capped at 59:59&lt;/span&gt;&lt;/p&gt; &lt;p&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;&lt;em&gt;Action Tag:&lt;/em&gt;&lt;br /&gt;&lt;/span&gt;@STOPWATCH&lt;/p&gt;&lt;/div&gt;</redcap:FormattedTranslatedText></Question>
 	</ItemDef>
-	<ItemDef OID="sw_text" Name="sw_text" DataType="text" Length="999" redcap:Variable="sw_text" redcap:FieldType="text" redcap:FieldAnnotation="@STOPWATCH={ &quot;hide_target&quot;: false }">
+	<ItemDef OID="sw_text" Name="sw_text" DataType="text" Length="999" redcap:Variable="sw_text" redcap:FieldType="text" redcap:FieldAnnotation="@STOPWATCH={ &quot;show_target&quot;: true }">
 		<Question><TranslatedText>5 Text Box, no validation, text box shown Action Tag:
-@STOPWATCH={ &quot;hide_target&quot;: false }</TranslatedText><redcap:FormattedTranslatedText>&lt;div class=&quot;rich-text-field-label&quot;&gt;&lt;p&gt;5&lt;span style=&quot;font-weight: normal;&quot;&gt; Text Box, &lt;/span&gt;no validation&lt;span style=&quot;font-weight: normal;&quot;&gt;, text box shown&lt;/span&gt;&lt;/p&gt; &lt;p&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;&lt;em&gt;Action Tag:&lt;/em&gt;&lt;br /&gt;&lt;/span&gt;@STOPWATCH&lt;span style=&quot;font-weight: normal;&quot;&gt;={ &quot;hide_target&quot;: false }&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;</redcap:FormattedTranslatedText></Question>
+@STOPWATCH={ &quot;show_target&quot;: true }</TranslatedText><redcap:FormattedTranslatedText>&lt;div class=&quot;rich-text-field-label&quot;&gt;&lt;p&gt;5&lt;span style=&quot;font-weight: normal;&quot;&gt; Text Box, &lt;/span&gt;no validation&lt;span style=&quot;font-weight: normal;&quot;&gt;, text box shown&lt;/span&gt;&lt;/p&gt; &lt;p&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;&lt;em&gt;Action Tag:&lt;/em&gt;&lt;br /&gt;&lt;/span&gt;@STOPWATCH&lt;span style=&quot;font-weight: normal;&quot;&gt;={ &quot;show_target&quot;: true }&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;</redcap:FormattedTranslatedText></Question>
+	</ItemDef>
+	<ItemDef OID="sw_blinded" Name="sw_blinded" DataType="integer" Length="999" redcap:Variable="sw_blinded" redcap:FieldType="text" redcap:TextValidationType="int" redcap:FieldAnnotation="@STOPWATCH={
+&quot;display_format&quot;: &quot;Blinded&quot;, 
+&quot;display_running&quot;: &quot;Running&quot;, 
+&quot;display_empty&quot;: &quot;--:--.---&quot;
+}">
+		<Question><TranslatedText>6 Text Box, integer, user blinded to the result Elapsed time: [sw_blinded] Action Tag:
+@STOPWATCH={ 
+     &quot;display_format&quot;: &quot;Blinded&quot;,
+     &quot;display_running&quot;: &quot;Running&quot;,
+     &quot;display_empty&quot;: &quot;--:--.---&quot;
+}</TranslatedText><redcap:FormattedTranslatedText>&lt;div class=&quot;rich-text-field-label&quot;&gt;&lt;p&gt;6&lt;span style=&quot;font-weight: normal;&quot;&gt; Text Box, integer, &lt;/span&gt;user blinded to the result&lt;/p&gt; &lt;p&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;Elapsed time: [sw_blinded]&lt;/span&gt;&lt;/p&gt; &lt;p&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;&lt;em&gt;Action Tag:&lt;/em&gt;&lt;br /&gt;&lt;/span&gt;@STOPWATCH&lt;span style=&quot;font-weight: normal;&quot;&gt;={ &lt;br /&gt;&lt;/span&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;     &quot;display_format&quot;: &quot;Blinded&quot;,&lt;br /&gt;&lt;/span&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;     &quot;display_running&quot;: &quot;Running&quot;,&lt;br /&gt;     &quot;display_empty&quot;: &quot;--:--.---&quot;&lt;br /&gt;}&lt;/span&gt;&lt;/p&gt;&lt;/div&gt;</redcap:FormattedTranslatedText></Question>
 	</ItemDef>
 	<ItemDef OID="sw_invalidtarget" Name="sw_invalidtarget" DataType="boolean" Length="1" redcap:Variable="sw_invalidtarget" redcap:FieldType="yesno" redcap:FieldAnnotation="@STOPWATCH">
-		<Question><TranslatedText>6 Yes - No (this is an invalid target type) Action Tag:
-@STOPWATCH</TranslatedText><redcap:FormattedTranslatedText>&lt;div class=&quot;rich-text-field-label&quot;&gt;&lt;p&gt;6 &lt;span style=&quot;font-weight: normal;&quot;&gt;Yes - No (this is an &lt;/span&gt;invalid &lt;span style=&quot;font-weight: normal;&quot;&gt;target type)&lt;/span&gt;&lt;/p&gt; &lt;p&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;&lt;em&gt;Action Tag:&lt;/em&gt;&lt;br /&gt;&lt;/span&gt;@STOPWATCH&lt;/p&gt;&lt;/div&gt;</redcap:FormattedTranslatedText></Question>
+		<Question><TranslatedText>7 Yes - No (this is an invalid target type) Action Tag:
+@STOPWATCH</TranslatedText><redcap:FormattedTranslatedText>&lt;div class=&quot;rich-text-field-label&quot;&gt;&lt;p&gt;7 &lt;span style=&quot;font-weight: normal;&quot;&gt;Yes - No (this is an &lt;/span&gt;invalid &lt;span style=&quot;font-weight: normal;&quot;&gt;target type)&lt;/span&gt;&lt;/p&gt; &lt;p&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;&lt;em&gt;Action Tag:&lt;/em&gt;&lt;br /&gt;&lt;/span&gt;@STOPWATCH&lt;/p&gt;&lt;/div&gt;</redcap:FormattedTranslatedText></Question>
 		<CodeListRef CodeListOID="sw_invalidtarget.choices"/>
 	</ItemDef>
 	<ItemDef OID="basic_complete" Name="basic_complete" DataType="text" Length="1" redcap:Variable="basic_complete" redcap:FieldType="select" redcap:SectionHeader="Form Status">
@@ -159,20 +194,20 @@ Note: no hours or milliseconds, capped at 59:59 Action Tag:
 {
   &quot;mode&quot;: &quot;capture&quot;, 
   &quot;resume&quot;: true, 
-  &quot;hide_target&quot;: false
+  &quot;show_target&quot;: true
 }">
-		<Question><TranslatedText>7 Notes Box - Captures stored as JSON, can resume @STOPWATCH=
+		<Question><TranslatedText>8 Notes Box - Captures stored as JSON, can resume @STOPWATCH=
 {
   &quot;mode&quot;: &quot;capture&quot;,
   &quot;resume&quot;: true,
-  &quot;hide_target&quot;: false
-}</TranslatedText><redcap:FormattedTranslatedText>&lt;div class=&quot;rich-text-field-label&quot;&gt;&lt;p&gt;7 &lt;span style=&quot;font-weight: normal;&quot;&gt;Notes Box - Captures stored as JSON, can resume&lt;/span&gt;&lt;/p&gt; &lt;pre&gt;@STOPWATCH=&lt;br /&gt;{&lt;br /&gt;  &quot;mode&quot;: &quot;capture&quot;,&lt;br /&gt;  &quot;resume&quot;: true,&lt;br /&gt;  &quot;hide_target&quot;: false&lt;br /&gt;}&lt;/pre&gt;&lt;/div&gt;</redcap:FormattedTranslatedText></Question>
+  &quot;show_target&quot;: true
+}</TranslatedText><redcap:FormattedTranslatedText>&lt;div class=&quot;rich-text-field-label&quot;&gt;&lt;p&gt;8 &lt;span style=&quot;font-weight: normal;&quot;&gt;Notes Box - Captures stored as JSON, can resume&lt;/span&gt;&lt;/p&gt; &lt;pre&gt;@STOPWATCH=&lt;br /&gt;{&lt;br /&gt;  &quot;mode&quot;: &quot;capture&quot;,&lt;br /&gt;  &quot;resume&quot;: true,&lt;br /&gt;  &quot;show_target&quot;: true&lt;br /&gt;}&lt;/pre&gt;&lt;/div&gt;</redcap:FormattedTranslatedText></Question>
 	</ItemDef>
 	<ItemDef OID="json_cap2" Name="json_cap2" DataType="text" Length="999" redcap:Variable="json_cap2" redcap:FieldType="textarea" redcap:FieldAnnotation="@STOPWATCH-CAPTURE">
-		<Question><TranslatedText>8 Notes Box - Captures stored as JSON, no resume @STOPWATCH-CAPTURE</TranslatedText><redcap:FormattedTranslatedText>&lt;div class=&quot;rich-text-field-label&quot;&gt;&lt;p&gt;8&lt;span style=&quot;font-weight: normal;&quot;&gt; Notes Box - Captures stored as JSON, no resume&lt;/span&gt;&lt;/p&gt; &lt;pre&gt;@STOPWATCH-CAPTURE&lt;/pre&gt;&lt;/div&gt;</redcap:FormattedTranslatedText></Question>
+		<Question><TranslatedText>9 Notes Box - Captures stored as JSON, no resume @STOPWATCH-CAPTURE</TranslatedText><redcap:FormattedTranslatedText>&lt;div class=&quot;rich-text-field-label&quot;&gt;&lt;p&gt;9&lt;span style=&quot;font-weight: normal;&quot;&gt; Notes Box - Captures stored as JSON, no resume&lt;/span&gt;&lt;/p&gt; &lt;pre&gt;@STOPWATCH-CAPTURE&lt;/pre&gt;&lt;/div&gt;</redcap:FormattedTranslatedText></Question>
 	</ItemDef>
 	<ItemDef OID="json_lap1" Name="json_lap1" DataType="text" Length="999" redcap:Variable="json_lap1" redcap:FieldType="textarea" redcap:SectionHeader="Stopwatches for capturing laps" redcap:FieldAnnotation="@STOPWATCH-LAP">
-		<Question><TranslatedText>9 Notes Box - Laps stored as JSON, no resume @STOPWATCH-LAP</TranslatedText><redcap:FormattedTranslatedText>&lt;div class=&quot;rich-text-field-label&quot;&gt;&lt;p&gt;9&lt;span style=&quot;font-weight: normal;&quot;&gt; Notes Box - Laps stored as JSON, no resume&lt;/span&gt;&lt;/p&gt; &lt;pre&gt;@STOPWATCH-LAP&lt;/pre&gt;&lt;/div&gt;</redcap:FormattedTranslatedText></Question>
+		<Question><TranslatedText>10 Notes Box - Laps stored as JSON, no resume @STOPWATCH-LAP</TranslatedText><redcap:FormattedTranslatedText>&lt;div class=&quot;rich-text-field-label&quot;&gt;&lt;p&gt;10&lt;span style=&quot;font-weight: normal;&quot;&gt; Notes Box - Laps stored as JSON, no resume&lt;/span&gt;&lt;/p&gt; &lt;pre&gt;@STOPWATCH-LAP&lt;/pre&gt;&lt;/div&gt;</redcap:FormattedTranslatedText></Question>
 	</ItemDef>
 	<ItemDef OID="json_cap3" Name="json_cap3" DataType="text" Length="999" redcap:Variable="json_cap3" redcap:FieldType="textarea" redcap:FieldAnnotation="@STOPWATCH-LAP=
 {
@@ -181,13 +216,13 @@ Note: no hours or milliseconds, capped at 59:59 Action Tag:
   &quot;digits&quot;: 2,
   &quot;cumulated&quot;: true
 }">
-		<Question><TranslatedText>10 Notes Box - Laps stored as JSON, no hours display, 2 digits, and showing cumlulated time @STOPWATCH-LAP=
+		<Question><TranslatedText>11 Notes Box - Laps stored as JSON, no hours display, 2 digits, and showing cumlulated time @STOPWATCH-LAP=
 {
   &quot;cumulated&quot;: true,
   &quot;no_hours&quot;: true,
   &quot;display_format&quot;: &quot;/m/g/s/d/f&quot;,
   &quot;digits&quot;: 2
-}</TranslatedText><redcap:FormattedTranslatedText>&lt;div class=&quot;rich-text-field-label&quot;&gt;&lt;p&gt;10 &lt;span style=&quot;font-weight: normal;&quot;&gt;Notes Box - Laps stored as JSON, no hours display, 2 digits, and showing cumlulated time&lt;/span&gt;&lt;/p&gt; &lt;pre&gt;@STOPWATCH-LAP=&lt;br /&gt;{&lt;br /&gt;  &quot;cumulated&quot;: true,&lt;br /&gt;  &quot;no_hours&quot;: true,&lt;br /&gt;  &quot;display_format&quot;: &quot;/m/g/s/d/f&quot;,&lt;br /&gt;  &quot;digits&quot;: 2&lt;br /&gt;}&lt;/pre&gt;&lt;/div&gt;</redcap:FormattedTranslatedText></Question>
+}</TranslatedText><redcap:FormattedTranslatedText>&lt;div class=&quot;rich-text-field-label&quot;&gt;&lt;p&gt;11 &lt;span style=&quot;font-weight: normal;&quot;&gt;Notes Box - Laps stored as JSON, no hours display, 2 digits, and showing cumlulated time&lt;/span&gt;&lt;/p&gt; &lt;pre&gt;@STOPWATCH-LAP=&lt;br /&gt;{&lt;br /&gt;  &quot;cumulated&quot;: true,&lt;br /&gt;  &quot;no_hours&quot;: true,&lt;br /&gt;  &quot;display_format&quot;: &quot;/m/g/s/d/f&quot;,&lt;br /&gt;  &quot;digits&quot;: 2&lt;br /&gt;}&lt;/pre&gt;&lt;/div&gt;</redcap:FormattedTranslatedText></Question>
 	</ItemDef>
 	<ItemDef OID="json_complete" Name="json_complete" DataType="text" Length="1" redcap:Variable="json_complete" redcap:FieldType="select" redcap:SectionHeader="Form Status">
 		<Question><TranslatedText>Complete?</TranslatedText></Question>
@@ -204,9 +239,9 @@ Note: no hours or milliseconds, capped at 59:59 Action Tag:
       &quot;stop&quot;: &quot;store_stop&quot;, 
       &quot;num_stops&quot;: &quot;store_num_stops&quot;
    },
-   &quot;resume&quot;: true
+  &quot;resume&quot;: true
 }">
-		<Question><TranslatedText>11 Text Box (no validation) - storage in a repeating instrument @STOPWATCH-LAP=
+		<Question><TranslatedText>12 Text Box (no validation) - storage in a repeating instrument @STOPWATCH-LAP=
 {
   &quot;cumulated&quot;: true,
   &quot;mapping&quot;: {
@@ -216,9 +251,9 @@ Note: no hours or milliseconds, capped at 59:59 Action Tag:
       &quot;start&quot;: &quot;store_start&quot;, 
       &quot;stop&quot;: &quot;store_stop&quot;, 
       &quot;num_stops&quot;: &quot;store_num_stops&quot;
-   },
-   &quot;resume&quot;: true
-}</TranslatedText><redcap:FormattedTranslatedText>&lt;div class=&quot;rich-text-field-label&quot;&gt;&lt;p&gt;11 &lt;span style=&quot;font-weight: normal;&quot;&gt;Text Box (no validation) - storage in a &lt;/span&gt;repeating instrument&lt;/p&gt; &lt;pre&gt;@STOPWATCH-LAP=&lt;br /&gt;{&lt;br /&gt;  &quot;cumulated&quot;: true,&lt;br /&gt;  &quot;mapping&quot;: {&lt;br /&gt;      &quot;id&quot;: &quot;stopwatch_id&quot;,&lt;br /&gt;      &quot;elapsed&quot;: &quot;store_elapsed&quot;, &lt;br /&gt;      &quot;cumulated&quot;: &quot;store_cumulated&quot;, &lt;br /&gt;      &quot;start&quot;: &quot;store_start&quot;, &lt;br /&gt;      &quot;stop&quot;: &quot;store_stop&quot;, &lt;br /&gt;      &quot;num_stops&quot;: &quot;store_num_stops&quot;&lt;br /&gt;   },&lt;br /&gt;   &quot;resume&quot;: true&lt;br /&gt;}&lt;/pre&gt;&lt;/div&gt;</redcap:FormattedTranslatedText></Question>
+   },
+   &quot;resume&quot;: true
+}</TranslatedText><redcap:FormattedTranslatedText>&lt;div class=&quot;rich-text-field-label&quot;&gt;&lt;p&gt;12 &lt;span style=&quot;font-weight: normal;&quot;&gt;Text Box (no validation) - storage in a &lt;/span&gt;repeating instrument&lt;/p&gt; &lt;pre&gt;@STOPWATCH-LAP=&lt;br /&gt;{&lt;br /&gt;  &quot;cumulated&quot;: true,&lt;br /&gt;  &quot;mapping&quot;: {&lt;br /&gt;      &quot;id&quot;: &quot;stopwatch_id&quot;,&lt;br /&gt;      &quot;elapsed&quot;: &quot;store_elapsed&quot;, &lt;br /&gt;      &quot;cumulated&quot;: &quot;store_cumulated&quot;, &lt;br /&gt;      &quot;start&quot;: &quot;store_start&quot;, &lt;br /&gt;      &quot;stop&quot;: &quot;store_stop&quot;, &lt;br /&gt;      &quot;num_stops&quot;: &quot;store_num_stops&quot;&lt;br /&gt;   },&lt;br /&gt;   &quot;resume&quot;: true&lt;br /&gt;}&lt;/pre&gt;&lt;/div&gt;</redcap:FormattedTranslatedText></Question>
 	</ItemDef>
 	<ItemDef OID="repeating_complete" Name="repeating_complete" DataType="text" Length="1" redcap:Variable="repeating_complete" redcap:FieldType="select" redcap:SectionHeader="Form Status">
 		<Question><TranslatedText>Complete?</TranslatedText></Question>
@@ -227,13 +262,13 @@ Note: no hours or milliseconds, capped at 59:59 Action Tag:
 	<ItemDef OID="stopwatch_id" Name="stopwatch_id" DataType="text" Length="999" redcap:Variable="stopwatch_id" redcap:FieldType="text">
 		<Question><TranslatedText>Stopwatch ID</TranslatedText></Question>
 	</ItemDef>
-	<ItemDef OID="store_elapsed" Name="store_elapsed" DataType="text" Length="999" redcap:Variable="store_elapsed" redcap:FieldType="text" redcap:TextValidationType="number_comma_decimal">
+	<ItemDef OID="store_elapsed" Name="store_elapsed" DataType="integer" Length="999" redcap:Variable="store_elapsed" redcap:FieldType="text" redcap:TextValidationType="int">
 		<Question><TranslatedText>Elapsed</TranslatedText></Question>
 	</ItemDef>
-	<ItemDef OID="store_cumulated" Name="store_cumulated" DataType="integer" Length="999" redcap:Variable="store_cumulated" redcap:FieldType="text" redcap:TextValidationType="int">
+	<ItemDef OID="store_cumulated" Name="store_cumulated" DataType="float" Length="999" SignificantDigits="1" redcap:Variable="store_cumulated" redcap:FieldType="text" redcap:TextValidationType="float">
 		<Question><TranslatedText>Cumulated</TranslatedText></Question>
 	</ItemDef>
-	<ItemDef OID="store_start" Name="store_start" DataType="integer" Length="999" redcap:Variable="store_start" redcap:FieldType="text" redcap:TextValidationType="int">
+	<ItemDef OID="store_start" Name="store_start" DataType="text" Length="999" redcap:Variable="store_start" redcap:FieldType="text">
 		<Question><TranslatedText>Start</TranslatedText></Question>
 	</ItemDef>
 	<ItemDef OID="store_stop" Name="store_stop" DataType="text" Length="999" redcap:Variable="store_stop" redcap:FieldType="text">
@@ -246,6 +281,18 @@ Note: no hours or milliseconds, capped at 59:59 Action Tag:
 		<Question><TranslatedText>Complete?</TranslatedText></Question>
 		<CodeListRef CodeListOID="repeating_store_complete.choices"/>
 	</ItemDef>
+	<ItemDef OID="survey_elapsed" Name="survey_elapsed" DataType="integer" Length="999" redcap:Variable="survey_elapsed" redcap:FieldType="text" redcap:TextValidationType="int">
+		<Question><TranslatedText>Lap duration (ms)</TranslatedText></Question>
+	</ItemDef>
+	<ItemDef OID="survey_timings_complete" Name="survey_timings_complete" DataType="text" Length="1" redcap:Variable="survey_timings_complete" redcap:FieldType="select" redcap:SectionHeader="Form Status">
+		<Question><TranslatedText>Complete?</TranslatedText></Question>
+		<CodeListRef CodeListOID="survey_timings_complete.choices"/>
+	</ItemDef>
+	<CodeList OID="survey_complete.choices" Name="survey_complete" DataType="text" redcap:Variable="survey_complete">
+		<CodeListItem CodedValue="0"><Decode><TranslatedText>Incomplete</TranslatedText></Decode></CodeListItem>
+		<CodeListItem CodedValue="1"><Decode><TranslatedText>Unverified</TranslatedText></Decode></CodeListItem>
+		<CodeListItem CodedValue="2"><Decode><TranslatedText>Complete</TranslatedText></Decode></CodeListItem>
+	</CodeList>
 	<CodeList OID="sw_invalidtarget.choices" Name="sw_invalidtarget" DataType="boolean" redcap:Variable="sw_invalidtarget">
 		<CodeListItem CodedValue="1"><Decode><TranslatedText>Yes</TranslatedText></Decode></CodeListItem>
 		<CodeListItem CodedValue="0"><Decode><TranslatedText>No</TranslatedText></Decode></CodeListItem>
@@ -266,6 +313,11 @@ Note: no hours or milliseconds, capped at 59:59 Action Tag:
 		<CodeListItem CodedValue="2"><Decode><TranslatedText>Complete</TranslatedText></Decode></CodeListItem>
 	</CodeList>
 	<CodeList OID="repeating_store_complete.choices" Name="repeating_store_complete" DataType="text" redcap:Variable="repeating_store_complete">
+		<CodeListItem CodedValue="0"><Decode><TranslatedText>Incomplete</TranslatedText></Decode></CodeListItem>
+		<CodeListItem CodedValue="1"><Decode><TranslatedText>Unverified</TranslatedText></Decode></CodeListItem>
+		<CodeListItem CodedValue="2"><Decode><TranslatedText>Complete</TranslatedText></Decode></CodeListItem>
+	</CodeList>
+	<CodeList OID="survey_timings_complete.choices" Name="survey_timings_complete" DataType="text" redcap:Variable="survey_timings_complete">
 		<CodeListItem CodedValue="0"><Decode><TranslatedText>Incomplete</TranslatedText></Decode></CodeListItem>
 		<CodeListItem CodedValue="1"><Decode><TranslatedText>Unverified</TranslatedText></Decode></CodeListItem>
 		<CodeListItem CodedValue="2"><Decode><TranslatedText>Complete</TranslatedText></Decode></CodeListItem>
