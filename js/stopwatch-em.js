@@ -367,7 +367,7 @@ function addLapRow(swd, n) {
     $label.html(swd.params.label_lap + ' ' + n)
     $elapsed.text(format(swd.currentLap.elapsed, swd).display)
     if (swd.currentLap.elapsed > 0) { 
-        $cumulated.text(format(swd.currentLap.elapsed, swd).display)
+        $cumulated.text(format(swd.currentLap.cumulated, swd).display)
     }
     $stop.html(getStopSymbol(swd.currentLap.num_stops > 0))
     swd.$tbody.prepend($row)
