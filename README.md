@@ -52,7 +52,7 @@ _Note:_ When providing parameters, the equal sign `=` must touch the action tag 
 
 - `digits` - The precisison to show (0, 1, 2, or 3).
 
-- `h_digits`, `m_digits`, `s_digits` - The (minimal) number of digits to use for hours, minutes, econds (when shorter, values will be padded with 0).
+- `h_digits`, `m_digits`, `s_digits` - The (minimal) number of digits to use for hours, minutes, seconds (when shorter, values will be padded with 0).
 
 - `no_hours` - Boolean (`true`|`false`). If set to `true`, minutes will be the largest unit counted.
 
