@@ -9,9 +9,9 @@ use \REDCap;
 class StopwatchExternalModule extends AbstractExternalModule {
 
     // Action Tags.
-    private const STOPWATCH = "@STOPWATCH";
-    private const STOPWATCH_CAPTURE = "@STOPWATCH-CAPTURE";
-    private const STOPWATCH_LAP = "@STOPWATCH-LAP";
+    private $STOPWATCH = "@STOPWATCH";
+    private $STOPWATCH_CAPTURE = "@STOPWATCH-CAPTURE";
+    private $STOPWATCH_LAP = "@STOPWATCH-LAP";
 
 
     function redcap_every_page_top($project_id) {
@@ -237,9 +237,9 @@ class StopwatchExternalModule extends AbstractExternalModule {
         $record = $project->getRecord($record_id);
         if (!class_exists("\DE\RUB\StopwatchExternalModule\ActionTagHelper")) include_once("classes/ActionTagHelper.php");
         $action_tags = array(
-            self::STOPWATCH, 
-            self::STOPWATCH_CAPTURE, 
-            self::STOPWATCH_LAP
+            self::$STOPWATCH, 
+            self::$STOPWATCH_CAPTURE, 
+            self::$STOPWATCH_LAP
         );
         $action_tag_results = ActionTagHelper::getActionTags($action_tags);
         foreach ($action_tags as $action_tag) {
@@ -262,10 +262,10 @@ class StopwatchExternalModule extends AbstractExternalModule {
                     );
                 }
                 else {
-                    if ($action_tag == self::STOPWATCH_LAP) {
+                    if ($action_tag == self::$STOPWATCH_LAP) {
                         $params["mode"] = "lap";
                     }
-                    else if ($action_tag == self::STOPWATCH_CAPTURE) {
+                    else if ($action_tag == self::$STOPWATCH_CAPTURE) {
                         $params["mode"] = "capture";
                     }
                     $params = $this->validateParams($project, $record, $instrument, $event_id, $instance, $field, $params);
