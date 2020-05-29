@@ -271,4 +271,5 @@ This module uses some code from Andy Martin (ActionTagHelper and other bits).
 
 Version | Description
 ------- | ---------------------
+v1.0.1  | Bug fixes: Lap cumulated time was not restored properly (this was a display issue only).
 v1.0.0  | Initial release.
