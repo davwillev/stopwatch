@@ -108,7 +108,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
 
     private function convertToStorage($field, $target_type, $value) {
         // id and num_stops
-        if (in_array($field, array("id", "num_stops"), true)) {
+        if (in_array($field, array("id", "index", "num_stops"), true)) {
             return $value;
         }
         // is_stop
@@ -477,7 +477,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
                     $params["error"] = "Target field type must be of type 'Text Box' without validation.";
                     return $params;
                 }
-                $repeating_field_names = array("elapsed", "start", "stop");
+                $repeating_field_names = array("elapsed", "start", "stop", "index");
                 // Extra options.
                 if ($params["mode"] == "lap") {
                     $repeating_field_names[] = "cumulated";
@@ -509,6 +509,9 @@ class StopwatchExternalModule extends AbstractExternalModule {
                 $allowedType = array(
                     "id" => array(
                         null
+                    ),
+                    "index" => array(
+                        "int"
                     ),
                     "elapsed" => array(
                         "int", "float", "number_comma_decimal", null
@@ -600,7 +603,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
 
     private function convertFromStorage($field, $target_type, $value) {
         // id and num_stops
-        if (in_array($field, array("id", "num_stops"), true)) {
+        if (in_array($field, array("id", "index", "num_stops"), true)) {
             return $value;
         } 
         // is_stop

@@ -79,6 +79,7 @@ Data from a stopwatch capturing multiple timepoints ('splits') or laps, by defau
   - `elapsed` - Field for storing the elapsed time. This mapping **must** be provided.
   - `start` - Field for storing the date/time the capture was (first) started.
   - `stop` - Field for storing the date/time the capture was (last) stopped.
+  - `index` - Field for storing the index (starting at 1) of the lap/capture within a measurement (the target field must be of type integer).
   - `cumulated` (`lap` mode only) - Field for storing the cumulated elapsed time.
   - `num_stops` (`lap` mode only) - Field for storing the number of times the timer was stopped during recording of a lap (the target field must be of type integer).
   - `is_stop` (`capture` mode only) - Field for storing the stop flag (the target field must be of type integer - it will hold 0 or 1).
@@ -273,6 +274,6 @@ This module uses some code from Andy Martin (ActionTagHelper and other bits).
 
 Version | Description
 ------- | ---------------------
-v1.0.2  | Change: Multi-capture stopwatches are now located at the top of their container (to avoid movement of the widget when rows are added; this can be controlled with a new setting).
+v1.0.2  | Change: Multi-capture stopwatches are now located at the top of their container (to avoid movement of the widget when rows are added; this can be controlled with a new setting).<br>New feature: The laps/captures index can now be mapped when storing data in a repeating instrument.
 v1.0.1  | Bug fixes: Lap cumulated time was not restored properly (this was a display issue only).
 v1.0.0  | Initial release.

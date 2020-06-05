@@ -132,6 +132,7 @@
 /**
  * @typedef LapInfo
  * @type {{
+ *  index: number
  *  start: Date
  *  stop: Date
  *  elapsed: number
@@ -143,6 +144,7 @@
 /**
  * @typedef CaptureInfo
  * @type {{
+ *  index: number
  *  start: Date
  *  stop: Date
  *  elapsed: number

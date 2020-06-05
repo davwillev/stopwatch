@@ -525,7 +525,8 @@ function capture(swd, now, stopped) {
         start:  swd.lapStartTime,
         stop: swd.lapStopTime,
         elapsed: swd.elapsed,
-        is_stop: stopped && swd.params.resume
+        is_stop: stopped && swd.params.resume,
+        index: swd.captures.length + 1
     }
     swd.captures.push(capture)
     swd.lapStartTime = now
@@ -561,7 +562,8 @@ function lap(swd, now, stopped) {
             stop: null,
             elapsed: 0,
             cumulated: swd.elapsed,
-            num_stops: 0
+            num_stops: 0,
+            index: swd.laps.length + 1
         }
         swd.laps.push(swd.currentLap)
         addLapRow(swd, swd.laps.length)
@@ -916,7 +918,8 @@ function parseValue(swd, val) {
                         start: new Date(restore[i]['start']),
                         stop: new Date(restore[i]['stop']),
                         elapsed: parseInt(restore[i]['elapsed']),
-                        is_stop: restore[i]['is_stop']
+                        is_stop: restore[i]['is_stop'],
+                        index: i + 1
                     }
                     rv.captures.push(capture)
                 }
@@ -943,7 +946,8 @@ function parseValue(swd, val) {
                         stop: new Date(restore[i]['stop']),
                         elapsed: elapsed,
                         cumulated: sum,
-                        num_stops: parseInt(restore[i]['num_stops'])
+                        num_stops: parseInt(restore[i]['num_stops']),
+                        index: i + 1
                     }
                     rv.laps.push(lap)
                 }
