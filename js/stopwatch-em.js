@@ -210,6 +210,10 @@ function create(id, params, $tr, $input) {
     if (swd.id == params.target) {
         // Inset above input control.
         swd.$input.before($sw)
+        // For capture/lap mode, set vertical alignment of parent container to top.
+        if (params.at_top && (params.mode == 'lap' || params.mode == 'capture')) {
+            $input.parent().css('vertical-align','top')
+        }
     }
     else {
         $tr.find('td.labelrc').last().append($sw)
@@ -283,8 +287,8 @@ function updateHourglass(swd) {
 function insertElapsed(swd) {
     // Hard time_mm_ss limit (59:59)?
     if (swd.params.is_mm_ss && swd.elapsed > 3599499) {
-        // TODO: tt-fy, nicer alert
-        alert('Elapsed times > 59:59 cannot be inserted! Reseting to stored value (or blank).')
+        // TODO: nicer alert
+        alert(DTO.messages.error_overflow) //= Elapsed times > 59:59 cannot be inserted! Reseting to stored value (or blank).
         var val = swd.$input.val().toString()
         var result = parseValue(swd, val)
         set(swd, result)
@@ -521,7 +525,8 @@ function capture(swd, now, stopped) {
         start:  swd.lapStartTime,
         stop: swd.lapStopTime,
         elapsed: swd.elapsed,
-        is_stop: stopped && swd.params.resume
+        is_stop: stopped && swd.params.resume,
+        index: swd.captures.length + 1
     }
     swd.captures.push(capture)
     swd.lapStartTime = now
@@ -557,7 +562,8 @@ function lap(swd, now, stopped) {
             stop: null,
             elapsed: 0,
             cumulated: swd.elapsed,
-            num_stops: 0
+            num_stops: 0,
+            index: swd.laps.length + 1
         }
         swd.laps.push(swd.currentLap)
         addLapRow(swd, swd.laps.length)
@@ -912,7 +918,8 @@ function parseValue(swd, val) {
                         start: new Date(restore[i]['start']),
                         stop: new Date(restore[i]['stop']),
                         elapsed: parseInt(restore[i]['elapsed']),
-                        is_stop: restore[i]['is_stop']
+                        is_stop: restore[i]['is_stop'],
+                        index: i + 1
                     }
                     rv.captures.push(capture)
                 }
@@ -939,7 +946,8 @@ function parseValue(swd, val) {
                         stop: new Date(restore[i]['stop']),
                         elapsed: elapsed,
                         cumulated: sum,
-                        num_stops: parseInt(restore[i]['num_stops'])
+                        num_stops: parseInt(restore[i]['num_stops']),
+                        index: i + 1
                     }
                     rv.laps.push(lap)
                 }

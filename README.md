@@ -2,6 +2,10 @@
 
 A REDCap External Module that provides a stopwatch widget that can be integrated into data entry forms or surveys. Results (elapsed time, times started/stopped) can be captured in a number of ways.
 
+## Bugs / Feature Requests
+
+In case of bugs, or for feature requests, please visit this module's [GitHub](https://github.com/davwillev/stopwatch) page and open an issue.
+
 ## Installation
 
 - Clone this repo into `<redcap-root>/modules/stopwatch_v<version-number>`, or
@@ -52,7 +56,7 @@ _Note:_ When providing parameters, the equal sign `=` must touch the action tag 
 
 - `digits` - The precisison to show (0, 1, 2, or 3).
 
-- `h_digits`, `m_digits`, `s_digits` - The (minimal) number of digits to use for hours, minutes, econds (when shorter, values will be padded with 0).
+- `h_digits`, `m_digits`, `s_digits` - The (minimal) number of digits to use for hours, minutes, seconds (when shorter, values will be padded with 0).
 
 - `no_hours` - Boolean (`true`|`false`). If set to `true`, minutes will be the largest unit counted.
 
@@ -79,6 +83,7 @@ Data from a stopwatch capturing multiple timepoints ('splits') or laps, by defau
   - `elapsed` - Field for storing the elapsed time. This mapping **must** be provided.
   - `start` - Field for storing the date/time the capture was (first) started.
   - `stop` - Field for storing the date/time the capture was (last) stopped.
+  - `index` - Field for storing the index (starting at 1) of the lap/capture within a measurement (the target field must be of type integer).
   - `cumulated` (`lap` mode only) - Field for storing the cumulated elapsed time.
   - `num_stops` (`lap` mode only) - Field for storing the number of times the timer was stopped during recording of a lap (the target field must be of type integer).
   - `is_stop` (`capture` mode only) - Field for storing the stop flag (the target field must be of type integer - it will hold 0 or 1).
@@ -88,6 +93,8 @@ Data from a stopwatch capturing multiple timepoints ('splits') or laps, by defau
 - `only_once` - Boolean (`true`|`false`) determining whether the stopwatch can be used again once a value has been recorded. The default is `false`.
 
 - `max_rows` - The maximum number of rows to show in the captures/laps table. Default = 0 (no limit).
+
+- `at_top` - Boolean (`true`|`false`) determining whether the stopwatch is shown vertically aligned at the top. The default is `true`.
 
 - `cumulated` (available in `lap` mode only) - Boolean (`true`|`false`). If set to `true`, an additional column with cumulated elapsed time will be shown.
 
@@ -271,5 +278,6 @@ This module uses some code from Andy Martin (ActionTagHelper and other bits).
 
 Version | Description
 ------- | ---------------------
+v1.0.2  | Change: Multi-capture stopwatches are now located at the top of their container (to avoid movement of the widget when rows are added; this can be controlled with a new setting).<br>New feature: The laps/captures index can now be mapped when storing data in a repeating instrument.<br>Misc: Added GitHub link to byline and README.
 v1.0.1  | Bug fixes: Lap cumulated time was not restored properly (this was a display issue only).
 v1.0.0  | Initial release.

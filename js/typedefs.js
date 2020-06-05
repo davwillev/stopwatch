@@ -13,6 +13,14 @@
  *  fields: Object<string, StopwatchParams>
  *  debug: boolean
  *  survey: boolean
+ *  messages: StopwatchMessages
+ * }}
+ */
+
+ /**
+ * @typedef StopwatchMessages
+ * @type {{
+ *  error_overflow: string
  * }}
  */
 
@@ -84,6 +92,7 @@
  *  repeating_laps: LapInfo[]
  *  repeating_captures: CaptureInfo[]
  *  error: string
+ *  at_top: boolean
  * }}
  */
 
@@ -131,6 +140,7 @@
 /**
  * @typedef LapInfo
  * @type {{
+ *  index: number
  *  start: Date
  *  stop: Date
  *  elapsed: number
@@ -142,6 +152,7 @@
 /**
  * @typedef CaptureInfo
  * @type {{
+ *  index: number
  *  start: Date
  *  stop: Date
  *  elapsed: number

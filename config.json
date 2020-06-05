@@ -1,11 +1,14 @@
 {
     "name": "Stopwatch",
+    "tt_name": "module_name",
 
     "namespace": "DE\\RUB\\StopwatchExternalModule",
     
-    "description": "A REDCap External Module that provides a stopwatch widget that can be integrated into data entry forms or surveys. Results (elapsed time, times started/stopped) can be captured in a number of ways.",
+    "description": "A REDCap External Module that provides a stopwatch widget that can be integrated into data entry forms or surveys. Results (elapsed time, times started/stopped) can be captured in a number of ways. For more details and to report bugs, please see this module's <a href=\"https://github.com/davwillev/stopwatch\" target=\"_blank\">GitHub</a> page.",
+    "tt_description": "module_desc",
     
     "documentation": "README.md",
+    "tt_documentation": "module_docs",
 
     "framework-version": 3,
 
@@ -44,6 +47,7 @@
     "project-settings": [
         {
             "name": "Enable JavaScript debug logging",
+            "tt_name": "ps_enablejs",
             "key": "debug-js",
             "type": "checkbox"
         }
