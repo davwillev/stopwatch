@@ -89,6 +89,8 @@ Data from a stopwatch capturing multiple timepoints ('splits') or laps, by defau
 
 - `max_rows` - The maximum number of rows to show in the captures/laps table. Default = 0 (no limit).
 
+- `at_top` - Boolean (`true`|`false`) determining whether the stopwatch is shown vertically aligned at the top. The default is `true`.
+
 - `cumulated` (available in `lap` mode only) - Boolean (`true`|`false`). If set to `true`, an additional column with cumulated elapsed time will be shown.
 
 ### Format of the stored values
@@ -271,5 +273,6 @@ This module uses some code from Andy Martin (ActionTagHelper and other bits).
 
 Version | Description
 ------- | ---------------------
+v1.0.2  | Change: Multi-capture stopwatches are now located at the top of their container (to avoid movement of the widget when rows are added; this can be controlled with a new setting).
 v1.0.1  | Bug fixes: Lap cumulated time was not restored properly (this was a display issue only).
 v1.0.0  | Initial release.

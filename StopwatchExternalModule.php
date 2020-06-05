@@ -459,6 +459,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
                 $params["error"] = "Invalid value for 'only_once'.";
                 return $params;
             }
+            $params["at_top"] = isset($params["at_top"]) ? ($params["at_top"] == true) : true;
             if (!isset($params["display_format"])) {
                 $params["display_format"] = "/h/g/m/g/s" . ($params["digits"] > 0 ? "/d/f" : "");
             }

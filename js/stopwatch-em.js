@@ -210,6 +210,10 @@ function create(id, params, $tr, $input) {
     if (swd.id == params.target) {
         // Inset above input control.
         swd.$input.before($sw)
+        // For capture/lap mode, set vertical alignment of parent container to top.
+        if (params.at_top && (params.mode == 'lap' || params.mode == 'capture')) {
+            $input.parent().css('vertical-align','top')
+        }
     }
     else {
         $tr.find('td.labelrc').last().append($sw)

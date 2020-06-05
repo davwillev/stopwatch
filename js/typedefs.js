@@ -84,6 +84,7 @@
  *  repeating_laps: LapInfo[]
  *  repeating_captures: CaptureInfo[]
  *  error: string
+ *  at_top: boolean
  * }}
  */
 
