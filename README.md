@@ -2,6 +2,10 @@
 
 A REDCap External Module that provides a stopwatch widget that can be integrated into data entry forms or surveys. Results (elapsed time, times started/stopped) can be captured in a number of ways.
 
+## Bugs / Feature Requests
+
+In case of bugs, or for feature requests, please visit this module's [GitHub](https://github.com/davwillev/stopwatch) page and open an issue.
+
 ## Installation
 
 - Clone this repo into `<redcap-root>/modules/stopwatch_v<version-number>`, or
@@ -274,6 +278,6 @@ This module uses some code from Andy Martin (ActionTagHelper and other bits).
 
 Version | Description
 ------- | ---------------------
-v1.0.2  | Change: Multi-capture stopwatches are now located at the top of their container (to avoid movement of the widget when rows are added; this can be controlled with a new setting).<br>New feature: The laps/captures index can now be mapped when storing data in a repeating instrument.
+v1.0.2  | Change: Multi-capture stopwatches are now located at the top of their container (to avoid movement of the widget when rows are added; this can be controlled with a new setting).<br>New feature: The laps/captures index can now be mapped when storing data in a repeating instrument.<br>Misc: Added GitHub link to byline and README.
 v1.0.1  | Bug fixes: Lap cumulated time was not restored properly (this was a display issue only).
 v1.0.0  | Initial release.
