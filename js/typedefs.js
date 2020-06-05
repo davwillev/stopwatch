@@ -13,6 +13,14 @@
  *  fields: Object<string, StopwatchParams>
  *  debug: boolean
  *  survey: boolean
+ *  messages: StopwatchMessages
+ * }}
+ */
+
+ /**
+ * @typedef StopwatchMessages
+ * @type {{
+ *  error_overflow: string
  * }}
  */
 

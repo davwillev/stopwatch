@@ -287,8 +287,8 @@ function updateHourglass(swd) {
 function insertElapsed(swd) {
     // Hard time_mm_ss limit (59:59)?
     if (swd.params.is_mm_ss && swd.elapsed > 3599499) {
-        // TODO: tt-fy, nicer alert
-        alert('Elapsed times > 59:59 cannot be inserted! Reseting to stored value (or blank).')
+        // TODO: nicer alert
+        alert(DTO.messages.error_overflow) //= Elapsed times > 59:59 cannot be inserted! Reseting to stored value (or blank).
         var val = swd.$input.val().toString()
         var result = parseValue(swd, val)
         set(swd, result)
