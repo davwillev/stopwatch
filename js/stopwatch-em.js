@@ -494,10 +494,6 @@ function start(swd) {
         if (!swd.currentLap) {
             lap(swd, now, false)
         } 
-        else {
-            // need to increment number of stops
-            swd.currentLap.num_stops++
-        }
         // Update UI.
         swd.$rclBtn.prop('disabled', false)
         swd.$rclBtn.html(params.label_lap)
