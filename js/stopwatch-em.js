@@ -66,6 +66,8 @@ function log() {
  */
 function setup() {
     log('Stopwatch EM - Initializing:', DTO)
+    // Anything to do?
+    if (Object.keys(DTO.fields).length == 0) return
     // Get missing data codes.
     // @ts-ignore
     if (Array.isArray(missing_data_codes)) MDC = missing_data_codes
@@ -84,6 +86,30 @@ function setup() {
             if ($tr.length && $input.length) {
                 create(field, params, $tr, $input)
             }
+        }
+    })
+    // Focus capture
+    $('input.stopwatch-em-focus-capture')
+        .prop('disabled', true)
+        .fadeTo(0, 0)
+        .first().prop('disabled', false).focus(function() {
+            var $fc = $(this)
+            $fc.parent().find('button.stopwatch-em-startstop').focus()
+            $fc.prop('disabled', true)
+        })
+    var setFocus = true
+    $('#form').find('tr[sq_id]').each(function() {
+        if (setFocus) {
+            var $tr = $(this)
+            if ($tr.hasClass('@READONLY')) return
+            if ($tr.hasClass('@HIDDEN')) return
+            if ($tr.hasClass('@HIDDEN-SURVEY') && location.href.includes('/surveys/')) return
+            if ($tr.hasClass('@HIDDEN-FORM') && location.href.includes('/DataEntry/')) return
+            var $fc = $tr.find('input, textarea, select, button, a.fileuploadlink').not('[disabled]').not('[type=hidden]')
+            if ($fc.length) {
+                $fc.first().focus()
+                setFocus = false
+            } 
         }
     })
     // Locked data entry form?
@@ -196,6 +222,11 @@ function create(id, params, $tr, $input) {
         var val = $input.val().toString()
         var result = parseValue(swd, val)
         set(swd, result)
+    })
+    // Handle focus
+    $sw.focusin(function() {
+        $('tr[sq_id] td').removeClass('greenhighlight')
+        $('tr[sq_id="' + swd.id + '"] td').addClass('greenhighlight')
     })
     // MDC resilience (it shamelessly hides any buttons, how dare it!).
     var mut = new MutationObserver(function() {
@@ -494,10 +525,6 @@ function start(swd) {
         if (!swd.currentLap) {
             lap(swd, now, false)
         } 
-        else {
-            // need to increment number of stops
-            swd.currentLap.num_stops++
-        }
         // Update UI.
         swd.$rclBtn.prop('disabled', false)
         swd.$rclBtn.html(params.label_lap)
@@ -649,6 +676,8 @@ function reset(swd) {
     updateDisplay(swd)
     updateHourglass(swd)
     log('Stopwatch [' + swd.id + '] has been reset.')
+    // Put focus on start/stop/resume
+    swd.$srsBtn.focus()
 }
 
 /**
