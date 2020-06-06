@@ -281,7 +281,8 @@ function hideTarget(swd) {
  * @param {string} elementType The type of the nested element to get.
  * @returns {JQuery} The jQuery representation of the template's content.
  */
-function getTemplate(name, elementType = 'div') {
+function getTemplate(name, elementType) {
+    if (typeof elementType == 'undefined' || elementType === null) elementType = 'div'
     // @ts-ignore
     return $('[data-stopwatch-em-template=' + name + ']').find(elementType).first().clone()
 }
