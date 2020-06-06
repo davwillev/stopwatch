@@ -187,6 +187,7 @@ class StopwatchExternalModule extends AbstractExternalModule {
             </script>
             <div style="display:none;" data-stopwatch-em-template="stopwatch-basic">
                 <div class="stopwatch-em stopwatch-em-container" aria-label="Stopwatch EM">
+                    <input type="text" class="stopwatch-em-focus-capture" style="position:absolute;right:0;top:0;width:1px;opacity:0" />
                     <div class="input-group input-group-sm">
                         <div class="input-group-prepend">
                             <div class="input-group-text"><i class="fas fa-hourglass-start stopwatch-em-hourglass"></i></div>
