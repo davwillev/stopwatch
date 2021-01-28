@@ -431,6 +431,7 @@ class Project
         // Use REDCap's Project class to get some of the data. Specifically, unique event names are not in the backend database.
         $proj = new \Project($pid);
         $proj->getUniqueEventNames();
+        $proj->getRepeatingFormsEvents();
 
         // Prepare return data structure.
         $ps = array(
@@ -444,60 +445,55 @@ class Project
         );
 
         // Gather data - arms, events, forms.
-        // Some of this might be extractable from $proj, but this is just easier.
-        $result = $this->framework->query('
-            select a.arm_id, m.event_id, f.form_name
-            from redcap_events_arms a
-            join redcap_events_metadata m
-            on a.arm_id = m.arm_id and a.project_id = ?
-            join redcap_events_forms f
-            on f.event_id = m.event_id
-        ', $pid);
-        while ($row = $result->fetch_assoc()) {
-            $ps["arms"][$row["arm_id"]]["id"] = $row["arm_id"];
-            $ps["arms"][$row["arm_id"]]["events"][$row["event_id"]] = array(
-                "id" => $row["event_id"],
-                "name" => $proj->uniqueEventNames[$row["event_id"]]
-            );
-            $ps["arms"][$row["arm_id"]]["forms"][$row["form_name"]] = array(
-                "name" => $row["form_name"]
-            );
-            $ps["events"][$row["event_id"]]["id"] = $row["event_id"];
-            $ps["events"][$row["event_id"]]["name"] = $proj->uniqueEventNames[$row["event_id"]];
-            $ps["events"][$row["event_id"]]["repeating"] = false;
-            $ps["events"][$row["event_id"]]["arm"] = $row["arm_id"];
-            $ps["events"][$row["event_id"]]["forms"][$row["form_name"]] = array(
-                "name" => $row["form_name"],
-                "repeating" => false
-            );
-            $ps["forms"][$row["form_name"]]["name"] = $row["form_name"];
-            $ps["forms"][$row["form_name"]]["repeating"] = false;
-            $ps["forms"][$row["form_name"]]["repeating_event"] = false;
-            $ps["forms"][$row["form_name"]]["arms"][$row["arm_id"]] = array(
-                "id" => $row["arm_id"]
-            );
-            $ps["forms"][$row["form_name"]]["events"][$row["event_id"]] = array(
-                "id" => $row["event_id"],
-                "name" => $proj->uniqueEventNames[$row["event_id"]],
-                "repeating" => false
-            );
+        foreach ($proj->events as $this_arm) {
+            $this_arm_id = $this_arm["id"];
+            $ps["arms"][$this_arm_id]["id"] = $this_arm_id;
+            $ps["arms"][$this_arm_id]["events"] = array();
+            $ps["arms"][$this_arm_id]["forms"] = array();
+            foreach ($this_arm["events"] as $this_event_id => $this_event) {
+                $ps["arms"][$this_arm_id]["events"][$this_event_id] = array (
+                    "id" => $this_event_id,
+                    "name" => $proj->uniqueEventNames[$this_event_id]
+                );
+                $ps["events"][$this_event_id]["id"] = $this_event_id;
+                $ps["events"][$this_event_id]["name"] = $proj->uniqueEventNames[$this_event_id];
+                $ps["events"][$this_event_id]["repeating"] = false;
+                $ps["events"][$this_event_id]["arm"] = $this_arm_id;
+                foreach ($proj->eventsForms[$this_event_id] as $this_form) {
+                    $ps["arms"][$this_arm_id]["forms"][$this_form] = array (
+                        "name" => $this_form
+                    );
+                    $ps["events"][$this_event_id]["forms"][$this_form] = array (
+                        "name" => $this_form,
+                        "repeating" => false
+                    );
+                    $ps["forms"][$this_form]["name"] = $this_form;
+                    $ps["forms"][$this_form]["repeating"] = false;
+                    $ps["forms"][$this_form]["repeating_event"] = false;
+                    $ps["forms"][$this_form]["arms"][$this_arm_id] = array(
+                        "id" => $this_arm_id
+                    );
+                    $ps["forms"][$this_form]["events"][$this_event_id] = array(
+                        "id" => $this_event_id,
+                        "name" => $proj->uniqueEventNames[$this_event_id],
+                        "repeating" => false
+                    );
+                }
+            }
         }
-        // Gather data - fields. Again, this could be got from $proj, but this is more straightforward to process.
-        $result = $this->framework->query('
-            select field_name, form_name
-            from redcap_metadata
-            where project_id = ?
-            order by field_order asc
-        ', $pid);
-        while ($row = $result->fetch_assoc()) {
-            $ps["fields"][$row["field_name"]] = array(
-                "name" => $row["field_name"],
-                "form" => $row["form_name"],
+
+        // Gather data - fields.
+        foreach ($proj->metadata as $this_field_name => $this_field_info) {
+            $this_form = $this_field_info["form_name"];
+            $ps["fields"][$this_field_name] = array (
+                "name" => $this_field_name,
+                "form" => $this_form,
                 "repeating_form" => false,
-                "repeating_event" => false,
+                "repeating_event" => false
             );
-            $ps["forms"][$row["form_name"]]["fields"][] = $row["field_name"];
+            $ps["forms"][$this_form]["fields"][] = $this_field_name;
         }
+
         // Gather data - repeating forms, events.
         $repeating = $this->getRepeatingFormsEvents($pid);
         foreach ($repeating["forms"] as $eventId => $forms) {
