@@ -278,6 +278,7 @@ This module uses some code from Andy Martin (ActionTagHelper and other bits).
 
 Version | Description
 ------- | ---------------------
+v1.0.5  | Bugfix: The module would not work on classic projects (i.e. non-longitudinal and/or not having repeating forms/events).
 v1.0.4  | Bugfix: IE11 compatibility.
 v1.0.3  | Bugfix: Stops counter now works properly.<br>Enhancement: Better focus handling.
 v1.0.2  | Change: Multi-capture stopwatches are now located at the top of their container (to avoid movement of the widget when rows are added; this can be controlled with a new setting).<br>New feature: The laps/captures index can now be mapped when storing data in a repeating instrument.<br>Misc: Added GitHub link to byline and README.
