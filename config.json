@@ -1,57 +1,64 @@
 {
-	"name": "Stopwatch",
+    "name": "Stopwatch",
+    "tt_name": "module_name",
 
-	"namespace": "UoB\\Stopwatch",
+    "namespace": "DE\\RUB\\StopwatchExternalModule",
+    
+    "description": "A REDCap External Module that provides a stopwatch widget that can be integrated into data entry forms or surveys. Results (elapsed time, times started/stopped) can be captured in a number of ways. For more details and to report bugs, please see this module's <a href=\"https://github.com/davwillev/stopwatch\" target=\"_blank\">GitHub</a> page.",
+    "tt_description": "module_desc",
+    
+    "documentation": "README.md",
+    "tt_documentation": "module_docs",
 
-	"description": "A stopwatch field that captures the value of a time interval with millisecond accuracy, as the timer is running (via the 'capture' button) or when the timer is stopped (via the 'stop' button'), which can be reset (via the 'reset' button).",
+    "framework-version": 3,
 
-	"documentation": "README.md",
+    "authors": [
+        {
+            "name": "Günther Rezniczek",
+            "email": "guenther.rezniczek@rub.de",
+            "institution": "Ruhr-Universität Bochum"
+        },
+        {
+            "name": "David W. Evans",
+            "email": "d.w.evans@bham.ac.uk",
+            "institution": "University of Birmingham"
+        },
+        {
+            "name": "Nadege Haouidji-Javaux",
+            "email": "n.c.haouidji-javaux@bham.ac.uk",
+            "institution": "University of Birmingham"
+        }
+    ],
 
-	"authors": [		{
-			"name": "Nadege Haouidji-Javayx",
-			"email": "n.c.haouidji-javaux@bham.ac.uk",
-			"institution": "University of Birmingham"
-		},		{
-			"name": "David W. Evans",
-			"email": "d.w.evans@bham.ac.uk",
-			"institution": "University of Birmingham"
-		}
-	],
+    "permissions": [
+        "redcap_every_page_top",
+        "redcap_data_entry_form",
+        "redcap_survey_page",
+        "redcap_save_record"
+    ],
 
-	"permissions": [
+    "enable-every-page-hooks-on-system-pages": false,
 
-		"redcap_save_record",
-		"redcap_data_entry_form"
-	],
-	
-	"enable-every-page-hooks-on-system-pages":false,	
+    "links": {
+        "project": [],
+        "control-center": []
+    },
 
-	"links": {
-		"project": [
-		],
-		"control-center": [
-		]
-	},
+    "project-settings": [
+        {
+            "name": "Enable JavaScript debug logging",
+            "tt_name": "ps_enablejs",
+            "key": "debug-js",
+            "type": "checkbox"
+        }
+    ],
 
-	"no-auth-pages": [
-		"public-page"
-	],
+    "system-settings": [],
 
-	"project-settings": [
-
-	],
-
-	"system-settings": [
-
-	],
-
-	"crons": [
-	],
-
-	"compatibility": {
-		"php-version-min": "5.4.0",
-		"php-version-max": "",
-		"redcap-version-min": "8.0.0",
-		"redcap-version-max": ""
-	}
+    "compatibility": {
+        "php-version-min": "5.6.0",
+        "php-version-max": "",
+        "redcap-version-min": "9.5.0",
+        "redcap-version-max": ""
+    }
 }
