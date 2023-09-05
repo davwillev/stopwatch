@@ -112,9 +112,10 @@ class Record
         // Verify record / instance exists.
         $event_id = $this->project->getEventId($event);
         $project_id = $this->project->getProjectId();
+        $data_table = method_exists('\REDCap', 'getDataTable') ? \REDCap::getDataTable($project_id) : "redcap_data"; 
         $form = $this->project->getFormByField($fields[0]);
         $sql = "SELECT COUNT(*) AS `count`
-                FROM redcap_data
+                FROM $data_table
                 WHERE `project_id` = ? AND
                       `event_id`= ? AND
                       `record` = ? AND ";
@@ -344,15 +345,17 @@ class Record
             $this->project->isFormRepeating($form, $event) &&
             $this->project->hasEvent($event)) {
             $event_id = $this->project->getEventId($event);
+            $project_id = $this->project->getProjectId();
+            $data_table = method_exists('\REDCap', 'getDataTable') ? \REDCap::getDataTable($project_id) : "redcap_data"; 
             $sql = "
                 SELECT COUNT(*) as `count` 
-                FROM redcap_data 
+                FROM $data_table 
                 WHERE `project_id` = ? AND 
                       `event_id` = ? AND 
                       `record` = ? AND 
                       `field_name` = ?";
             $result = $this->framework->query($sql, [
-                $this->project->getProjectId(),
+                $project_id,
                 $event_id,
                 $this->record_id,
                 "{$form}_complete"
@@ -377,9 +380,11 @@ class Record
             $this->project->isFormRepeating($form, $event) &&
             $this->project->hasEvent($event)) {
             $event_id = $this->project->getEventId($event);
+            $project_id = $this->project->getProjectId();
+            $data_table = method_exists('\REDCap', 'getDataTable') ? \REDCap::getDataTable($project_id) : "redcap_data"; 
             $sql = "
                 SELECT IF(`instance` IS NULL, 1, `instance`) AS instance 
-                FROM redcap_data 
+                FROM $data_table 
                 WHERE `project_id` = ? AND 
                       `event_id` = ? AND 
                       `record` = ? AND 
@@ -387,7 +392,7 @@ class Record
                 ORDER BY instance DESC 
                 LIMIT 1";
             $result = $this->framework->query($sql, [
-                $this->project->getProjectId(),
+                $project_id,
                 $event_id,
                 $this->record_id,
                 "{$form}_complete"
