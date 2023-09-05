@@ -13,6 +13,6 @@
 		}
 	],
 	"settings": {
-		"breadcrumbs.icons": true
+		"php.suggest.basic": false
 	}
 }
