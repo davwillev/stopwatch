@@ -1,3 +1,6 @@
+**Note: This EM is now maintained in [this fork](https://github.com/grezniczek/stopwatch/).**
+
+
 # Stopwatch
 
 A REDCap External Module that provides a stopwatch widget that can be integrated into data entry forms or surveys. Results (elapsed time, times started/stopped) can be captured in a number of ways.
